@@ -27,6 +27,15 @@ jobs:
         id: version
         run: echo "VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')" >> $GITHUB_OUTPUT
 
+      - name: Verify package.json version matches tag
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${{ steps.version.outputs.VERSION }}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
+            exit 1
+          fi
+
       - name: Build Firefox and Chrome packages
         run: node scripts/build.js ${{ steps.version.outputs.VERSION }}
 
@@ -46,6 +55,20 @@ jobs:
             dist/glimpser-${{ steps.version.outputs.VERSION }}-chrome.crx
           rm -f /tmp/crx_key.pem
 
+      - name: Generate checksums
+        run: |
+          cd dist
+          sha256sum glimpser-${{ steps.version.outputs.VERSION }}-firefox.xpi > glimpser-${{ steps.version.outputs.VERSION }}-firefox.xpi.sha256
+          sha256sum glimpser-${{ steps.version.outputs.VERSION }}-firefox.zip > glimpser-${{ steps.version.outputs.VERSION }}-firefox.zip.sha256
+          sha256sum glimpser-${{ steps.version.outputs.VERSION }}-chrome.crx > glimpser-${{ steps.version.outputs.VERSION }}-chrome.crx.sha256
+          sha256sum glimpser-${{ steps.version.outputs.VERSION }}-chrome.zip > glimpser-${{ steps.version.outputs.VERSION }}-chrome.zip.sha256
+
+      - name: Upload build artifacts (for debugging)
+        uses: actions/upload-artifact@v4
+        with:
+          name: glimpser-${{ steps.version.outputs.VERSION }}-dist
+          path: dist/
+
       - name: Create GitHub Release and upload artifacts
         uses: softprops/action-gh-release@v2
         with:
@@ -57,3 +80,7 @@ jobs:
             dist/glimpser-${{ steps.version.outputs.VERSION }}-chrome.crx
             dist/glimpser-${{ steps.version.outputs.VERSION }}-firefox.zip
             dist/glimpser-${{ steps.version.outputs.VERSION }}-chrome.zip
+            dist/glimpser-${{ steps.version.outputs.VERSION }}-firefox.xpi.sha256
+            dist/glimpser-${{ steps.version.outputs.VERSION }}-firefox.zip.sha256
+            dist/glimpser-${{ steps.version.outputs.VERSION }}-chrome.crx.sha256
+            dist/glimpser-${{ steps.version.outputs.VERSION }}-chrome.zip.sha256
