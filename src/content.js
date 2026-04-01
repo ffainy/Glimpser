@@ -120,7 +120,7 @@ function applyContentTheme(theme) {
  */
 function applyContentCorners(corners) {
   if (_overlay) {
-    _overlay.style.setProperty('--gs-overlay-radius', corners === 'square' ? '0px' : '8px');
+    _overlay.style.setProperty('--overlay-radius', corners === 'square' ? '0px' : '8px');
   }
 }
 
