@@ -3,6 +3,25 @@
 // enabling user-selectable language independent of browser locale.
 
 let _messages = {};
+let _debug = false;
+
+function _dlog(...args) {
+  if (_debug) {
+    console.log('[Glimpser]', ...args);
+  }
+}
+
+async function _loadDebugFlag() {
+  try {
+    const nativeAPI = typeof browser !== 'undefined' ? browser : (typeof chrome !== 'undefined' ? chrome : null);
+    const { debug } = nativeAPI
+      ? await nativeAPI.storage.sync.get({ debug: false })
+      : { debug: false };
+    _debug = !!debug;
+  } catch (e) {
+    _debug = false;
+  }
+}
 
 /**
  * Detect locale from browser language.
@@ -22,6 +41,7 @@ let _i18nLang = _detectBrowserLang();
  * @returns {Promise<void>}
  */
 async function loadMessages(lang) {
+  await _loadDebugFlag();
   const nativeAPI = typeof browser !== 'undefined' ? browser : (typeof chrome !== 'undefined' ? chrome : null);
   const validLang = (lang === 'zh_CN' || lang === 'zh') ? 'zh_CN' : 'en';
   _i18nLang = validLang;
@@ -37,7 +57,9 @@ async function loadMessages(lang) {
     for (const [k, v] of Object.entries(json)) {
       _messages[k] = v.message || k;
     }
+    _dlog('i18n loaded', validLang);
   } catch (e) {
+    _dlog('i18n load failed', validLang, e);
     // Fallback to English if load fails
     if (validLang !== 'en') {
       await loadMessages('en');

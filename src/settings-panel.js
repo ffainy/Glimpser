@@ -42,6 +42,10 @@
       themeLight:     'Light',
       hintThemeDark:  'Dark background — easier on the eyes in low light.',
       hintThemeLight: 'Light background — matches bright pages.',
+      labelDebug:     'Debug logging',
+      debugOn:        'On',
+      debugOff:       'Off',
+      hintDebug:      'Write diagnostic logs to the console.',
       labelCorners:   'Window corners',
       cornersRounded: 'Rounded',
       cornersSquare:  'Square',
@@ -92,6 +96,10 @@
       themeLight:     '浅色',
       hintThemeDark:  '深色背景，适合低光环境。',
       hintThemeLight: '浅色背景，与亮色页面更协调。',
+      labelDebug:     '调试日志',
+      debugOn:        '开启',
+      debugOff:       '关闭',
+      hintDebug:      '将诊断日志输出到控制台。',
       labelCorners:   '窗口圆角',
       cornersRounded: '圆角',
       cornersSquare:  '直角',
@@ -141,6 +149,7 @@
     theme:              null,
     corners:            'rounded',
     controlBarSide:     'right',
+    debug:              false,
   };
 
   // ── Panel singleton ────────────────────────────────────────────────────
@@ -306,6 +315,17 @@
         document.body.setAttribute('data-dp-theme', v);
       }
     })));
+
+    // Debug logging
+    tab.appendChild(_makeCard(_t('labelDebug'), () => {
+      const wrap = document.createDocumentFragment();
+      wrap.appendChild(_makeOptionGroup([
+        { label: _t('debugOn'),  value: true  },
+        { label: _t('debugOff'), value: false },
+      ], _settings?.debug ?? false, v => { _settings.debug = v; }));
+      wrap.appendChild(_makeHint(_t('hintDebug')));
+      return wrap;
+    }));
 
     // Corners
     tab.appendChild(_makeCard(_t('labelCorners'), () => {
@@ -605,9 +625,15 @@
       statusEl.textContent = _t('saved');
       statusEl.className = 'gs-status visible';
       setTimeout(() => { statusEl.className = 'gs-status'; }, 2000);
+      if (_settings?.debug) {
+        console.log('[Glimpser]', 'settings saved');
+      }
     } catch (e) {
       statusEl.textContent = _t('saveFailed');
       statusEl.className = 'gs-status visible error';
+      if (_settings?.debug) {
+        console.log('[Glimpser]', 'settings save failed', e);
+      }
     }
   }
 

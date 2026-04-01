@@ -24,6 +24,7 @@ const DEFAULT_SETTINGS = {
   theme: null,
   corners: 'rounded',
   controlBarSide: 'right',
+  debug: false,
 };
 
 /**
@@ -188,6 +189,16 @@ function _removeDragHandlers() {
  */
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+function _isDebugEnabled() {
+  return !!(_settings && _settings.debug);
+}
+
+function _dlog(...args) {
+  if (_isDebugEnabled()) {
+    console.log('[Glimpser]', ...args);
+  }
 }
 
 /**
@@ -364,6 +375,7 @@ async function initGlimpser() {
   // Load user settings, falling back to defaults on failure
   const settings = await loadSettings();
   _settings = settings;
+  _dlog('settings loaded', _settings);
   await applyLangPref(settings.language);
 
   // Inject Modal overlay DOM structure
@@ -392,12 +404,14 @@ async function initGlimpser() {
     hideLoadingSpinner();
     state.isLoading = false;
     _iframe.classList.add('loaded');
+    _dlog('iframe loaded', _iframe.src);
   };
 
   _iframe.onerror = () => {
     hideLoadingSpinner();
     _errorMsg.style.display = '';
     _errorMsg.textContent = t('errorLoadFailed');
+    _dlog('iframe error', _iframe.src);
   };
 
   // Bind ESC key to close Modal
@@ -484,6 +498,7 @@ function openModal(url, stateObj, settingsObj) {
   stateObj.isLoading = true;
 
   showLoadingSpinner();
+  _dlog('modal opened', url);
 }
 
 /**
@@ -506,10 +521,18 @@ function handleDrop(event, state, dropZone) {
     event.dataTransfer.getData('URL') ||
     event.dataTransfer.getData('text/plain');
 
+  if (_isDebugEnabled() && event.dataTransfer) {
+    _dlog('drop data', {
+      types: Array.from(event.dataTransfer.types || []),
+      hasDraggedLink: !!state.draggedLink,
+    });
+  }
+
   if (validateURL(url)) {
     openModal(url, state, _settings || DEFAULT_SETTINGS);
   } else {
     console.warn(t('warnInvalidUrl'));
+    _dlog('drop ignored: invalid url', url);
   }
 
   state.draggedLink = null;
@@ -694,6 +717,7 @@ function closeModal() {
 
   state.isVisible = false;
   state.currentUrl = null;
+  _dlog('modal closed');
 
   setTimeout(() => {
     if (_iframe) {
@@ -722,6 +746,9 @@ if (typeof exports === 'undefined') {
       newSettings[key] = newValue;
     }
     _settings = { ...(_settings || DEFAULT_SETTINGS), ...newSettings };
+    if (Object.prototype.hasOwnProperty.call(newSettings, 'debug')) {
+      _dlog('debug logging updated', _settings.debug);
+    }
     if (newSettings.theme) {
       applyContentTheme(newSettings.theme);
     }

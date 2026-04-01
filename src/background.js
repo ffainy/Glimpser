@@ -5,6 +5,23 @@
 // 跨浏览器兼容 API 对象
 const nativeAPI = typeof browser !== 'undefined' ? browser : chrome;
 
+let _debug = false;
+
+async function _loadDebugFlag() {
+  try {
+    const { debug } = await nativeAPI.storage.sync.get({ debug: false });
+    _debug = !!debug;
+  } catch (e) {
+    _debug = false;
+  }
+}
+
+function _dlog(...args) {
+  if (_debug) {
+    console.log('[Glimpser]', ...args);
+  }
+}
+
 /**
  * 注册 declarativeNetRequest 动态规则，移除 sub_frame 请求的
  * X-Frame-Options 和 Content-Security-Policy 响应头。
@@ -33,15 +50,36 @@ async function updateHeaderRules(api = nativeAPI) {
       removeRuleIds: [1],
       addRules: [rule]
     });
-    console.log('响应头净化规则已激活');
+    _dlog('header rules active');
+    try {
+      const rules = await api.declarativeNetRequest.getDynamicRules();
+      const hasRule = Array.isArray(rules) && rules.some(r => r.id === 1);
+      _dlog('header rules verified', hasRule ? 'present' : 'missing');
+    } catch (verifyErr) {
+      _dlog('header rules verify failed', verifyErr);
+    }
   } catch (error) {
     console.error('规则注册失败: ' + error);
+    _dlog('header rules failed', error);
   }
 }
 
 // 扩展安装或更新时注册规则
 nativeAPI.runtime.onInstalled.addListener(() => {
+  _loadDebugFlag();
   updateHeaderRules();
+});
+
+// Load debug flag on startup (MV3 service worker restart / MV2 background load)
+nativeAPI.runtime.onStartup?.addListener(() => {
+  _loadDebugFlag();
+});
+
+// Keep debug flag in sync with settings
+nativeAPI.storage.onChanged.addListener((changes) => {
+  if (Object.prototype.hasOwnProperty.call(changes, 'debug')) {
+    _debug = !!changes.debug.newValue;
+  }
 });
 
 /**
@@ -49,6 +87,7 @@ nativeAPI.runtime.onInstalled.addListener(() => {
  * 若失败（特殊页面无法注入 content script），则打开 popup.html 作为兜底。
  */
 nativeAPI.action.onClicked.addListener(async (tab) => {
+  _dlog('action clicked', { tabId: tab?.id, url: tab?.url });
   try {
     await nativeAPI.tabs.sendMessage(tab.id, { action: 'toggleSettings' });
   } catch (e) {
