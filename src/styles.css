@@ -1,0 +1,763 @@
+﻿/* styles.css — Unified Shadow DOM stylesheet for all Glimpser UI
+   Shared by: content.js (drop zone / modal) and settings-panel.js (settings panel)
+   Both inject this file into their respective shadow roots via fetch().
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── 1. Shadow DOM reset ─────────────────────────────────────────────────── */
+/* Must come first — resets inherited page styles before we define our own.   */
+:host {
+  all: initial;
+  display: contents;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 2. Global tokens ────────────────────────────────────────────────────── */
+/* Primitive values only. Everything else is derived from these.              */
+:host {
+  /* Color primitives — stored as R G B channels for use with rgb() / rgba()  */
+  --c-green:   54 170 109;   /* brand green  #36aa6d */
+  --c-black:   0 0 0;
+  --c-white:   255 255 255;
+  --c-grey:    128 128 128;
+  --c-red:     239 68 68;
+
+  /* Typography */
+  --font:      -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --fs-base:   14px;
+  --fs-xs:     calc(var(--fs-base) - 2px);   /* 12px */
+  --fs-sm:     calc(var(--fs-base) - 1px);   /* 13px */
+  --fs-md:     calc(var(--fs-base) + 2px);   /* 16px */
+  --fs-lg:     calc(var(--fs-base) + 4px);   /* 18px */
+
+  /* Shape */
+  --r-sm:      8px;
+  --r-md:      12px;
+  --r-lg:      16px;
+
+  /* Easing */
+  --ease:      cubic-bezier(0.23, 1, 0.32, 1);
+  --t-fast:    0.15s ease;
+  --t-base:    0.2s ease;
+  --t-slow:    0.45s var(--ease);
+
+  /* z-index */
+  --z-backdrop: 2147483646;
+  --z-overlay:  2147483647;
+
+  /* Blur */
+  --blur:       10px;                        /* base                */
+  --blur-sm:    calc(var(--blur) * 0.4);     /* 4px  — overlays     */
+  --blur-md:    calc(var(--blur) * 1.2);     /* 12px — drop zone    */
+  --blur-lg:    calc(var(--blur) * 2);       /* 20px — panel glass  */
+}
+
+/* ── 3. Theme tokens ─────────────────────────────────────────────────────── */
+/* Semantic tokens derived from primitives. Only these change between themes. */
+
+:host([data-dp-theme="dark"]),
+[data-dp-theme="dark"] {
+  /* Surfaces */
+  --bg-page:       rgb(var(--c-black) / 0.6);          /* overlay backdrop   */
+  --bg-panel:      rgb(18 18 22 / 0.96);
+  --bg-card:       rgb(28 28 34 / 0.92);
+  --bg-inner:      rgb(var(--c-white) / 0.05);
+  --bg-inner-2:    rgb(var(--c-white) / 0.09);
+  --bg-modal:      #1a1a1a;
+
+  /* Borders */
+  --border:        rgb(var(--c-white) / 0.1);
+  --border-subtle: rgb(var(--c-grey) / 0.45);
+
+  /* Text */
+  --text:          rgb(var(--c-white) / 0.9);
+  --text-dim:      rgb(var(--c-white) / 0.5);
+
+  /* Accent (green) */
+  --accent:        rgb(var(--c-green));
+  --accent-glow:   rgb(var(--c-green) / 0.25);
+  --accent-hover:  rgb(var(--c-green) / 0.15);
+  --accent-fill:   rgb(var(--c-green) / 0.92);
+
+  /* Shadows */
+  --shadow-panel:  0 24px 80px rgb(var(--c-black) / 0.7),
+                   0 0 0 1px rgb(var(--c-white) / 0.06);
+  --shadow-modal:  0 8px 40px rgb(var(--c-black) / 0.45);
+  --shadow-zone:   0 4px 24px rgb(var(--c-black) / 0.5);
+
+  /* Error */
+  --error-bg:      rgb(var(--c-red) / 0.1);
+  --error-border:  rgb(var(--c-red) / 0.4);
+  --error-text:    #f87171;
+
+  /* Control bar buttons */
+  --btn-bg:        rgb(var(--c-black) / 0.6);
+  --btn-color:     rgb(var(--c-white) / 0.9);
+  --btn-hover-bg:  rgb(var(--c-black) / 0.85);
+
+  /* Drop zone */
+  --zone-bg:       rgb(24 24 24 / 0.72);
+  --zone-border:   rgb(var(--c-grey) / 0.45);
+  --zone-text:     rgb(var(--c-green));
+  --zone-hover-bg: rgb(var(--c-green) / 0.92);
+  --zone-hover-bd: rgb(var(--c-green));
+  --zone-hover-tx: rgb(var(--c-black) / 0.85);
+}
+
+:host([data-dp-theme="light"]),
+[data-dp-theme="light"] {
+  /* Surfaces */
+  --bg-page:       rgb(var(--c-black) / 0.35);
+  --bg-panel:      rgb(248 248 250 / 0.97);
+  --bg-card:       rgb(var(--c-white) / 0.9);
+  --bg-inner:      rgb(var(--c-black) / 0.04);
+  --bg-inner-2:    rgb(var(--c-black) / 0.07);
+  --bg-modal:      #f0f0f0;
+
+  /* Borders */
+  --border:        rgb(var(--c-black) / 0.1);
+  --border-subtle: rgb(var(--c-grey) / 0.35);
+
+  /* Text */
+  --text:          rgb(var(--c-black) / 0.85);
+  --text-dim:      rgb(var(--c-black) / 0.45);
+
+  /* Accent (green) */
+  --accent:        rgb(var(--c-green));
+  --accent-glow:   rgb(var(--c-green) / 0.18);
+  --accent-hover:  rgb(var(--c-green) / 0.1);
+  --accent-fill:   rgb(var(--c-green) / 0.92);
+
+  /* Shadows */
+  --shadow-panel:  0 24px 80px rgb(var(--c-black) / 0.2),
+                   0 0 0 1px rgb(var(--c-black) / 0.08);
+  --shadow-modal:  0 8px 40px rgb(var(--c-black) / 0.3);
+  --shadow-zone:   0 4px 20px rgb(var(--c-black) / 0.35);
+
+  /* Error */
+  --error-bg:      rgb(var(--c-red) / 0.08);
+  --error-border:  rgb(var(--c-red) / 0.35);
+  --error-text:    #b91c1c;
+
+  /* Control bar buttons */
+  --btn-bg:        rgb(var(--c-white) / 0.75);
+  --btn-color:     rgb(var(--c-black) / 0.75);
+  --btn-hover-bg:  rgb(var(--c-white) / 0.95);
+
+  /* Drop zone — always dark so it's visible on any page background */
+  --zone-bg:       rgb(24 24 24 / 0.68);
+  --zone-border:   rgb(var(--c-grey) / 0.4);
+  --zone-text:     rgb(var(--c-green));
+  --zone-hover-bg: rgb(var(--c-green) / 0.92);
+  --zone-hover-bd: rgb(var(--c-green));
+  --zone-hover-tx: rgb(var(--c-black) / 0.85);
+}
+
+/* ── 4. Drop Zone ────────────────────────────────────────────────────────── */
+
+#glimpser-zone {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-backdrop);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  background: var(--zone-bg);
+  backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(1.4);
+  border: 1.5px solid var(--zone-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-zone);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-base), background var(--t-fast), border-color var(--t-fast);
+}
+
+#glimpser-zone[data-position="bottom"] { bottom: 16px; }
+#glimpser-zone[data-position="top"]    { top: 16px; }
+
+#glimpser-zone.active  { opacity: 1; pointer-events: all; }
+
+#glimpser-zone.hovered {
+  background: var(--zone-hover-bg);
+  border-color: var(--zone-hover-bd);
+}
+
+#glimpser-zone .gs-drop-hint {
+  color: var(--zone-text);
+  font-size: var(--fs-base);
+  text-align: center;
+  padding: 0 12px;
+  width: 100%;
+}
+
+#glimpser-zone.hovered .gs-drop-hint { color: var(--zone-hover-tx); }
+
+/* ── 5. Fullscreen Drop Overlay ──────────────────────────────────────────── */
+
+#glimpser-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  background: rgb(var(--c-black) / 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-base);
+}
+
+#glimpser-fullscreen-overlay.active { opacity: 1; pointer-events: all; }
+
+#glimpser-fullscreen-overlay .gs-drop-hint {
+  color: var(--accent);
+  font-size: var(--fs-lg);
+}
+
+/* ── 6. Drop hint — shared base ──────────────────────────────────────────── */
+
+.gs-drop-hint {
+  font-family: var(--font);
+  font-weight: 500;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* ── 7. Modal overlay ────────────────────────────────────────────────────── */
+
+#glimpser-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-overlay);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--bg-modal);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--overlay-radius, var(--r-sm));
+  box-shadow: var(--shadow-modal);
+  overflow: visible;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-slow), background var(--t-base);
+  will-change: opacity, transform;
+}
+
+#glimpser-overlay.visible { opacity: 1; pointer-events: all; }
+
+#glimpser-overlay iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  border-radius: var(--overlay-radius, var(--r-sm));
+  opacity: 0;
+  transition: opacity var(--t-base);
+}
+
+#glimpser-overlay iframe.loaded { opacity: 1; }
+
+/* ── 8. Loading spinner ──────────────────────────────────────────────────── */
+
+.glimpser-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.glimpser-spinner svg { display: block; }
+.glimpser-spinner svg circle { fill: var(--accent); }
+
+/* ── 9. Error message ────────────────────────────────────────────────────── */
+
+.glimpser-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 16px 24px;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: var(--r-sm);
+  color: var(--error-text);
+  font-family: var(--font);
+  font-size: var(--fs-base);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ── 10. Control bar ─────────────────────────────────────────────────────── */
+
+.glimpser-control-bar {
+  position: absolute;
+  top: 12px;
+  right: -52px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.glimpser-control-bar.bar-left { right: auto; left: -52px; }
+
+.glimpser-control-bar button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: var(--font);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+
+.glimpser-control-bar button:hover { background: var(--btn-hover-bg); }
+
+/* ── 11. Modal backdrop ──────────────────────────────────────────────────── */
+
+#glimpser-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  background: var(--bg-page);
+  backdrop-filter: blur(var(--blur-sm));
+  -webkit-backdrop-filter: blur(var(--blur-sm));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-slow);
+}
+
+#glimpser-backdrop.visible { opacity: 1; pointer-events: all; }
+
+/* ── 12. Settings panel — overlay & shell ────────────────────────────────── */
+
+.gs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483640;
+  background: var(--bg-page);
+  backdrop-filter: blur(var(--blur-sm));
+  -webkit-backdrop-filter: blur(var(--blur-sm));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-slow);
+}
+
+.gs-overlay.visible { opacity: 1; pointer-events: all; }
+
+.gs-panel-shell {
+  position: relative;
+  display: flex;
+  width: 480px;
+  height: 68vh;
+  max-height: 600px;
+  min-height: 400px;
+  transform: scale(0.94) translateY(12px);
+  opacity: 0;
+  transition: transform var(--t-slow), opacity var(--t-base);
+}
+
+.gs-overlay.visible .gs-panel-shell {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* ── 13. Settings panel — tab nav ────────────────────────────────────────── */
+
+.gs-tab-nav {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+  background: var(--bg-panel);
+  backdrop-filter: blur(var(--blur-lg));
+  -webkit-backdrop-filter: blur(var(--blur-lg));
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  transition: width var(--t-slow);
+}
+
+.gs-tab-nav:hover { width: 148px; }
+
+.gs-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 9px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  color: var(--text-dim);
+  white-space: nowrap;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+
+.gs-tab-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+.gs-tab-label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition: opacity 0.1s linear, max-width var(--t-slow);
+}
+
+.gs-tab-nav:hover .gs-tab-label {
+  opacity: 1;
+  max-width: 120px;
+  transition: opacity 0.15s var(--ease) 0.15s, max-width var(--t-slow) 0.1s;
+}
+
+.gs-tab-btn:not(.active):hover {
+  background: var(--accent-hover);
+  color: var(--text);
+}
+
+.gs-tab-btn.active {
+  background: var(--accent);
+  color: rgb(var(--c-white));
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+
+/* ── 14. Settings panel — body ───────────────────────────────────────────── */
+
+.gs-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  backdrop-filter: blur(var(--blur-lg));
+  -webkit-backdrop-filter: blur(var(--blur-lg));
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.gs-panel-title {
+  padding: 22px 24px 18px;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-shadow: 0 0 20px var(--accent-glow);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.gs-panel-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 20px 8px;
+}
+
+.gs-panel-scroll::-webkit-scrollbar { width: 4px; }
+.gs-panel-scroll::-webkit-scrollbar-track { background: transparent; }
+.gs-panel-scroll::-webkit-scrollbar-thumb {
+  background: var(--accent-glow);
+  border-radius: 10px;
+}
+.gs-panel-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+.gs-panel-scroll { scrollbar-width: thin; scrollbar-color: var(--accent-glow) transparent; }
+
+/* ── 15. Settings panel — tab content ────────────────────────────────────── */
+
+.gs-tab-content { display: none; }
+
+@keyframes gs-tab-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.gs-tab-content.active {
+  display: block;
+  animation: gs-tab-in 0.2s var(--ease) both;
+}
+
+/* ── 16. Card ────────────────────────────────────────────────────────────── */
+
+.gs-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 18px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
+}
+
+.gs-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50px;
+  background: linear-gradient(to bottom, rgb(var(--c-green) / 0.06), transparent);
+  opacity: 0;
+  transition: opacity var(--t-base);
+  pointer-events: none;
+}
+
+.gs-card:hover {
+  border-color: rgb(var(--c-green) / 0.25);
+  box-shadow: 0 0 0 1px rgb(var(--c-green) / 0.1), 0 8px 24px rgb(var(--c-black) / 0.12);
+  transform: translateY(-1px);
+}
+
+.gs-card:hover::before { opacity: 1; }
+
+.gs-card-title {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+  text-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ── 17. Field label & hint ──────────────────────────────────────────────── */
+
+.gs-field-label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.gs-field-hint {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* ── 18. Option buttons ──────────────────────────────────────────────────── */
+
+.gs-option-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.gs-option-btn {
+  flex: 1;
+  min-width: 60px;
+  padding: 8px 10px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  font-family: var(--font);
+  text-align: center;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-inner);
+  color: var(--text-dim);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background var(--t-fast), border-color var(--t-fast),
+              color var(--t-fast), transform var(--t-base), box-shadow var(--t-base);
+}
+
+.gs-option-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(105deg, transparent 40%, rgb(var(--c-white) / 0.07) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0s;
+  pointer-events: none;
+}
+
+.gs-option-btn:hover {
+  background: var(--bg-inner-2);
+  border-color: rgb(var(--c-green) / 0.35);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgb(var(--c-black) / 0.1), 0 0 12px var(--accent-glow);
+}
+
+.gs-option-btn:hover::after { transform: translateX(100%); transition: transform 0.45s ease; }
+
+.gs-option-btn.active {
+  background: rgb(var(--c-green) / 0.12);
+  border-color: rgb(var(--c-green) / 0.5);
+  color: var(--accent);
+  box-shadow: inset 0 -2px 0 var(--accent), 0 0 10px var(--accent-glow);
+}
+
+.gs-option-btn.active:hover {
+  background: rgb(var(--c-green) / 0.18);
+  border-color: rgb(var(--c-green) / 0.7);
+}
+
+/* ── 19. Slider ──────────────────────────────────────────────────────────── */
+
+.gs-slider {
+  width: 100%;
+  height: 18px;
+  background: transparent;
+  outline: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.gs-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.gs-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: -5px;
+  border: none;
+  box-shadow: 0 0 6px var(--accent-glow);
+  transition: box-shadow var(--t-fast), transform var(--t-fast);
+}
+
+.gs-slider:hover::-webkit-slider-thumb {
+  box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent-glow);
+  transform: scale(1.15);
+}
+
+.gs-slider::-moz-range-track {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  border: none;
+}
+
+.gs-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--accent-glow);
+  transition: box-shadow var(--t-fast), transform var(--t-fast);
+}
+
+.gs-slider:hover::-moz-range-thumb {
+  box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent-glow);
+  transform: scale(1.15);
+}
+
+/* ── 20. Panel footer & buttons ──────────────────────────────────────────── */
+
+.gs-panel-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  background: linear-gradient(to top, rgb(var(--c-green) / 0.02), transparent);
+}
+
+.gs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 20px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: transform var(--t-base), box-shadow var(--t-base),
+              background var(--t-fast), border-color var(--t-fast);
+}
+
+.gs-btn:active { transform: scale(0.97); transition-duration: 0.08s; }
+
+.gs-btn-primary {
+  background: var(--accent);
+  color: rgb(var(--c-white));
+  border-color: var(--accent);
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+
+.gs-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--accent-glow), 0 0 0 1px var(--accent);
+}
+
+.gs-btn-secondary {
+  background: var(--bg-inner);
+  color: var(--text-dim);
+  border-color: var(--border);
+}
+
+.gs-btn-secondary:hover {
+  background: var(--bg-inner-2);
+  border-color: rgb(var(--c-green) / 0.35);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgb(var(--c-black) / 0.1);
+}
+
+/* ── 21. Status message ──────────────────────────────────────────────────── */
+
+.gs-status {
+  font-size: var(--fs-xs);
+  color: var(--accent);
+  margin-right: auto;
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+
+.gs-status.visible { opacity: 1; }
+.gs-status.error   { color: rgb(var(--c-red)); }

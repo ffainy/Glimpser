@@ -1,0 +1,11 @@
+﻿{
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "glimpser@extension",
+      "strict_min_version": "109.0"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

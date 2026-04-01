@@ -1,0 +1,50 @@
+﻿{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "version": "0.0.0",
+  "description": "__MSG_extDescription__",
+  "author": "farfaraway",
+  "homepage_url": "https://github.com/ffainy/glimpser",
+  "default_locale": "en",
+  "action": {
+    "default_title": "Glimpser"
+  },
+  "options_ui": {
+    "page": "settings.html",
+    "open_in_tab": true
+  },
+  "permissions": [
+    "declarativeNetRequest",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["i18n.js", "settings-panel.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "glimpser@extension",
+      "strict_min_version": "109.0"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["_locales/*", "styles.css"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
