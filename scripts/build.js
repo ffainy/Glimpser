@@ -26,13 +26,17 @@ const SOURCE_FILES = [
 ]
 const SOURCE_DIRS = ['icons', '_locales']
 
-// Version: CLI arg > env var > package.json > fallback
-const pkgVersion = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version
-const version = process.argv[2] || process.env.VERSION || pkgVersion || '0.0.0'
+function stripBom(content) {
+  return content.replace(/^\uFEFF/, '')
+}
 
 function readJSON(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+  return JSON.parse(stripBom(fs.readFileSync(filePath, 'utf8')))
 }
+
+// Version: CLI arg > env var > package.json > fallback
+const pkgVersion = readJSON(path.join(ROOT, 'package.json')).version
+const version = process.argv[2] || process.env.VERSION || pkgVersion || '0.0.0'
 
 function buildManifest(base, overlay, browser) {
   // Deep merge: overlay fields overwrite base fields
