@@ -4,3 +4,4 @@
 _temp
 .github/release-notes.md
 node_modules
+dist
