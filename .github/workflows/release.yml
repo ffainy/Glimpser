@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,6 +37,31 @@ jobs:
             echo "package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
             exit 1
           fi
+
+      - name: Generate changelog and release notes
+        run: node scripts/update-changelog.mjs --tag ${{ github.ref_name }}
+
+      - name: Commit changelog to default branch
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          cp CHANGELOG.md /tmp/CHANGELOG.md
+          cp .github/release-notes.md /tmp/release-notes.md
+          git fetch origin "$DEFAULT_BRANCH"
+          git switch -C "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"
+          cp /tmp/CHANGELOG.md CHANGELOG.md
+          cp /tmp/release-notes.md .github/release-notes.md
+
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "No changelog changes to commit"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "docs(changelog): update for ${{ github.ref_name }}"
+          git push origin "HEAD:$DEFAULT_BRANCH"
 
       - name: Build Firefox and Chrome packages
         run: node scripts/build.js ${{ steps.version.outputs.VERSION }}
@@ -74,7 +101,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Glimpser ${{ github.ref_name }}
-          generate_release_notes: true
+          body_path: .github/release-notes.md
           files: |
             dist/glimpser-${{ steps.version.outputs.VERSION }}-firefox.xpi
             dist/glimpser-${{ steps.version.outputs.VERSION }}-chrome.crx

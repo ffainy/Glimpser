@@ -1,3 +1,5 @@
 .vscode
 .kiro
 .secret
+_temp
+.github/release-notes.md
