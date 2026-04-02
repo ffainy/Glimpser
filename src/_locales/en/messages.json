@@ -3,13 +3,17 @@
   "extDescription":       { "message": "Drag links to a Drop Zone and preview them in a Modal iframe." },
 
   "btnClose":             { "message": "Close preview" },
+  "btnCloseOthers":       { "message": "Close other previews" },
+  "btnCloseAll":          { "message": "Close all previews" },
   "btnOpenCurrent":       { "message": "Open in current tab" },
   "btnOpenNewTab":        { "message": "Open in new tab" },
   "btnCopyUrl":           { "message": "Copy URL" },
+  "btnRefresh":           { "message": "Refresh preview" },
   "btnOpenSettings":      { "message": "Open settings" },
+  "toastCopySuccess":     { "message": "URL copied" },
 
   "dropHintZone":         { "message": "Drop link to preview" },
-  "dropHintFullscreen":   { "message": "Release to preview" },
+  "dropHintFullscreen":   { "message": "Release anywhere to create a preview window" },
 
   "errorLoadFailed":      { "message": "Failed to load page. Try opening in a new tab." },
   "warnInvalidUrl":       { "message": "Invalid URL, ignored." },
@@ -29,9 +33,6 @@
   "labelWidth":           { "message": "W" },
   "labelHeight":          { "message": "H" },
   "labelModalSize":       { "message": "Modal size" },
-  "modalSmall":           { "message": "Small (60vw × 65vh)" },
-  "modalMedium":          { "message": "Medium (75vw × 82vh)" },
-  "modalLarge":           { "message": "Large (full width)" },
   "labelActivation":      { "message": "Activation delay / distance" },
   "labelDelay":           { "message": "Delay" },
   "labelDistance":        { "message": "Distance" },

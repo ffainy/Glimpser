@@ -3,13 +3,17 @@
   "extDescription":       { "message": "将链接拖放到 Drop Zone，在 Modal 中快速预览目标页面。" },
 
   "btnClose":             { "message": "关闭预览" },
+  "btnCloseOthers":       { "message": "关闭其他预览" },
+  "btnCloseAll":          { "message": "关闭全部预览" },
   "btnOpenCurrent":       { "message": "在当前页面打开" },
   "btnOpenNewTab":        { "message": "在新标签页打开" },
   "btnCopyUrl":           { "message": "复制网址" },
+  "btnRefresh":           { "message": "刷新预览" },
   "btnOpenSettings":      { "message": "打开设置" },
+  "toastCopySuccess":     { "message": "网址已复制" },
 
   "dropHintZone":         { "message": "拖放链接以预览" },
-  "dropHintFullscreen":   { "message": "松开鼠标预览链接" },
+  "dropHintFullscreen":   { "message": "在任意位置松开以创建预览窗口" },
 
   "errorLoadFailed":      { "message": "页面加载失败，请尝试在新标签页中打开" },
   "warnInvalidUrl":       { "message": "无效 URL，已忽略" },
@@ -29,9 +33,6 @@
   "labelWidth":           { "message": "宽" },
   "labelHeight":          { "message": "高" },
   "labelModalSize":       { "message": "Modal 尺寸" },
-  "modalSmall":           { "message": "小 (60vw × 65vh)" },
-  "modalMedium":          { "message": "中 (75vw × 82vh)" },
-  "modalLarge":           { "message": "大 (全宽)" },
   "labelActivation":      { "message": "激活延迟 / 距离" },
   "labelDelay":           { "message": "延迟" },
   "labelDistance":        { "message": "距离" },

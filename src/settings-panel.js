@@ -1,4 +1,4 @@
-﻿// settings-panel.js — In-page settings panel (Shadow DOM)
+// settings-panel.js — In-page settings panel (Shadow DOM)
 // Injected by content.js; communicates with storage directly.
 
 /* global browser, chrome */
@@ -6,26 +6,36 @@
 (function () {
   'use strict';
 
+  if (window !== top) {
+    window.__gsSettingsPanel = {
+      toggle() {},
+      show() {},
+      hide() {},
+    };
+    return;
+  }
+
   const nativeAPI = typeof browser !== 'undefined' ? browser : chrome;
-  const HOST_ID   = 'glimpser-settings-host';
+  const HOST_ID   = 'gs-settings-host';
+  const BRAND_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0C4.492 2.746-.885 11.312.502 19.963C.502 19.963 4.989 24 12 24s11.496-4.037 11.496-4.037C24.882 11.312 19.508 2.746 12 0m0 1.846s2.032.726 3.945 2.488c.073.067.13.163.129.277c-.001.168-.128.287-.301.287a.5.5 0 0 1-.137-.027a6.5 6.5 0 0 0-2.316-.4a6.63 6.63 0 0 0-3.914 1.273l-.002.002a7.98 7.98 0 0 1 6.808.768C20.48 9.11 22.597 14.179 21.902 19c0 0-1.646 1.396-4.129 2.172a.37.37 0 0 1-.303-.026c-.144-.084-.185-.255-.1-.404a.5.5 0 0 1 .094-.103a6.6 6.6 0 0 0 1.504-1.809a6.63 6.63 0 0 0 .856-4.027l-.002-.002a7.95 7.95 0 0 1-3.838 5.383c-4.42 2.552-9.99 1.882-13.885-1.184c0 0-.388-2.124.182-4.662a.37.37 0 0 1 .176-.25c.145-.084.31-.033.396.117a.5.5 0 0 1 .045.13c.126.762.405 1.5.814 2.208a6.64 6.64 0 0 0 3.059 2.756a8 8 0 0 1-1.672-2.033a7.93 7.93 0 0 1-1.066-4.205C4.128 8.047 7.464 3.659 12 1.846m0 7.623c-2.726 0-5.117.93-6.483 2.332c-.064.32-.1.65-.1.984c0 3.146 2.947 5.695 6.583 5.695c3.635 0 6.584-2.549 6.584-5.695c0-.334-.038-.664-.102-.984C17.116 10.4 14.724 9.469 12 9.469m0 .693a3.12 3.12 0 0 1 0 6.238a3.118 3.118 0 0 1-2.872-4.336a1.3 1.3 0 1 0 1.657-1.656A3.1 3.1 0 0 1 12 10.162"/></svg>`;
 
   // ── Tab definitions ────────────────────────────────────────────────────
   const TABS = [
     {
       key: 'appearance',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14.4 3.419a.639.639 0 0 1 1.2 0l.61 1.668a9.59 9.59 0 0 0 5.703 5.703l1.668.61a.639.639 0 0 1 0 1.2l-1.668.61a9.59 9.59 0 0 0-5.703 5.703l-.61 1.668a.639.639 0 0 1-1.2 0l-.61-1.668a9.59 9.59 0 0 0-5.703-5.703l-1.668-.61a.639.639 0 0 1 0-1.2l1.668-.61a9.59 9.59 0 0 0 5.703-5.703zM8 16.675a.266.266 0 0 1 .5 0l.254.694a4 4 0 0 0 2.376 2.377l.695.254a.266.266 0 0 1 0 .5l-.695.254a4 4 0 0 0-2.376 2.377l-.254.694a.266.266 0 0 1-.5 0l-.254-.694a4 4 0 0 0-2.376-2.377l-.695-.254a.266.266 0 0 1 0-.5l.695-.254a4 4 0 0 0 2.376-2.377z"/></svg>',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14.4 3.419a.639.639 0 0 1 1.2 0l.61 1.668a9.59 9.59 0 0 0 5.703 5.703l1.668.61a.639.639 0 0 1 0 1.2l-1.668.61a9.59 9.59 0 0 0-5.703 5.703l-.61 1.668a.639.639 0 0 1-1.2 0l-.61-1.668a9.59 9.59 0 0 0-5.703-5.703l-1.668-.61a.639.639 0 0 1 0-1.2l1.668-.61a9.59 9.59 0 0 0 5.703-5.703zM8 16.675a.266.266 0 0 1 .5 0l.254.694a4 4 0 0 0 2.376 2.377l.695.254a.266.266 0 0 1 0 .5l-.695.254a4 4 0 0 0-2.376 2.377l-.254.694a.266.266 0 0 1-.5 0l-.254-.694a4 4 0 0 0-2.376-2.377l-.695-.254a.266.266 0 0 1 0-.5l.695-.254a4 4 0 0 0 2.376-2.377zM4.2.21a.32.32 0 0 1 .6 0l.305.833a4.8 4.8 0 0 0 2.852 2.852l.833.305a.32.32 0 0 1 0 .6l-.833.305a4.8 4.8 0 0 0-2.852 2.852L4.8 8.79a.32.32 0 0 1-.6 0l-.305-.833a4.8 4.8 0 0 0-2.852-2.852L.21 4.8a.32.32 0 0 1 0-.6l.833-.305a4.8 4.8 0 0 0 2.852-2.852z"/></svg>',
     },
     {
       key: 'dropzone',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m0 18a8 8 0 1 1 8-8a8 8 0 0 1-8 8m-1-5h2v2h-2zm0-8h2v6h-2z"/></svg>',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M2 3.75C2 2.784 2.784 2 3.75 2h16.5c.966 0 1.75.784 1.75 1.75v16.5A1.75 1.75 0 0 1 20.25 22H9.75a.75.75 0 0 1 0-1.5h10.5a.25.25 0 0 0 .25-.25V9h-17v3A.75.75 0 0 1 2 12ZM9 7.5h11.5V3.75a.25.25 0 0 0-.25-.25H9Zm-5.5 0h4v-4H3.75a.25.25 0 0 0-.25.25Z"/><path fill="currentColor" d="m9.308 14.5l-2.104-2.236a.75.75 0 1 1 1.092-1.028l3.294 3.5a.75.75 0 0 1 0 1.028l-3.294 3.5a.75.75 0 1 1-1.092-1.028L9.308 16H6.09a2.59 2.59 0 0 0-2.59 2.59v2.66a.75.75 0 0 1-1.5 0v-2.66a4.09 4.09 0 0 1 4.09-4.09z"/></svg>',
     },
     {
       key: 'preview',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h18v18H3zm2 2v14h14V5zm2 2h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/></svg>',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M11.063 1.456a1.75 1.75 0 0 1 1.874 0l8.383 5.316a1.75 1.75 0 0 1 0 2.956l-8.383 5.316a1.75 1.75 0 0 1-1.874 0L2.68 9.728a1.75 1.75 0 0 1 0-2.956Zm1.071 1.267a.25.25 0 0 0-.268 0L3.483 8.039a.25.25 0 0 0 0 .422l8.383 5.316a.25.25 0 0 0 .268 0l8.383-5.316a.25.25 0 0 0 0-.422Z"/><path fill="currentColor" d="M1.867 12.324a.75.75 0 0 1 1.035-.232l8.964 5.685a.25.25 0 0 0 .268 0l8.964-5.685a.75.75 0 0 1 .804 1.267l-8.965 5.685a1.75 1.75 0 0 1-1.874 0l-8.965-5.685a.75.75 0 0 1-.231-1.035"/><path fill="currentColor" d="M1.867 16.324a.75.75 0 0 1 1.035-.232l8.964 5.685a.25.25 0 0 0 .268 0l8.964-5.685a.75.75 0 0 1 .804 1.267l-8.965 5.685a1.75 1.75 0 0 1-1.874 0l-8.965-5.685a.75.75 0 0 1-.231-1.035"/></svg>',
     },
     {
       key: 'about',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M9.197 10a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5zm-2.382 4a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5zm-1.581 4a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5z"/><path fill="currentColor" d="M4.125 0h15.75a4.1 4.1 0 0 1 2.92 1.205A4.1 4.1 0 0 1 24 4.125c0 1.384-.476 2.794-1.128 4.16c-.652 1.365-1.515 2.757-2.352 4.104l-.008.013c-.849 1.368-1.669 2.691-2.28 3.97c-.614 1.283-.982 2.45-.982 3.503a2.625 2.625 0 1 0 4.083-2.183a.75.75 0 1 1 .834-1.247A4.126 4.126 0 0 1 19.875 24H4.5a4.125 4.125 0 0 1-4.125-4.125c0-2.234 1.258-4.656 2.59-6.902c.348-.586.702-1.162 1.05-1.728c.8-1.304 1.567-2.553 2.144-3.738H3.39c-.823 0-1.886-.193-2.567-1.035A3.65 3.65 0 0 1 0 4.125A4.125 4.125 0 0 1 4.125 0M15.75 19.875c0-1.38.476-2.786 1.128-4.15c.649-1.358 1.509-2.743 2.343-4.086l.017-.028c.849-1.367 1.669-2.692 2.28-3.972c.614-1.285.982-2.457.982-3.514A2.615 2.615 0 0 0 19.875 1.5a2.625 2.625 0 0 0-2.625 2.625c0 .865.421 1.509 1.167 2.009A.75.75 0 0 1 18 7.507H7.812c-.65 1.483-1.624 3.069-2.577 4.619c-.334.544-.666 1.083-.98 1.612c-1.355 2.287-2.38 4.371-2.38 6.137A2.625 2.625 0 0 0 4.5 22.5h12.193a4.1 4.1 0 0 1-.943-2.625M1.5 4.125c-.01.511.163 1.008.487 1.403c.254.313.74.479 1.402.479h12.86a3.65 3.65 0 0 1-.499-1.882a4.1 4.1 0 0 1 .943-2.625H4.125A2.625 2.625 0 0 0 1.5 4.125"/></svg>',
     },
   ];
 
@@ -50,10 +60,8 @@
       cornersRounded: 'Rounded',
       cornersSquare:  'Square',
       hintCorners:    'Controls the border-radius of the preview window.',
-      labelBarSide:   'Buttons side',
-      barRight:       'Right',
-      barLeft:        'Left',
-      hintBarSide:    'Which side the action buttons (close, open, copy…) float on.',
+      labelCornerRadius: 'Corner radius',
+      hintCornerRadius: 'Adjusts the roundness of preview window corners.',
       labelLang:      'Language',
       labelPos:       'Drop Zone position',
       posBottom:      'Bottom',
@@ -61,21 +69,29 @@
       posFullscreen:  'Fullscreen',
       hintPosBottom:  'A fixed bar at the bottom of the page. Drag a link onto it to preview.',
       hintPosTop:     'A fixed bar at the top of the page.',
-      hintPosFullscreen: 'The entire page becomes a drop target. Release the link anywhere to preview.',
+      hintPosFullscreen: 'While dragging a link, a full-screen blurred overlay appears above the page and existing preview windows. Release anywhere on it to create a new preview window.',
       labelSize:      'Drop Zone size',
       hintSize:       'Width and height of the drop bar (not applicable in Fullscreen mode).',
       labelW:         'W',
       labelH:         'H',
-      labelModal:     'Preview size',
-      hintModalSmall: 'A compact window — good for quick glances.',
-      hintModalMedium:'Balanced size — the default.',
-      hintModalLarge: 'Maximised width, leaving just enough room for the action buttons.',
-      modalSmall:     'Small',
-      modalMedium:    'Medium',
-      modalLarge:     'Large',
+      labelDefaultWindowSize: 'Default window size',
+      labelWindowWidth: 'Width',
+      labelWindowHeight: 'Height',
+      hintDefaultWindowSize: 'Controls the initial size of newly created preview windows as a percentage of the current browser viewport.',
+      labelMaxPreviewWindows: 'Maximum preview windows',
+      hintMaxPreviewWindows: 'When the limit is reached, the oldest preview window closes automatically.',
+      labelWindowOffset: 'New window offset',
+      hintWindowOffset: 'Controls how far each new preview window is offset from the active one.',
+      labelClosePreviewOnOpenNewTab: 'Close preview after opening in a new tab',
+      hintClosePreviewOnOpenNewTab: 'If enabled, opening a link in a new tab also closes its preview window.',
+      labelHeaderActions: 'Header actions',
+      labelShowCloseOthersButton: 'Show "Close other previews"',
+      hintShowCloseOthersButton: 'Adds a button that closes every preview window except the current one.',
+      labelShowCloseAllButton: 'Show "Close all previews"',
+      hintShowCloseAllButton: 'Adds a button that closes every open preview window at once.',
+      btnReset:       'Reset',
       btnSave:        'Save',
-      btnCancel:      'Cancel',
-      btnClosePage:   'Close',
+      btnClose:       'Close',
       saved:          'Saved ✓',
       saveFailed:     'Save failed',
       aboutName:      'Name',
@@ -83,7 +99,7 @@
       aboutDesc:      'Description',
       aboutAuthor:    'Author',
       aboutHomepage:  'Homepage',
-      aboutDescText:  'Drag links to a Drop Zone and preview them in a Modal iframe.',
+      aboutDescText:  'Drag links into Glimpser to open lightweight preview windows without leaving the current page. Multiple preview windows can stay open at the same time.',
     },
     zh: {
       title:          'Glimpser 设置',
@@ -104,10 +120,8 @@
       cornersRounded: '圆角',
       cornersSquare:  '直角',
       hintCorners:    '控制预览窗口的圆角大小。',
-      labelBarSide:   '按钮位置',
-      barRight:       '右侧',
-      barLeft:        '左侧',
-      hintBarSide:    '关闭、打开、复制等功能按钮悬浮在预览窗口的哪一侧。',
+      labelCornerRadius: '圆角半径',
+      hintCornerRadius: '调整预览窗口圆角的大小。',
       labelLang:      '语言',
       labelPos:       'Drop Zone 位置',
       posBottom:      '底部',
@@ -115,21 +129,29 @@
       posFullscreen:  '全屏',
       hintPosBottom:  '页面底部的固定拖放条，将链接拖到上面即可预览。',
       hintPosTop:     '页面顶部的固定拖放条。',
-      hintPosFullscreen: '整个页面都是拖放区域，在任意位置松开链接即可预览。',
+      hintPosFullscreen: '拖曳链接时，会出现一个覆盖原网页和现有预览窗口的全屏模糊遮罩；在遮罩上的任意位置松开即可创建新的预览窗口。',
       labelSize:      'Drop Zone 尺寸',
       hintSize:       '拖放条的宽度和高度（全屏模式下不适用）。',
       labelW:         '宽',
       labelH:         '高',
-      labelModal:     '预览尺寸',
-      hintModalSmall: '紧凑窗口，适合快速浏览。',
-      hintModalMedium:'均衡尺寸，默认选项。',
-      hintModalLarge: '最大化宽度，右侧仅保留功能按钮所需空间。',
-      modalSmall:     '小',
-      modalMedium:    '中',
-      modalLarge:     '大',
+      labelDefaultWindowSize: '默认窗口尺寸',
+      labelWindowWidth: '宽度',
+      labelWindowHeight: '高度',
+      hintDefaultWindowSize: '以当前浏览器视口百分比的方式控制新建预览窗口的默认宽度和高度。',
+      labelMaxPreviewWindows: '预览窗口数量上限',
+      hintMaxPreviewWindows: '达到上限后，会自动关闭最早创建的预览窗口。',
+      labelWindowOffset: '新窗口偏移',
+      hintWindowOffset: '控制新建预览窗口相对于当前激活窗口的偏移距离。',
+      labelClosePreviewOnOpenNewTab: '在新标签页打开后关闭预览',
+      hintClosePreviewOnOpenNewTab: '开启后，点击“在新标签页打开”会同时关闭对应的预览窗口。',
+      labelHeaderActions: '标题栏操作',
+      labelShowCloseOthersButton: '显示“关闭其他预览”',
+      hintShowCloseOthersButton: '在预览窗口标题栏中显示一个按钮，用来关闭除当前窗口外的其他预览。',
+      labelShowCloseAllButton: '显示“关闭全部预览”',
+      hintShowCloseAllButton: '在预览窗口标题栏中显示一个按钮，用来一次性关闭所有预览窗口。',
+      btnReset:       '重置',
       btnSave:        '保存',
-      btnCancel:      '取消',
-      btnClosePage:   '关闭',
+      btnClose:       '关闭',
       saved:          '已保存 ✓',
       saveFailed:     '保存失败',
       aboutName:      '名称',
@@ -137,18 +159,23 @@
       aboutDesc:      '简介',
       aboutAuthor:    '作者',
       aboutHomepage:  '主页',
-      aboutDescText:  '将链接拖放到 Drop Zone，在 Modal 中快速预览目标页面。',
+      aboutDescText:  '将链接拖入 Glimpser，在当前页面内打开轻量预览窗口，无需离开当前浏览上下文。支持多个预览窗口同时存在。',
     },
   };
 
   const DEFAULT_SETTINGS = {
     dropZonePosition:   'bottom',
     dropZoneCustomSize: { width: 300, height: 150 },
-    modalSize:          'medium',
+    defaultWindowScale: { width: 75, height: 82 },
+    maxPreviewWindows:  6,
+    newWindowOffset:    24,
+    closePreviewOnOpenNewTab: true,
+    showCloseOthersButton: true,
+    showCloseAllButton: true,
     language:           null,
     theme:              null,
     corners:            'rounded',
-    controlBarSide:     'right',
+    cornerRadius:       16,
     debug:              false,
   };
 
@@ -157,10 +184,22 @@
   let _shadow = null;
   let _activeTab = 'appearance';
   let _settings = null;
+  let _scrollLockState = null;
 
   function _t(key) {
     const lang = (_settings?.language === 'zh') ? 'zh' : 'en';
     return LABELS[lang]?.[key] ?? LABELS.en[key] ?? key;
+  }
+
+  function _resolveDefaultWindowScale(settings) {
+    return {
+      width: settings?.defaultWindowScale?.width ?? DEFAULT_SETTINGS.defaultWindowScale.width,
+      height: settings?.defaultWindowScale?.height ?? DEFAULT_SETTINGS.defaultWindowScale.height,
+    };
+  }
+
+  function _cloneDefaultSettings() {
+    return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   }
 
   // ── Build Shadow DOM ───────────────────────────────────────────────────
@@ -176,6 +215,10 @@
 
     _host = document.createElement('div');
     _host.id = HOST_ID;
+    _host.style.position = 'fixed';
+    _host.style.inset = '0';
+    _host.style.zIndex = '2147483640';
+    _host.style.pointerEvents = 'none';
     document.documentElement.appendChild(_host);
 
     _shadow = _host.attachShadow({ mode: 'open' });
@@ -185,6 +228,45 @@
     _shadow.appendChild(style);
 
     _render();
+  }
+
+  function _lockPageScroll() {
+    if (document.documentElement.dataset.dpStandalone || _scrollLockState) return;
+
+    const html = document.documentElement;
+    const body = document.body;
+    const scrollbarWidth = Math.max(0, window.innerWidth - html.clientWidth);
+
+    _scrollLockState = {
+      htmlOverflow: html.style.overflow,
+      bodyOverflow: body ? body.style.overflow : '',
+      bodyPaddingRight: body ? body.style.paddingRight : '',
+    };
+
+    html.style.overflow = 'hidden';
+
+    if (body) {
+      body.style.overflow = 'hidden';
+      if (scrollbarWidth > 0) {
+        body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+    }
+  }
+
+  function _unlockPageScroll() {
+    if (document.documentElement.dataset.dpStandalone || !_scrollLockState) return;
+
+    const html = document.documentElement;
+    const body = document.body;
+
+    html.style.overflow = _scrollLockState.htmlOverflow;
+
+    if (body) {
+      body.style.overflow = _scrollLockState.bodyOverflow;
+      body.style.paddingRight = _scrollLockState.bodyPaddingRight;
+    }
+
+    _scrollLockState = null;
   }
 
   // ── Render ─────────────────────────────────────────────────────────────
@@ -207,24 +289,24 @@
     }
 
     const overlay = document.createElement('div');
-    overlay.className = 'gs-overlay';
+    overlay.className = 'gs-settings-overlay';
 
     const shell = document.createElement('div');
-    shell.className = 'gs-panel-shell';
+    shell.className = 'gs-settings-shell';
 
     // Tab nav
     const tabNav = document.createElement('nav');
-    tabNav.className = 'gs-tab-nav';
+    tabNav.className = 'gs-settings-tabs';
 
     TABS.forEach(tab => {
       const btn = document.createElement('div');
-      btn.className = 'gs-tab-btn' + (_activeTab === tab.key ? ' active' : '');
+      btn.className = 'gs-settings-tab' + (_activeTab === tab.key ? ' active' : '');
       btn.dataset.tab = tab.key;
-      btn.innerHTML = tab.svg + `<span class="gs-tab-label">${_t('tab' + tab.key.charAt(0).toUpperCase() + tab.key.slice(1))}</span>`;
+      btn.innerHTML = tab.svg + `<span class="gs-settings-tab-label">${_t('tab' + tab.key.charAt(0).toUpperCase() + tab.key.slice(1))}</span>`;
       btn.addEventListener('click', () => {
         _activeTab = tab.key;
-        _shadow.querySelectorAll('.gs-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab.key));
-        _shadow.querySelectorAll('.gs-tab-content').forEach(c => {
+        _shadow.querySelectorAll('.gs-settings-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab.key));
+        _shadow.querySelectorAll('.gs-settings-section').forEach(c => {
           const isActive = c.dataset.tab === tab.key;
           c.classList.remove('active');
           if (isActive) { void c.offsetWidth; c.classList.add('active'); }
@@ -235,14 +317,14 @@
 
     // Panel
     const panel = document.createElement('div');
-    panel.className = 'gs-panel';
+    panel.className = 'gs-settings-panel';
 
     const title = document.createElement('div');
-    title.className = 'gs-panel-title';
+    title.className = 'gs-settings-title';
     title.textContent = _t('title');
 
     const scroll = document.createElement('div');
-    scroll.className = 'gs-panel-scroll';
+    scroll.className = 'gs-settings-scroll';
 
     scroll.appendChild(_renderAppearanceTab());
     scroll.appendChild(_renderDropzoneTab());
@@ -251,19 +333,33 @@
 
     // Footer
     const footer = document.createElement('div');
-    footer.className = 'gs-panel-footer';
+    footer.className = 'gs-settings-footer';
+
+    const footerStart = document.createElement('div');
+    footerStart.className = 'gs-settings-footer-start';
+
+    const footerEnd = document.createElement('div');
+    footerEnd.className = 'gs-settings-footer-end';
 
     const status = document.createElement('span');
-    status.className = 'gs-status';
+    status.className = 'gs-settings-status';
 
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'gs-btn gs-btn-secondary';
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'gs-btn gs-btn-secondary gs-btn-reset';
+    resetBtn.textContent = _t('btnReset');
+    resetBtn.addEventListener('click', () => {
+      _settings = _cloneDefaultSettings();
+      _settings.theme = _host?.getAttribute('data-dp-theme') || _settings.theme || 'dark';
+      _render();
+    });
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'gs-btn gs-btn-secondary';
+    closeBtn.textContent = _t('btnClose');
     if (document.documentElement.dataset.dpStandalone) {
-      cancelBtn.textContent = _t('btnClosePage');
-      cancelBtn.addEventListener('click', () => window.close());
+      closeBtn.addEventListener('click', () => window.close());
     } else {
-      cancelBtn.textContent = _t('btnCancel');
-      cancelBtn.addEventListener('click', hide);
+      closeBtn.addEventListener('click', hide);
     }
 
     const saveBtn = document.createElement('button');
@@ -271,7 +367,9 @@
     saveBtn.textContent = _t('btnSave');
     saveBtn.addEventListener('click', () => _save(status));
 
-    footer.append(status, cancelBtn, saveBtn);
+    footerStart.append(resetBtn);
+    footerEnd.append(status, closeBtn, saveBtn);
+    footer.append(footerStart, footerEnd);
     panel.append(title, scroll, footer);
     shell.append(tabNav, panel);
     overlay.appendChild(shell);
@@ -330,22 +428,40 @@
     // Corners
     tab.appendChild(_makeCard(_t('labelCorners'), () => {
       const wrap = document.createDocumentFragment();
-      wrap.appendChild(_makeOptionGroup([
+      const radiusRow = _makeSliderRow(
+        _t('labelCornerRadius'),
+        4,
+        28,
+        _settings?.cornerRadius ?? 16,
+        (value) => { _settings.cornerRadius = value; },
+        'px'
+      );
+
+      const cornersGroup = document.createElement('div');
+      cornersGroup.className = 'gs-setting-group';
+
+      const radiusGroup = document.createElement('div');
+      radiusGroup.className = 'gs-setting-group';
+
+      const group = _makeOptionGroup([
         { label: _t('cornersRounded'), value: 'rounded' },
         { label: _t('cornersSquare'),  value: 'square'  },
-      ], _settings?.corners || 'rounded', v => { _settings.corners = v; }));
-      wrap.appendChild(_makeHint(_t('hintCorners')));
-      return wrap;
-    }));
+      ], _settings?.corners || 'rounded', v => {
+        _settings.corners = v;
+        radiusRow.style.opacity = v === 'square' ? '0.5' : '1';
+        radiusRow.style.pointerEvents = v === 'square' ? 'none' : '';
+      });
 
-    // Buttons side
-    tab.appendChild(_makeCard(_t('labelBarSide'), () => {
-      const wrap = document.createDocumentFragment();
-      wrap.appendChild(_makeOptionGroup([
-        { label: _t('barRight'), value: 'right' },
-        { label: _t('barLeft'),  value: 'left'  },
-      ], _settings?.controlBarSide || 'right', v => { _settings.controlBarSide = v; }));
-      wrap.appendChild(_makeHint(_t('hintBarSide')));
+      radiusRow.style.opacity = (_settings?.corners || 'rounded') === 'square' ? '0.5' : '1';
+      radiusRow.style.pointerEvents = (_settings?.corners || 'rounded') === 'square' ? 'none' : '';
+
+      cornersGroup.appendChild(group);
+      cornersGroup.appendChild(_makeHint(_t('hintCorners')));
+      radiusGroup.appendChild(radiusRow);
+      radiusGroup.appendChild(_makeHint(_t('hintCornerRadius')));
+
+      wrap.appendChild(cornersGroup);
+      wrap.appendChild(radiusGroup);
       return wrap;
     }));
 
@@ -384,10 +500,10 @@
 
     const makeSliderRow = (labelKey, min, max, value, onChange) => {
       const row = document.createElement('div');
-      row.style.cssText = 'margin-bottom:12px';
+      row.className = 'gs-slider-row';
 
       const header = document.createElement('div');
-      header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px';
+      header.className = 'gs-slider-header';
 
       const lbl = document.createElement('span');
       lbl.className = 'gs-field-label';
@@ -395,7 +511,7 @@
       lbl.textContent = _t(labelKey);
 
       const val = document.createElement('span');
-      val.style.cssText = 'font-size:var(--fs-xs);color:var(--accent);font-family:monospace;font-weight:600';
+      val.className = 'gs-value-chip';
       val.textContent = value + ' px';
 
       const slider = document.createElement('input');
@@ -441,29 +557,24 @@
     const author     = manifest.author       || '—';
     const authorUrl  = 'https://github.com/ffainy';
     const homepage   = manifest.homepage_url || '';
+    const releaseLink = homepage ? `${homepage.replace(/\/$/, '')}/releases/tag/v${version}` : '';
 
     const card = document.createElement('div');
     card.className = 'gs-card';
 
     // Extension name + logo row
     const nameRow = document.createElement('div');
-    nameRow.style.cssText = 'display:flex;align-items:center;gap:14px;margin-bottom:20px';
+    nameRow.className = 'gs-settings-about-header';
 
     const logo = document.createElement('div');
-    logo.style.cssText = `
-      width:56px;height:56px;border-radius:14px;
-      background:rgba(54,170,109,0.12);border:1px solid rgba(54,170,109,0.3);
-      display:flex;align-items:center;justify-content:center;flex-shrink:0;
-    `;
-    logo.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
-      <path fill="#36aa6d" d="M12 1.253c1.044 0 1.956.569 2.44 1.412l4.589 7.932l4.45 7.691c.047.074.21.359.27.494a2.808 2.808 0 0 1-3.406 3.836l-7.901-2.606a1.4 1.4 0 0 0-.442-.07a1.4 1.4 0 0 0-.442.07l-7.9 2.606l-.162.046a2.8 2.8 0 0 1-.684.083a2.81 2.81 0 0 1-2.644-3.763c.03-.091.074-.176.111-.264c.072-.15.161-.288.242-.432l4.449-7.691l4.588-7.932A2.81 2.81 0 0 1 12 1.253"/>
-    </svg>`;
+    logo.className = 'gs-settings-about-logo';
+    logo.innerHTML = BRAND_ICON_SVG;
 
     const nameBlock = document.createElement('div');
     nameBlock.style.cssText = 'display:flex;flex-direction:column;justify-content:center';
 
     const extName = document.createElement('div');
-    extName.style.cssText = 'font-size:var(--fs-lg);font-weight:700;color:var(--accent);letter-spacing:1px;text-shadow:0 0 16px var(--accent-glow);line-height:1.2';
+    extName.className = 'gs-settings-about-name';
     extName.textContent = 'Glimpser';
 
     nameBlock.append(extName);
@@ -472,35 +583,32 @@
 
     // Description
     const desc = document.createElement('div');
-    desc.style.cssText = 'font-size:var(--fs-sm);color:var(--text-dim);line-height:1.6;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)';
+    desc.className = 'gs-settings-about-desc';
     desc.textContent = _t('aboutDescText');
     card.appendChild(desc);
 
     // Info rows — values use accent color
     const rows = [
-      { label: _t('aboutVersion'),  value: `v${version}`, link: null       },
+      { label: _t('aboutVersion'),  value: `v${version}`, link: releaseLink },
       { label: _t('aboutAuthor'),   value: author,         link: authorUrl  },
       { label: _t('aboutHomepage'), value: homepage,       link: homepage   },
     ];
 
     rows.forEach(({ label, value, link }) => {
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:var(--fs-sm)';
+      row.className = 'gs-settings-about-row';
 
       const lbl = document.createElement('span');
-      lbl.style.cssText = 'color:var(--text-dim);min-width:80px;flex-shrink:0;font-weight:600';
+      lbl.className = 'gs-settings-about-label';
       lbl.textContent = label;
 
       const val = link ? document.createElement('a') : document.createElement('span');
-      val.style.cssText = 'color:var(--accent);word-break:break-all;font-family:monospace;letter-spacing:0.3px';
+      val.className = link ? 'gs-settings-about-value gs-settings-about-link' : 'gs-settings-about-value';
       val.textContent = value;
       if (link) {
         val.href = link;
         val.target = '_blank';
         val.rel = 'noopener noreferrer';
-        val.style.textDecoration = 'none';
-        val.addEventListener('mouseenter', () => { val.style.textDecoration = 'underline'; });
-        val.addEventListener('mouseleave', () => { val.style.textDecoration = 'none'; });
       }
 
       row.append(lbl, val);
@@ -514,35 +622,99 @@
   // ── Tab: Preview ───────────────────────────────────────────────────────
   function _renderPreviewTab() {
     const tab = _makeTab('preview');
+    const windowScale = _resolveDefaultWindowScale(_settings);
+    const sizeContent = document.createDocumentFragment();
+    sizeContent.appendChild(_makeSliderRow(
+      _t('labelWindowWidth'),
+      35,
+      92,
+      windowScale.width,
+      (value) => {
+        _settings.defaultWindowScale = _settings.defaultWindowScale || {};
+        _settings.defaultWindowScale.width = value;
+      },
+      '%'
+    ));
+    sizeContent.appendChild(_makeSliderRow(
+      _t('labelWindowHeight'),
+      35,
+      92,
+      windowScale.height,
+      (value) => {
+        _settings.defaultWindowScale = _settings.defaultWindowScale || {};
+        _settings.defaultWindowScale.height = value;
+      },
+      '%'
+    ));
+    sizeContent.appendChild(_makeHint(_t('hintDefaultWindowSize')));
 
-    const modalHints = {
-      small:  _t('hintModalSmall'),
-      medium: _t('hintModalMedium'),
-      large:  _t('hintModalLarge'),
-    };
-    const modalHintEl = _makeHint(modalHints[_settings?.modalSize || 'medium']);
+    tab.appendChild(_makeCard(_t('labelDefaultWindowSize'), sizeContent));
 
-    const group = _makeOptionGroup([
-      { label: _t('modalSmall'),  value: 'small'  },
-      { label: _t('modalMedium'), value: 'medium' },
-      { label: _t('modalLarge'),  value: 'large'  },
-    ], _settings?.modalSize || 'medium', v => {
-      _settings.modalSize = v;
-      modalHintEl.textContent = modalHints[v];
-    });
+    const maxWindowsContent = document.createDocumentFragment();
+    maxWindowsContent.appendChild(_makeSliderRow(
+      _t('labelMaxPreviewWindows'),
+      1,
+      12,
+      _settings?.maxPreviewWindows ?? 6,
+      (value) => { _settings.maxPreviewWindows = value; },
+      ''
+    ));
+    maxWindowsContent.appendChild(_makeHint(_t('hintMaxPreviewWindows')));
+    tab.appendChild(_makeCard(_t('labelMaxPreviewWindows'), maxWindowsContent));
 
-    const content = document.createDocumentFragment();
-    content.appendChild(group);
-    content.appendChild(modalHintEl);
+    const offsetContent = document.createDocumentFragment();
+    offsetContent.appendChild(_makeSliderRow(
+      _t('labelWindowOffset'),
+      0,
+      64,
+      _settings?.newWindowOffset ?? 24,
+      (value) => { _settings.newWindowOffset = value; }
+    ));
+    offsetContent.appendChild(_makeHint(_t('hintWindowOffset')));
+    tab.appendChild(_makeCard(_t('labelWindowOffset'), offsetContent));
 
-    tab.appendChild(_makeCard(_t('labelModal'), content));
+    const openBehaviorContent = document.createDocumentFragment();
+    openBehaviorContent.appendChild(_makeOptionGroup([
+      { label: _t('debugOn'), value: true },
+      { label: _t('debugOff'), value: false },
+    ], _settings?.closePreviewOnOpenNewTab ?? true, (value) => {
+      _settings.closePreviewOnOpenNewTab = value;
+    }));
+    openBehaviorContent.appendChild(_makeHint(_t('hintClosePreviewOnOpenNewTab')));
+    tab.appendChild(_makeCard(_t('labelClosePreviewOnOpenNewTab'), openBehaviorContent));
+
+    const headerActionsContent = document.createDocumentFragment();
+
+    const closeOthersContent = document.createElement('div');
+    closeOthersContent.style.cssText = 'margin-bottom:16px';
+    closeOthersContent.appendChild(_makeOptionGroup([
+      { label: _t('debugOn'), value: true },
+      { label: _t('debugOff'), value: false },
+    ], _settings?.showCloseOthersButton ?? true, (value) => {
+      _settings.showCloseOthersButton = value;
+    }));
+    closeOthersContent.appendChild(_makeHint(_t('hintShowCloseOthersButton')));
+    headerActionsContent.appendChild(_makeLabeledBlock(_t('labelShowCloseOthersButton'), closeOthersContent));
+
+    const closeAllContent = document.createElement('div');
+    closeAllContent.appendChild(_makeOptionGroup([
+      { label: _t('debugOn'), value: true },
+      { label: _t('debugOff'), value: false },
+    ], _settings?.showCloseAllButton ?? true, (value) => {
+      _settings.showCloseAllButton = value;
+    }));
+    closeAllContent.appendChild(_makeHint(_t('hintShowCloseAllButton')));
+    headerActionsContent.appendChild(_makeLabeledBlock(_t('labelShowCloseAllButton'), closeAllContent));
+
+    tab.appendChild(_makeCard(_t('labelHeaderActions'), headerActionsContent));
+
     return tab;
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────
   function _makeTab(key) {
     const div = document.createElement('div');
-    div.className = 'gs-tab-content' + (_activeTab === key ? ' active' : '');
+    div.className = 'gs-settings-section' + (_activeTab === key ? ' active' : '');
     div.dataset.tab = key;
     return div;
   }
@@ -572,6 +744,52 @@
     el.className = 'gs-field-hint';
     el.textContent = text;
     return el;
+  }
+
+  function _makeLabeledBlock(label, content) {
+    const block = document.createElement('div');
+    block.className = 'gs-setting-group';
+
+    const title = document.createElement('div');
+    title.className = 'gs-field-label';
+    title.textContent = label;
+
+    block.appendChild(title);
+    block.appendChild(content);
+    return block;
+  }
+
+  function _makeSliderRow(label, min, max, value, onChange, unit = 'px') {
+    const row = document.createElement('div');
+    row.className = 'gs-slider-row';
+
+    const header = document.createElement('div');
+    header.className = 'gs-slider-header';
+
+    const lbl = document.createElement('span');
+    lbl.className = 'gs-field-label';
+    lbl.style.marginBottom = '0';
+    lbl.textContent = label;
+
+    const val = document.createElement('span');
+    val.className = 'gs-value-chip';
+    val.textContent = unit ? `${value} ${unit}` : String(value);
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.className = 'gs-slider';
+    slider.min = String(min);
+    slider.max = String(max);
+    slider.value = String(value);
+    slider.addEventListener('input', () => {
+      const next = parseInt(slider.value, 10);
+      val.textContent = unit ? `${next} ${unit}` : String(next);
+      onChange(next);
+    });
+
+    header.append(lbl, val);
+    row.append(header, slider);
+    return row;
   }
 
   // Option group where each option shows a per-option hint below when active
@@ -621,16 +839,17 @@
   // ── Save ───────────────────────────────────────────────────────────────
   async function _save(statusEl) {
     try {
+      delete _settings.controlBarSide;
       await nativeAPI.storage.sync.set(_settings);
       statusEl.textContent = _t('saved');
-      statusEl.className = 'gs-status visible';
-      setTimeout(() => { statusEl.className = 'gs-status'; }, 2000);
+      statusEl.className = 'gs-settings-status visible';
+      setTimeout(() => { statusEl.className = 'gs-settings-status'; }, 2000);
       if (_settings?.debug) {
         console.log('[Glimpser]', 'settings saved');
       }
     } catch (e) {
       statusEl.textContent = _t('saveFailed');
-      statusEl.className = 'gs-status visible error';
+      statusEl.className = 'gs-settings-status visible error';
       if (_settings?.debug) {
         console.log('[Glimpser]', 'settings save failed', e);
       }
@@ -648,7 +867,7 @@
     try {
       _settings = await nativeAPI.storage.sync.get(DEFAULT_SETTINGS);
     } catch (e) {
-      _settings = { ...DEFAULT_SETTINGS };
+      _settings = _cloneDefaultSettings();
     }
 
     // Auto-detect theme on first use
@@ -661,13 +880,15 @@
     } else {
       _render();
     }
-    document.documentElement.classList.add('glimpser-open');
+    _lockPageScroll();
+    document.documentElement.classList.add('gs-settings-open');
   }
 
   function hide() {
     document.removeEventListener('keydown', _onKeyDown);
-    document.documentElement.classList.remove('glimpser-open');
-    const overlay = _shadow?.querySelector('.gs-overlay');
+    document.documentElement.classList.remove('gs-settings-open');
+    _unlockPageScroll();
+    const overlay = _shadow?.querySelector('.gs-settings-overlay');
     if (!overlay) return;
     overlay.classList.remove('visible');
     setTimeout(() => {
@@ -688,5 +909,5 @@
   }
 
   // Expose for content.js
-  window.__glimpserSettingsPanel = { toggle, show, hide };
+  window.__gsSettingsPanel = { toggle, show, hide };
 })();

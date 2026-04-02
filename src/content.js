@@ -1,768 +1,1373 @@
-﻿// content.js — Content Script
-// Injects Drop Zone and Modal overlay into each page.
-// Handles drag-and-drop events and manages the iframe preview lifecycle.
+// content.js — Content Script
+// Injects a drop zone and creates floating preview windows for dragged links.
 
-/**
- * Modal size mappings from ModalSize enum to CSS vw/vh dimensions.
- * @type {Record<string, { width: string, height: string }>}
- */
-const MODAL_SIZES = {
-  small:  { width: '60vw',                  height: '65vh' },
-  medium: { width: '75vw',                  height: '82vh' },
-  large:  { width: 'calc(100vw - 120px)',   height: '92vh' },
-};
-
-/**
- * Default settings used when storage.sync is unavailable or returns no data.
- * @type {GlimpserSettings}
- */
 const DEFAULT_SETTINGS = {
   dropZonePosition: 'bottom',
   dropZoneCustomSize: { width: 300, height: 150 },
-  modalSize: 'medium',
+  defaultWindowScale: { width: 75, height: 82 },
+  maxPreviewWindows: 6,
+  newWindowOffset: 24,
+  closePreviewOnOpenNewTab: true,
+  showCloseOthersButton: true,
+  showCloseAllButton: true,
   language: null,
   theme: null,
   corners: 'rounded',
-  controlBarSide: 'right',
+  cornerRadius: 16,
   debug: false,
-};
-
-/**
- * Validates that a URL uses the http or https protocol.
- * Silently rejects null and empty strings.
- * Logs a warning for non-empty URLs that are not http/https.
- *
- * @param {string|null|undefined} url
- * @returns {boolean}
- */
-function validateURL(url) {
-  if (url === null || url === undefined || url === '') {
-    return false;
-  }
-
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return true;
-  }
-
-  console.warn(t('warnBlockedUrl') + url);
-  return false;
 }
 
-/**
- * Detects the URL of a link being dragged from a dragstart event.
- * Walks up the DOM from the event target to find the nearest <a> ancestor.
- *
- * @param {DragEvent} event
- * @returns {string|null} The href of the nearest <a> ancestor, or null
- */
-function detectDraggedLink(event) {
-  if (!event || !event.target) {
-    return null;
-  }
-
-  let target = event.target;
-
-  // If the target is a text node, move up to its parent element
-  if (target.nodeType === Node.TEXT_NODE) {
-    target = target.parentNode;
-  }
-
-  if (!target || typeof target.closest !== 'function') {
-    return null;
-  }
-
-  const anchor = target.closest('a');
-
-  if (anchor === null || anchor.href === '') {
-    return null;
-  }
-
-  return anchor.href;
-}
-
-/**
- * Loads user settings from storage.sync.
- * Falls back to DEFAULT_SETTINGS if storage is unavailable or read fails.
- *
- * @returns {Promise<typeof DEFAULT_SETTINGS>}
- */
-async function loadSettings() {
-  try {
-    const nativeAPI = typeof browser !== 'undefined' ? browser : chrome;
-    const result = await nativeAPI.storage.sync.get(DEFAULT_SETTINGS);
-    return result;
-  } catch (e) {
-    return DEFAULT_SETTINGS;
-  }
-}
-
-/**
- * Applies the given theme to all injected Glimpser elements by setting
- * data-dp-theme on the overlay and backdrop elements.
- * @param {'dark'|'light'} theme
- */
-function applyContentTheme(theme) {
-  const val = (theme === 'light') ? 'light' : 'dark';
-  if (_overlay)  _overlay.setAttribute('data-dp-theme', val);
-  if (_backdrop) _backdrop.setAttribute('data-dp-theme', val);
-  // Also apply to drop zone if present
-  const zone = _shadowRoot ? _shadowRoot.getElementById('glimpser-zone') : null;
-  if (zone) zone.setAttribute('data-dp-theme', val);
-  // And fullscreen overlay
-  const fsOverlay = _shadowRoot ? _shadowRoot.getElementById('glimpser-fullscreen-overlay') : null;
-  if (fsOverlay) fsOverlay.setAttribute('data-dp-theme', val);
-  // Store for use when elements are created later
-  _currentTheme = val;
-}
-
-/**
- * Applies the corners setting to the overlay by updating --gs-overlay-radius.
- * @param {'rounded'|'square'} corners
- */
-function applyContentCorners(corners) {
-  if (_overlay) {
-    _overlay.style.setProperty('--overlay-radius', corners === 'square' ? '0px' : '8px');
-  }
-}
-
-/**
- * Applies the control bar side setting by toggling the bar-left class.
- * @param {'right'|'left'} side
- */
-function applyContentControlBarSide(side) {
-  if (_controlBar) {
-    _controlBar.classList.toggle('bar-left', side === 'left');
-  }
-}
-
-/**
- * Detect theme from prefers-color-scheme.
- * @returns {'dark'|'light'}
- */
-function _detectSystemTheme() {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
-/**
- * Module-level state object for the Glimpser extension.
- * @type {{ isVisible: boolean, currentUrl: string|null, isLoading: boolean, history: string[], draggedLink: string|null }}
- */
 const state = {
-  isVisible: false,
-  currentUrl: null,
-  isLoading: false,
-  draggedLink: null
-};
-
-// Module-level DOM references set by initGlimpser
-let _overlay = null;
-let _iframe = null;
-let _spinner = null;
-let _errorMsg = null;
-let _controlBar = null;
-let _backdrop = null;
-
-// Shadow DOM host and root
-let _shadowHost = null;
-let _shadowRoot = null;
-
-// Module-level settings reference set by initGlimpser
-let _settings = null;
-let _currentTheme = 'dark';
-
-// Stored drag event handlers for cleanup on reinit
-let _dragHandlers = [];
-
-function _removeDragHandlers() {
-  for (const { target, type, fn } of _dragHandlers) {
-    target.removeEventListener(type, fn);
-  }
-  _dragHandlers = [];
+  draggedLink: null,
 }
 
-/**
- * Clamps a numeric value within [min, max].
- * @param {number} value
- * @param {number} min
- * @param {number} max
- * @returns {number}
- */
+const previewManager = {
+  previews: new Map(),
+  activeId: null,
+  nextId: 1,
+  nextZIndex: 2147483000,
+  layer: null,
+}
+
+const MIN_PREVIEW_WIDTH = 360
+const MIN_PREVIEW_HEIGHT = 240
+const MAX_PREVIEW_WIDTH_RATIO = 0.92
+const MAX_PREVIEW_HEIGHT_RATIO = 0.92
+const VIEWPORT_MARGIN = 16
+const FRAME_DRAG_MESSAGE = 'gs:frame-drag-link'
+const FRAME_DRAG_END_MESSAGE = 'gs:frame-drag-end'
+const FRAME_FOCUS_MESSAGE = 'gs:frame-focus'
+const FRAME_ESCAPE_MESSAGE = 'gs:frame-escape'
+
+const ICON_REFRESH = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/></svg>`
+const ICON_OPEN_CURRENT = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H4m12 0l-4 4m4-4l-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/></svg>`
+const ICON_OPEN_NEW_TAB = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H8m12 0l-4 4m4-4l-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2"/></svg>`
+const ICON_COPY_URL = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m0 3h6m-6 5h6m-6 4h6M10 3v4h4V3z"/></svg>`
+const ICON_COPY_SUCCESS = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 4h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m0 3h6m-6 7l2 2l4-4m-5-9v4h4V3z"/></svg>`
+const ICON_CLOSE = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L17.94 6M18 18L6.06 6"/></svg>`
+const ICON_CLOSE_OTHERS = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.5 8.046H11V6.119c0-.921-.9-1.446-1.524-.894l-5.108 4.49a1.2 1.2 0 0 0 0 1.739l5.108 4.49c.624.556 1.524.027 1.524-.893v-1.928h2a3.023 3.023 0 0 1 3 3.046V19a5.593 5.593 0 0 0-1.5-10.954"/></svg>`
+const ICON_CLOSE_ALL = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.757 6L3.24 10.95a1.05 1.05 0 0 0 0 1.549l5.611 5.088m5.73-3.214v1.615a.948.948 0 0 1-1.524.845l-5.108-4.251a1.1 1.1 0 0 1 0-1.646l5.108-4.251a.95.95 0 0 1 1.524.846v1.7c3.312 0 6 2.979 6 6.654v1.329a.7.7 0 0 1-1.345.353a5.17 5.17 0 0 0-4.652-3.191z"/></svg>`
+const ICON_BRAND = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0C4.492 2.746-.885 11.312.502 19.963C.502 19.963 4.989 24 12 24s11.496-4.037 11.496-4.037C24.882 11.312 19.508 2.746 12 0m0 1.846s2.032.726 3.945 2.488c.073.067.13.163.129.277c-.001.168-.128.287-.301.287a.5.5 0 0 1-.137-.027a6.5 6.5 0 0 0-2.316-.4a6.63 6.63 0 0 0-3.914 1.273l-.002.002a7.98 7.98 0 0 1 6.808.768C20.48 9.11 22.597 14.179 21.902 19c0 0-1.646 1.396-4.129 2.172a.37.37 0 0 1-.303-.026c-.144-.084-.185-.255-.1-.404a.5.5 0 0 1 .094-.103a6.6 6.6 0 0 0 1.504-1.809a6.63 6.63 0 0 0 .856-4.027l-.002-.002a7.95 7.95 0 0 1-3.838 5.383c-4.42 2.552-9.99 1.882-13.885-1.184c0 0-.388-2.124.182-4.662a.37.37 0 0 1 .176-.25c.145-.084.31-.033.396.117a.5.5 0 0 1 .045.13c.126.762.405 1.5.814 2.208a6.64 6.64 0 0 0 3.059 2.756a8 8 0 0 1-1.672-2.033a7.93 7.93 0 0 1-1.066-4.205C4.128 8.047 7.464 3.659 12 1.846m0 7.623c-2.726 0-5.117.93-6.483 2.332c-.064.32-.1.65-.1.984c0 3.146 2.947 5.695 6.583 5.695c3.635 0 6.584-2.549 6.584-5.695c0-.334-.038-.664-.102-.984C17.116 10.4 14.724 9.469 12 9.469m0 .693a3.12 3.12 0 0 1 0 6.238a3.118 3.118 0 0 1-2.872-4.336a1.3 1.3 0 1 0 1.657-1.656A3.1 3.1 0 0 1 12 10.162"/></svg>`
+
+let _shadowHost = null
+let _shadowRoot = null
+let _previewLayer = null
+let _tooltipLayer = null
+let _settings = null
+let _currentTheme = 'dark'
+let _dragHandlers = []
+let _activeTooltipTarget = null
+
 function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max);
+  return Math.min(Math.max(value, min), max)
 }
 
 function _isDebugEnabled() {
-  return !!(_settings && _settings.debug);
+  return !!(_settings && _settings.debug)
 }
 
 function _dlog(...args) {
   if (_isDebugEnabled()) {
-    console.log('[Glimpser]', ...args);
+    console.log('[Glimpser]', ...args)
   }
 }
 
-/**
- * Creates the Control Bar DOM structure with five action buttons.
- * Positioned absolutely to float on the right side of the Modal overlay.
- *
- * Requirements 7.1, 7.2
- *
- * @returns {HTMLElement} The control bar element
- */
-const ICON_CLOSE = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M5.72 5.72a.75.75 0 0 1 1.06 0L12 10.94l5.22-5.22a.749.749 0 0 1 1.275.326a.75.75 0 0 1-.215.734L13.06 12l5.22 5.22a.749.749 0 0 1-.326 1.275a.75.75 0 0 1-.734-.215L12 13.06l-5.22 5.22a.75.75 0 0 1-1.042-.018a.75.75 0 0 1-.018-1.042L10.94 12L5.72 6.78a.75.75 0 0 1 0-1.06"/></svg>`;
-const ICON_OPEN_CURRENT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M9.47 13.47a.749.749 0 1 1 1.06 1.06l-5.719 5.72H9a.75.75 0 0 1 0 1.5H3a1 1 0 0 1-.133-.013l-.016-.003l-.039-.011q-.051-.012-.099-.031a1 1 0 0 1-.083-.044a.7.7 0 0 1-.279-.279A.7.7 0 0 1 2.25 21v-6a.75.75 0 0 1 1.5 0v4.189zM21 2.25a1 1 0 0 1 .132.012l.016.003l.04.011q.05.012.098.031a1 1 0 0 1 .083.044a.7.7 0 0 1 .279.279a.66.66 0 0 1 .102.37v6a.75.75 0 0 1-1.5 0V4.811l-5.72 5.719a.749.749 0 1 1-1.06-1.06l5.719-5.72H15a.75.75 0 0 1 0-1.5z"/></svg>`;
-const ICON_OPEN_NEW_TAB = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 2.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V4.06l-6.22 6.22a.75.75 0 1 1-1.06-1.06L19.94 3h-3.69a.75.75 0 0 1-.75-.75"/><path fill="currentColor" d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.25.25 0 0 0-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 0 0 .25-.25v-8.5a.75.75 0 0 1 1.5 0v8.5a1.75 1.75 0 0 1-1.75 1.75H4.25a1.75 1.75 0 0 1-1.75-1.75z"/></svg>`;
-const ICON_COPY_URL = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14.513 6a.75.75 0 0 1 .75.75v2h1.987a.75.75 0 0 1 0 1.5h-1.987v2a.75.75 0 1 1-1.5 0v-2H11.75a.75.75 0 0 1 0-1.5h2.013v-2a.75.75 0 0 1 .75-.75"/><path fill="currentColor" d="M7.024 3.75c0-.966.784-1.75 1.75-1.75H20.25c.966 0 1.75.784 1.75 1.75v11.498a1.75 1.75 0 0 1-1.75 1.75H8.774a1.75 1.75 0 0 1-1.75-1.75Zm1.75-.25a.25.25 0 0 0-.25.25v11.498c0 .139.112.25.25.25H20.25a.25.25 0 0 0 .25-.25V3.75a.25.25 0 0 0-.25-.25Z"/><path fill="currentColor" d="M1.995 10.749a1.75 1.75 0 0 1 1.75-1.751H5.25a.75.75 0 1 1 0 1.5H3.745a.25.25 0 0 0-.25.25L3.5 20.25c0 .138.111.25.25.25h9.5a.25.25 0 0 0 .25-.25v-1.51a.75.75 0 1 1 1.5 0v1.51A1.75 1.75 0 0 1 13.25 22h-9.5A1.75 1.75 0 0 1 2 20.25z"/></svg>`;
-const ICON_COPY_SUCCESS = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M3.5 3.75a.25.25 0 0 1 .25-.25h13.5a.25.25 0 0 1 .25.25v10a.75.75 0 0 0 1.5 0v-10A1.75 1.75 0 0 0 17.25 2H3.75A1.75 1.75 0 0 0 2 3.75v16.5c0 .966.784 1.75 1.75 1.75h7a.75.75 0 0 0 0-1.5h-7a.25.25 0 0 1-.25-.25z"/><path fill="currentColor" d="M6.25 7a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5zm-.75 4.75a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75m16.28 4.53a.75.75 0 1 0-1.06-1.06l-4.97 4.97l-1.97-1.97a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0z"/></svg>`;
-const ICON_SETTINGS = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M11 18.25a.75.75 0 0 1 .75-.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1-.75-.75m-8-12a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 3 6.25m13 6a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75M8.75 16a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3a.75.75 0 0 1 .75-.75"/><path fill="currentColor" d="M3 18.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75m0-6a.75.75 0 0 1 .75-.75h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1-.75-.75M16.75 10a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3a.75.75 0 0 1 .75-.75M14 6.25a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75M11.25 4a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3a.75.75 0 0 1 .75-.75"/></svg>`;
-
-function _createControlBar() {
-  const controlBar = document.createElement('div');
-  controlBar.className = 'glimpser-control-bar';
-
-  const buttons = [
-    { action: 'close',         icon: ICON_CLOSE,        title: t('btnClose') },
-    { action: 'open-current',  icon: ICON_OPEN_CURRENT, title: t('btnOpenCurrent') },
-    { action: 'open-new-tab',  icon: ICON_OPEN_NEW_TAB, title: t('btnOpenNewTab') },
-    { action: 'copy-url',      icon: ICON_COPY_URL,     title: t('btnCopyUrl') },
-    { action: 'open-settings', icon: ICON_SETTINGS,     title: t('btnOpenSettings') },
-  ];
-
-  for (const { action, icon, title } of buttons) {
-    const btn = document.createElement('button');
-    btn.dataset.action = action;
-    btn.title = title;
-    btn.innerHTML = icon;
-    controlBar.appendChild(btn);
+function validateURL(url) {
+  if (url === null || url === undefined || url === '') {
+    return false
   }
 
-  return controlBar;
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return true
+  }
+
+  console.warn(t('warnBlockedUrl') + url)
+  return false
 }
 
-/**
- * Creates and injects the Modal overlay DOM structure into document.body.
- * Includes the overlay container, iframe, loading spinner, error message area,
- * and the control bar.
- * Applies the modal size from settings using MODAL_SIZES mapping.
- *
- * @param {typeof DEFAULT_SETTINGS} settings
- * @returns {{ overlay: HTMLElement, iframe: HTMLIFrameElement, spinner: HTMLElement, errorMsg: HTMLElement, controlBar: HTMLElement }}
- */
-function _createModalOverlay(settings) {
-  const sizeKey = (settings && settings.modalSize) || 'medium';
-  const size = MODAL_SIZES[sizeKey] || MODAL_SIZES.medium;
+function detectDraggedLink(event) {
+  if (!event || !event.target) {
+    return null
+  }
 
-  // Backdrop — sits behind the overlay, click to close
-  const backdrop = document.createElement('div');
-  backdrop.id = 'glimpser-backdrop';
-  _shadowRoot.appendChild(backdrop);
+  let target = event.target
+  if (target.nodeType === Node.TEXT_NODE) {
+    target = target.parentNode
+  }
 
-  // Overlay container — singleton sentinel via id
-  const overlay = document.createElement('div');
-  overlay.id = 'glimpser-overlay';
-  overlay.style.width = size.width;
-  overlay.style.height = size.height;
+  if (!target || typeof target.closest !== 'function') {
+    return null
+  }
 
-  // iframe for page preview
-  const iframe = document.createElement('iframe');
-  iframe.src = 'about:blank';
-  iframe.setAttribute('allowfullscreen', '');
-  overlay.appendChild(iframe);
+  const anchor = target.closest('a')
+  if (anchor === null || anchor.href === '') {
+    return null
+  }
 
-  // Loading spinner
-  const spinner = document.createElement('div');
-  spinner.className = 'glimpser-spinner';
-  spinner.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"><g><circle cx="12" cy="3" r="1" fill="#36aa6d"><animate id="SVGelgoqhuA" attributeName="r" begin="0;SVGSRzJybSJ.end-0.5s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="16.5" cy="4.21" r="1" fill="#36aa6d"><animate id="SVGBcQu6cCi" attributeName="r" begin="SVGelgoqhuA.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="7.5" cy="4.21" r="1" fill="#36aa6d"><animate id="SVGSRzJybSJ" attributeName="r" begin="SVGeZGzNdVZ.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="19.79" cy="7.5" r="1" fill="#36aa6d"><animate id="SVGG5Q0fe0M" attributeName="r" begin="SVGBcQu6cCi.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="4.21" cy="7.5" r="1" fill="#36aa6d"><animate id="SVGeZGzNdVZ" attributeName="r" begin="SVGUTnihcal.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="21" cy="12" r="1" fill="#36aa6d"><animate id="SVG8aQG8dpc" attributeName="r" begin="SVGG5Q0fe0M.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="3" cy="12" r="1" fill="#36aa6d"><animate id="SVGUTnihcal" attributeName="r" begin="SVGHktsvT5Q.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="19.79" cy="16.5" r="1" fill="#36aa6d"><animate id="SVGqCF3Scrd" attributeName="r" begin="SVG8aQG8dpc.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="4.21" cy="16.5" r="1" fill="#36aa6d"><animate id="SVGHktsvT5Q" attributeName="r" begin="SVGSFNCBbxb.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="16.5" cy="19.79" r="1" fill="#36aa6d"><animate id="SVGMFYo1cJN" attributeName="r" begin="SVGqCF3Scrd.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="7.5" cy="19.79" r="1" fill="#36aa6d"><animate id="SVGSFNCBbxb" attributeName="r" begin="SVGLSoLpdOI.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="12" cy="21" r="1" fill="#36aa6d"><animate id="SVGLSoLpdOI" attributeName="r" begin="SVGMFYo1cJN.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><animateTransform attributeName="transform" dur="6s" repeatCount="indefinite" type="rotate" values="360 12 12;0 12 12"/></g></svg>`;
-  overlay.appendChild(spinner);
-
-  // Error message area
-  const errorMsg = document.createElement('div');
-  errorMsg.className = 'glimpser-error';
-  errorMsg.style.display = 'none';
-  overlay.appendChild(errorMsg);
-
-  // Control bar — floats to the right of the modal
-  const controlBar = _createControlBar();
-  overlay.appendChild(controlBar);
-
-  _shadowRoot.appendChild(overlay);
-
-  return { overlay, iframe, spinner, errorMsg, controlBar, backdrop };
+  return anchor.href
 }
 
-/**
- * Tears down the current Drop Zone and rebuilds it with updated settings.
- * Called after settings are saved.
- */
+async function loadSettings() {
+  try {
+    const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
+    return await nativeAPI.storage.sync.get(DEFAULT_SETTINGS)
+  } catch (e) {
+    return DEFAULT_SETTINGS
+  }
+}
+
+function _detectSystemTheme() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function _removeDragHandlers() {
+  for (const { target, type, fn } of _dragHandlers) {
+    target.removeEventListener(type, fn)
+  }
+  _dragHandlers = []
+}
+
+function _formatUrlForDisplay(url) {
+  try {
+    const parsed = new URL(url)
+    const path = parsed.pathname === '/' ? '' : parsed.pathname
+    return `${parsed.host}${path}${parsed.search}${parsed.hash}`
+  } catch (e) {
+    return url
+  }
+}
+
+function _makeIconButton(className, title, icon) {
+  const button = document.createElement('button')
+  button.className = className
+  button.type = 'button'
+  button.dataset.tooltip = title
+  button.setAttribute('aria-label', title)
+  button.innerHTML = icon
+  return button
+}
+
+function _isCloseOthersButtonEnabled() {
+  return _settings?.showCloseOthersButton !== false
+}
+
+function _isCloseAllButtonEnabled() {
+  return _settings?.showCloseAllButton !== false
+}
+
+function ensurePreviewLayer() {
+  if (_previewLayer) {
+    return _previewLayer
+  }
+
+  _previewLayer = document.createElement('div')
+  _previewLayer.id = 'gs-preview-layer'
+  _shadowRoot.appendChild(_previewLayer)
+  previewManager.layer = _previewLayer
+  return _previewLayer
+}
+
+function ensureTooltipLayer() {
+  if (_tooltipLayer) {
+    return _tooltipLayer
+  }
+
+  _tooltipLayer = document.createElement('div')
+  _tooltipLayer.className = 'gs-tooltip'
+  _tooltipLayer.setAttribute('data-dp-theme', _currentTheme)
+  _shadowRoot.appendChild(_tooltipLayer)
+  return _tooltipLayer
+}
+
+function _showTooltip(target, text) {
+  if (!target || !text || !_shadowRoot) {
+    return
+  }
+
+  const tooltip = ensureTooltipLayer()
+  const rect = target.getBoundingClientRect()
+
+  _activeTooltipTarget = target
+  tooltip.textContent = text
+  tooltip.classList.add('visible')
+  tooltip.setAttribute('data-dp-theme', _currentTheme)
+
+  const tooltipRect = tooltip.getBoundingClientRect()
+  const spacing = 10
+  const viewport = _viewportRect()
+  let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2)
+  left = clamp(left, 12, Math.max(12, viewport.width - tooltipRect.width - 12))
+
+  let top = rect.top - tooltipRect.height - spacing
+  let placeBelow = false
+
+  if (top < 12) {
+    top = rect.bottom + spacing
+    placeBelow = true
+  }
+
+  tooltip.classList.toggle('below', placeBelow)
+  tooltip.style.left = `${Math.round(left)}px`
+  tooltip.style.top = `${Math.round(top)}px`
+}
+
+function _hideTooltip(target = null) {
+  if (!_tooltipLayer) {
+    return
+  }
+
+  if (target && _activeTooltipTarget && target !== _activeTooltipTarget) {
+    return
+  }
+
+  _activeTooltipTarget = null
+  _tooltipLayer.classList.remove('visible', 'below')
+}
+
+function _bindTooltipEvents(preview, ...buttons) {
+  for (const button of buttons) {
+    button.addEventListener('pointerenter', () => {
+      _showTooltip(button, button.dataset.tooltip || button.getAttribute('aria-label') || '')
+    })
+
+    button.addEventListener('pointerleave', () => {
+      _hideTooltip(button)
+    })
+
+    button.addEventListener('focus', () => {
+      _showTooltip(button, button.dataset.tooltip || button.getAttribute('aria-label') || '')
+    })
+
+    button.addEventListener('blur', () => {
+      _hideTooltip(button)
+    })
+  }
+}
+
+function _showCopyToast(preview, text) {
+  const toast = preview.elements.copyToast
+  if (!toast) {
+    return
+  }
+
+  if (preview.copyToastTimer) {
+    clearTimeout(preview.copyToastTimer)
+  }
+
+  toast.textContent = text
+  toast.classList.add('visible')
+
+  preview.copyToastTimer = setTimeout(() => {
+    toast.classList.remove('visible')
+    preview.copyToastTimer = null
+  }, 1200)
+}
+
+function _applyPreviewLayout(preview) {
+  const { root } = preview.elements
+  root.style.left = `${preview.x}px`
+  root.style.top = `${preview.y}px`
+  root.style.width = `${preview.width}px`
+  root.style.height = `${preview.height}px`
+  root.style.zIndex = String(preview.zIndex)
+}
+
+function _applyPreviewTheme(preview) {
+  preview.elements.root.setAttribute('data-dp-theme', _currentTheme)
+  if (_tooltipLayer) {
+    _tooltipLayer.setAttribute('data-dp-theme', _currentTheme)
+  }
+}
+
+function _viewportRect() {
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }
+}
+
+function _normalizePreviewBounds(preview) {
+  const viewport = _viewportRect()
+  const maxWidth = Math.max(MIN_PREVIEW_WIDTH, Math.floor(viewport.width * MAX_PREVIEW_WIDTH_RATIO))
+  const maxHeight = Math.max(MIN_PREVIEW_HEIGHT, Math.floor(viewport.height * MAX_PREVIEW_HEIGHT_RATIO))
+
+  preview.width = clamp(preview.width, MIN_PREVIEW_WIDTH, Math.min(maxWidth, viewport.width - VIEWPORT_MARGIN * 2))
+  preview.height = clamp(preview.height, MIN_PREVIEW_HEIGHT, Math.min(maxHeight, viewport.height - VIEWPORT_MARGIN * 2))
+  preview.x = clamp(preview.x, VIEWPORT_MARGIN, Math.max(VIEWPORT_MARGIN, viewport.width - preview.width - VIEWPORT_MARGIN))
+  preview.y = clamp(preview.y, VIEWPORT_MARGIN, Math.max(VIEWPORT_MARGIN, viewport.height - preview.height - VIEWPORT_MARGIN))
+}
+
+function _refreshPreviewViewportBounds() {
+  for (const preview of previewManager.previews.values()) {
+    _normalizePreviewBounds(preview)
+    _applyPreviewLayout(preview)
+  }
+}
+
+function _resolvePreviewSize(settings) {
+  const viewport = _viewportRect()
+  const configured = settings && settings.defaultWindowScale
+  const widthPercent = clamp(
+    typeof configured?.width === 'number' ? configured.width : DEFAULT_SETTINGS.defaultWindowScale.width,
+    35,
+    92
+  )
+  const heightPercent = clamp(
+    typeof configured?.height === 'number' ? configured.height : DEFAULT_SETTINGS.defaultWindowScale.height,
+    35,
+    92
+  )
+
+  return {
+    width: Math.round((viewport.width * widthPercent) / 100),
+    height: Math.round((viewport.height * heightPercent) / 100),
+  }
+}
+
+function _resolvePreviewPosition(width, height) {
+  const active = getActivePreview()
+  const viewport = _viewportRect()
+  const configuredOffset = _settings && typeof _settings.newWindowOffset === 'number'
+    ? _settings.newWindowOffset
+    : DEFAULT_SETTINGS.newWindowOffset
+  const offset = clamp(configuredOffset, 0, 64)
+
+  if (!active) {
+    return {
+      x: Math.round((viewport.width - width) / 2),
+      y: Math.round((viewport.height - height) / 2),
+    }
+  }
+
+  return {
+    x: clamp(active.x + offset, VIEWPORT_MARGIN, viewport.width - width - VIEWPORT_MARGIN),
+    y: clamp(active.y + offset, VIEWPORT_MARGIN, viewport.height - height - VIEWPORT_MARGIN),
+  }
+}
+
+function _createLoadingSpinner() {
+  const spinner = document.createElement('div')
+  spinner.className = 'gs-preview-spinner'
+  spinner.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"><g><circle cx="12" cy="3" r="1" fill="#36aa6d"><animate id="SVGelgoqhuA" attributeName="r" begin="0;SVGSRzJybSJ.end-0.5s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="16.5" cy="4.21" r="1" fill="#36aa6d"><animate id="SVGBcQu6cCi" attributeName="r" begin="SVGelgoqhuA.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="7.5" cy="4.21" r="1" fill="#36aa6d"><animate id="SVGSRzJybSJ" attributeName="r" begin="SVGeZGzNdVZ.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="19.79" cy="7.5" r="1" fill="#36aa6d"><animate id="SVGG5Q0fe0M" attributeName="r" begin="SVGBcQu6cCi.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="4.21" cy="7.5" r="1" fill="#36aa6d"><animate id="SVGeZGzNdVZ" attributeName="r" begin="SVGUTnihcal.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="21" cy="12" r="1" fill="#36aa6d"><animate id="SVG8aQG8dpc" attributeName="r" begin="SVGG5Q0fe0M.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="3" cy="12" r="1" fill="#36aa6d"><animate id="SVGUTnihcal" attributeName="r" begin="SVGHktsvT5Q.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="19.79" cy="16.5" r="1" fill="#36aa6d"><animate id="SVGqCF3Scrd" attributeName="r" begin="SVG8aQG8dpc.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="4.21" cy="16.5" r="1" fill="#36aa6d"><animate id="SVGHktsvT5Q" attributeName="r" begin="SVGSFNCBbxb.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="16.5" cy="19.79" r="1" fill="#36aa6d"><animate id="SVGMFYo1cJN" attributeName="r" begin="SVGqCF3Scrd.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="7.5" cy="19.79" r="1" fill="#36aa6d"><animate id="SVGSFNCBbxb" attributeName="r" begin="SVGLSoLpdOI.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="12" cy="21" r="1" fill="#36aa6d"><animate id="SVGLSoLpdOI" attributeName="r" begin="SVGMFYo1cJN.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><animateTransform attributeName="transform" dur="6s" repeatCount="indefinite" type="rotate" values="360 12 12;0 12 12"/></g></svg>`
+  return spinner
+}
+
+function _createPreviewWindow(url, settings) {
+  const id = previewManager.nextId++
+  const size = _resolvePreviewSize(settings)
+  const position = _resolvePreviewPosition(size.width, size.height)
+
+  const root = document.createElement('div')
+  root.className = 'gs-preview-window'
+  root.dataset.id = String(id)
+
+  const header = document.createElement('div')
+  header.className = 'gs-preview-header'
+
+  const leftActions = document.createElement('div')
+  leftActions.className = 'gs-preview-group'
+
+  const brandIcon = document.createElement('div')
+  brandIcon.className = 'gs-preview-brand'
+  brandIcon.dataset.tooltip = 'Glimpser'
+  brandIcon.setAttribute('aria-label', 'Glimpser')
+  brandIcon.innerHTML = ICON_BRAND
+
+  const refreshButton = _makeIconButton('gs-pill-action', t('btnRefresh'), ICON_REFRESH)
+  refreshButton.dataset.action = 'refresh'
+  leftActions.append(brandIcon)
+
+  const urlPill = document.createElement('div')
+  urlPill.className = 'gs-preview-urlbar'
+
+  const urlText = document.createElement('span')
+  urlText.className = 'gs-preview-urltext'
+  urlText.textContent = _formatUrlForDisplay(url)
+  urlText.title = url
+
+  const copyButton = _makeIconButton('gs-pill-action', t('btnCopyUrl'), ICON_COPY_URL)
+  copyButton.dataset.action = 'copy-url'
+
+  urlPill.append(refreshButton, urlText, copyButton)
+
+  const rightActions = document.createElement('div')
+  rightActions.className = 'gs-preview-group gs-preview-toolbar'
+
+  const openActions = document.createElement('div')
+  openActions.className = 'gs-preview-group'
+
+  const closeActions = document.createElement('div')
+  closeActions.className = 'gs-preview-group gs-preview-group--danger'
+
+  const openCurrentButton = _makeIconButton('gs-preview-action', t('btnOpenCurrent'), ICON_OPEN_CURRENT)
+  openCurrentButton.dataset.action = 'open-current'
+
+  const openNewTabButton = _makeIconButton('gs-preview-action', t('btnOpenNewTab'), ICON_OPEN_NEW_TAB)
+  openNewTabButton.dataset.action = 'open-new-tab'
+
+  const closeOthersButton = _makeIconButton('gs-preview-action gs-preview-action-bulk-close', t('btnCloseOthers'), ICON_CLOSE_OTHERS)
+  closeOthersButton.dataset.action = 'close-others'
+
+  const closeAllButton = _makeIconButton('gs-preview-action gs-preview-action-bulk-close', t('btnCloseAll'), ICON_CLOSE_ALL)
+  closeAllButton.dataset.action = 'close-all'
+
+  const closeButton = _makeIconButton('gs-preview-action gs-preview-action-close', t('btnClose'), ICON_CLOSE)
+  closeButton.dataset.action = 'close'
+
+  openActions.append(openCurrentButton, openNewTabButton)
+  closeActions.append(closeOthersButton, closeAllButton, closeButton)
+  rightActions.append(openActions, closeActions)
+  header.append(leftActions, urlPill, rightActions)
+
+  const body = document.createElement('div')
+  body.className = 'gs-preview-body'
+
+  const iframe = document.createElement('iframe')
+  iframe.src = 'about:blank'
+  iframe.setAttribute('allowfullscreen', '')
+  iframe.className = 'gs-preview-frame'
+
+  const spinner = _createLoadingSpinner()
+
+  const error = document.createElement('div')
+  error.className = 'gs-preview-error'
+  error.style.display = 'none'
+
+  const copyToast = document.createElement('div')
+  copyToast.className = 'gs-toast'
+
+  const resizeDirections = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw']
+  const resizeHandles = resizeDirections.map((direction) => {
+    const handle = document.createElement('div')
+    handle.className = `gs-preview-resize-handle gs-preview-resize-${direction}`
+    handle.dataset.direction = direction
+    return handle
+  })
+
+  body.append(iframe, spinner, error, copyToast)
+  root.append(header, body, ...resizeHandles)
+
+  const preview = {
+    id,
+    currentUrl: url,
+    x: position.x,
+    y: position.y,
+    width: size.width,
+    height: size.height,
+    zIndex: previewManager.nextZIndex++,
+    isLoading: true,
+    hasError: false,
+    elements: {
+      root,
+      header,
+      refreshButton,
+      urlText,
+      copyButton,
+      copyToast,
+      openCurrentButton,
+      openNewTabButton,
+      closeOthersButton,
+      closeAllButton,
+      closeButton,
+      iframe,
+      spinner,
+      error,
+      resizeHandles,
+    },
+  }
+
+  _applyPreviewTheme(preview)
+  _syncPreviewActionVisibility(preview)
+  _applyPreviewLayout(preview)
+  _bindPreviewEvents(preview)
+  _bindTooltipEvents(
+    preview,
+    brandIcon,
+    refreshButton,
+    copyButton,
+    openCurrentButton,
+    openNewTabButton,
+    closeOthersButton,
+    closeAllButton,
+    closeButton
+  )
+
+  return preview
+}
+
+function _bindPreviewEvents(preview) {
+  const { root, header, iframe, refreshButton, resizeHandles } = preview.elements
+
+  root.addEventListener('pointerdown', () => {
+    focusPreview(preview.id)
+  })
+
+  header.addEventListener('pointerdown', (event) => {
+    if (event.target.closest('button')) {
+      return
+    }
+
+    event.preventDefault()
+    focusPreview(preview.id)
+    _startPreviewDrag(preview, event, header)
+  })
+
+  header.addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-action]')
+    if (!button) {
+      return
+    }
+    handlePreviewAction(preview.id, button.dataset.action, button)
+  })
+
+  for (const handle of resizeHandles) {
+    handle.addEventListener('pointerdown', (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      focusPreview(preview.id)
+      _startPreviewResize(preview, event, handle.dataset.direction, handle)
+    })
+  }
+
+  iframe.addEventListener('load', () => {
+    if (iframe.src === 'about:blank') {
+      return
+    }
+    _setPreviewLoading(preview, false)
+    _setPreviewError(preview)
+    iframe.classList.add('loaded')
+    _dlog('preview loaded', preview.currentUrl)
+  })
+
+  iframe.addEventListener('error', () => {
+    _setPreviewLoading(preview, false)
+    _setPreviewError(preview, t('errorLoadFailed'))
+  })
+
+  refreshButton.addEventListener('animationend', () => {
+    refreshButton.classList.remove('is-loading')
+  })
+}
+
+function _updatePreviewLabels() {
+  for (const preview of previewManager.previews.values()) {
+    const {
+      brandIcon,
+      refreshButton,
+      copyButton,
+      urlText,
+      openCurrentButton,
+      openNewTabButton,
+      closeOthersButton,
+      closeAllButton,
+      closeButton,
+    } = preview.elements
+    brandIcon.dataset.tooltip = 'Glimpser'
+    brandIcon.setAttribute('aria-label', 'Glimpser')
+    refreshButton.dataset.tooltip = t('btnRefresh')
+    refreshButton.setAttribute('aria-label', t('btnRefresh'))
+    copyButton.dataset.tooltip = t('btnCopyUrl')
+    copyButton.setAttribute('aria-label', t('btnCopyUrl'))
+    openCurrentButton.dataset.tooltip = t('btnOpenCurrent')
+    openCurrentButton.setAttribute('aria-label', t('btnOpenCurrent'))
+    openNewTabButton.dataset.tooltip = t('btnOpenNewTab')
+    openNewTabButton.setAttribute('aria-label', t('btnOpenNewTab'))
+    closeOthersButton.dataset.tooltip = t('btnCloseOthers')
+    closeOthersButton.setAttribute('aria-label', t('btnCloseOthers'))
+    closeAllButton.dataset.tooltip = t('btnCloseAll')
+    closeAllButton.setAttribute('aria-label', t('btnCloseAll'))
+    closeButton.dataset.tooltip = t('btnClose')
+    closeButton.setAttribute('aria-label', t('btnClose'))
+
+    urlText.title = preview.currentUrl
+  }
+}
+
+function _syncPreviewActionVisibility(preview) {
+  const { closeOthersButton, closeAllButton } = preview.elements
+  const previewCount = previewManager.previews.size
+
+  closeOthersButton.hidden = !_isCloseOthersButtonEnabled()
+  closeOthersButton.disabled = closeOthersButton.hidden || previewCount <= 1
+
+  closeAllButton.hidden = !_isCloseAllButtonEnabled()
+  closeAllButton.disabled = closeAllButton.hidden || previewCount <= 0
+}
+
+function _syncAllPreviewActionVisibility() {
+  for (const preview of previewManager.previews.values()) {
+    _syncPreviewActionVisibility(preview)
+  }
+}
+
+function _startPreviewDrag(preview, event) {
+  const startX = event.clientX
+  const startY = event.clientY
+  const initialX = preview.x
+  const initialY = preview.y
+  const viewport = _viewportRect()
+  const interaction = _beginPreviewInteraction(preview, event.currentTarget || event.target, event.pointerId, 'dragging')
+
+  const onMove = (moveEvent) => {
+    preview.x = clamp(initialX + (moveEvent.clientX - startX), VIEWPORT_MARGIN, viewport.width - preview.width - VIEWPORT_MARGIN)
+    preview.y = clamp(initialY + (moveEvent.clientY - startY), VIEWPORT_MARGIN, viewport.height - preview.height - VIEWPORT_MARGIN)
+    _applyPreviewLayout(preview)
+  }
+
+  const onUp = () => interaction.cleanup()
+
+  interaction.bind(onMove, onUp)
+}
+
+function _startPreviewResize(preview, event, direction, handle) {
+  const startX = event.clientX
+  const startY = event.clientY
+  const initialX = preview.x
+  const initialY = preview.y
+  const initialWidth = preview.width
+  const initialHeight = preview.height
+  const interaction = _beginPreviewInteraction(preview, handle || event.currentTarget || event.target, event.pointerId, 'resizing')
+
+  const onMove = (moveEvent) => {
+    const viewport = _viewportRect()
+    const deltaX = moveEvent.clientX - startX
+    const deltaY = moveEvent.clientY - startY
+
+    let nextX = initialX
+    let nextY = initialY
+    let nextWidth = initialWidth
+    let nextHeight = initialHeight
+
+    if (direction.includes('e')) {
+      nextWidth = initialWidth + deltaX
+    }
+
+    if (direction.includes('s')) {
+      nextHeight = initialHeight + deltaY
+    }
+
+    if (direction.includes('w')) {
+      nextX = clamp(initialX + deltaX, VIEWPORT_MARGIN, initialX + initialWidth - MIN_PREVIEW_WIDTH)
+      nextWidth = initialWidth - (nextX - initialX)
+    }
+
+    if (direction.includes('n')) {
+      nextY = clamp(initialY + deltaY, VIEWPORT_MARGIN, initialY + initialHeight - MIN_PREVIEW_HEIGHT)
+      nextHeight = initialHeight - (nextY - initialY)
+    }
+
+    nextWidth = clamp(nextWidth, MIN_PREVIEW_WIDTH, viewport.width - nextX - VIEWPORT_MARGIN)
+    nextHeight = clamp(nextHeight, MIN_PREVIEW_HEIGHT, viewport.height - nextY - VIEWPORT_MARGIN)
+
+    preview.x = nextX
+    preview.y = nextY
+    preview.width = nextWidth
+    preview.height = nextHeight
+    _normalizePreviewBounds(preview)
+    _applyPreviewLayout(preview)
+  }
+
+  const onUp = () => interaction.cleanup()
+
+  interaction.bind(onMove, onUp)
+}
+
+function _beginPreviewInteraction(preview, target, pointerId, mode) {
+  const { root, iframe } = preview.elements
+  let moveHandler = null
+  let upHandler = null
+
+  root.classList.add('is-interacting', `is-${mode}`)
+  iframe.style.pointerEvents = 'none'
+  document.body.style.cursor = mode === 'resizing' ? getComputedStyle(target).cursor || 'default' : 'grabbing'
+
+  if (target && typeof target.setPointerCapture === 'function' && pointerId !== undefined) {
+    try {
+      target.setPointerCapture(pointerId)
+    } catch {}
+  }
+
+  return {
+    bind(onMove, onUp) {
+      moveHandler = onMove
+      upHandler = onUp
+      window.addEventListener('pointermove', moveHandler, true)
+      window.addEventListener('pointerup', upHandler, true)
+      window.addEventListener('pointercancel', upHandler, true)
+      window.addEventListener('blur', upHandler, true)
+    },
+    cleanup() {
+      root.classList.remove('is-interacting', `is-${mode}`)
+      iframe.style.pointerEvents = ''
+      document.body.style.cursor = ''
+      if (moveHandler) {
+        window.removeEventListener('pointermove', moveHandler, true)
+      }
+      if (upHandler) {
+        window.removeEventListener('pointerup', upHandler, true)
+        window.removeEventListener('pointercancel', upHandler, true)
+        window.removeEventListener('blur', upHandler, true)
+      }
+      if (target && typeof target.releasePointerCapture === 'function' && pointerId !== undefined) {
+        try {
+          target.releasePointerCapture(pointerId)
+        } catch {}
+      }
+    }
+  }
+}
+
+function _setPreviewLoading(preview, isLoading) {
+  preview.isLoading = isLoading
+  preview.elements.root.classList.toggle('is-loading', isLoading)
+  preview.elements.spinner.style.display = isLoading ? '' : 'none'
+  preview.elements.refreshButton.classList.toggle('is-loading', isLoading)
+  preview.elements.refreshButton.disabled = isLoading
+  preview.elements.refreshButton.setAttribute('aria-busy', isLoading ? 'true' : 'false')
+}
+
+function _setPreviewError(preview, message = '') {
+  const hasError = !!message
+  preview.hasError = hasError
+  preview.elements.root.classList.toggle('has-error', hasError)
+  preview.elements.error.style.display = hasError ? '' : 'none'
+  preview.elements.error.textContent = hasError ? message : ''
+}
+
+function _loadPreviewUrl(preview, url) {
+  preview.currentUrl = url
+  preview.elements.urlText.textContent = _formatUrlForDisplay(url)
+  preview.elements.urlText.title = url
+  _setPreviewError(preview)
+  preview.elements.iframe.classList.remove('loaded')
+  _setPreviewLoading(preview, true)
+  preview.elements.iframe.src = 'about:blank'
+  requestAnimationFrame(() => {
+    preview.elements.iframe.src = url
+  })
+}
+
+function getActivePreview() {
+  return previewManager.activeId ? previewManager.previews.get(previewManager.activeId) || null : null
+}
+
+function focusPreview(id) {
+  const target = previewManager.previews.get(id)
+  if (!target) {
+    return
+  }
+
+  previewManager.activeId = id
+  target.zIndex = previewManager.nextZIndex++
+
+  for (const preview of previewManager.previews.values()) {
+    preview.elements.root.classList.toggle('active', preview.id === id)
+    if (preview.id === id) {
+      preview.elements.root.style.zIndex = String(target.zIndex)
+    }
+  }
+
+  _applyPreviewLayout(target)
+}
+
+function _getTopmostPreview() {
+  let candidate = null
+  for (const preview of previewManager.previews.values()) {
+    if (!candidate || preview.zIndex > candidate.zIndex) {
+      candidate = preview
+    }
+  }
+  return candidate
+}
+
+function _getOldestPreview(preferNonActive = true) {
+  let candidate = null
+  for (const preview of previewManager.previews.values()) {
+    if (preferNonActive && preview.id === previewManager.activeId) {
+      continue
+    }
+    if (!candidate || preview.id < candidate.id) {
+      candidate = preview
+    }
+  }
+
+  if (candidate || !preferNonActive) {
+    return candidate
+  }
+
+  return _getOldestPreview(false)
+}
+
+function _enforcePreviewWindowLimit() {
+  const configured = (_settings && _settings.maxPreviewWindows) || DEFAULT_SETTINGS.maxPreviewWindows
+  const limit = clamp(configured, 1, 12)
+
+  while (previewManager.previews.size >= limit) {
+    const oldest = _getOldestPreview(true)
+    if (!oldest) {
+      break
+    }
+    closePreview(oldest.id)
+  }
+}
+
+function closePreview(id) {
+  const preview = previewManager.previews.get(id)
+  if (!preview) {
+    return
+  }
+
+  preview.elements.root.remove()
+  previewManager.previews.delete(id)
+  _hideTooltip()
+
+  if (previewManager.activeId === id) {
+    const next = _getTopmostPreview()
+    previewManager.activeId = next ? next.id : null
+    if (next) {
+      focusPreview(next.id)
+    }
+  }
+
+  _syncAllPreviewActionVisibility()
+}
+
+function closeAllPreviews(exceptId = null) {
+  const ids = Array.from(previewManager.previews.keys()).filter((id) => id !== exceptId)
+  for (const id of ids) {
+    closePreview(id)
+  }
+
+  if (exceptId !== null && previewManager.previews.has(exceptId)) {
+    focusPreview(exceptId)
+  }
+}
+
+function openPreview(url) {
+  if (!validateURL(url)) {
+    console.warn(t('warnInvalidUrl'))
+    return null
+  }
+
+  _enforcePreviewWindowLimit()
+  const preview = _createPreviewWindow(url, _settings || DEFAULT_SETTINGS)
+  _normalizePreviewBounds(preview)
+  ensurePreviewLayer().appendChild(preview.elements.root)
+  previewManager.previews.set(preview.id, preview)
+  focusPreview(preview.id)
+  _syncAllPreviewActionVisibility()
+  _loadPreviewUrl(preview, url)
+  return preview
+}
+
+function reloadPreview(id) {
+  const preview = previewManager.previews.get(id)
+  if (!preview) {
+    return
+  }
+  focusPreview(id)
+
+  _setPreviewError(preview)
+  preview.elements.iframe.classList.remove('loaded')
+  _setPreviewLoading(preview, true)
+
+  try {
+    if (preview.elements.iframe.contentWindow) {
+      preview.elements.iframe.contentWindow.location.reload()
+      return
+    }
+  } catch (e) {
+    _dlog('reload fallback', e)
+  }
+
+  const url = preview.currentUrl
+  preview.elements.iframe.src = 'about:blank'
+  window.setTimeout(() => {
+    preview.elements.iframe.src = url
+  }, 30)
+}
+
+function handlePreviewAction(id, action, buttonEl) {
+  const preview = previewManager.previews.get(id)
+  if (!preview) {
+    return
+  }
+
+  switch (action) {
+    case 'refresh':
+      reloadPreview(id)
+      break
+
+    case 'close':
+      closePreview(id)
+      break
+
+    case 'close-others':
+      closeAllPreviews(id)
+      break
+
+    case 'close-all':
+      closeAllPreviews()
+      break
+
+    case 'open-current':
+      closePreview(id)
+      location.href = preview.currentUrl
+      break
+
+    case 'open-new-tab':
+      window.open(preview.currentUrl, '_blank')
+      if (_settings?.closePreviewOnOpenNewTab !== false) {
+        closePreview(id)
+      }
+      break
+
+    case 'copy-url':
+      navigator.clipboard.writeText(preview.currentUrl).then(() => {
+        if (!buttonEl) {
+          return
+        }
+        buttonEl.innerHTML = ICON_COPY_SUCCESS
+        _hideTooltip()
+        _showCopyToast(preview, t('toastCopySuccess'))
+        setTimeout(() => {
+          buttonEl.innerHTML = ICON_COPY_URL
+        }, 1200)
+      }).catch((err) => {
+        console.error(t('errorClipboard'), err)
+      })
+      break
+  }
+}
+
+function applyContentTheme(theme) {
+  const resolvedTheme = theme === 'light' ? 'light' : 'dark'
+  _currentTheme = resolvedTheme
+
+  if (_shadowHost) {
+    _shadowHost.setAttribute('data-dp-theme', resolvedTheme)
+  }
+
+  const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
+  if (zone) {
+    zone.setAttribute('data-dp-theme', resolvedTheme)
+  }
+
+  const fullscreen = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
+  if (fullscreen) {
+    fullscreen.setAttribute('data-dp-theme', resolvedTheme)
+  }
+
+  for (const preview of previewManager.previews.values()) {
+    _applyPreviewTheme(preview)
+  }
+}
+
+function applyContentCorners(corners) {
+  if (_shadowHost) {
+    const configuredRadius = typeof _settings?.cornerRadius === 'number' ? _settings.cornerRadius : DEFAULT_SETTINGS.cornerRadius
+    const radius = corners === 'square' ? 0 : clamp(configuredRadius, 4, 28)
+    _shadowHost.style.setProperty('--gs-window-radius', `${radius}px`)
+  }
+}
+
+function _createDropZoneElement(position, customSize) {
+  const width = clamp((customSize && customSize.width) || 300, 100, 1200)
+  const height = clamp((customSize && customSize.height) || 150, 60, 400)
+
+  const zone = document.createElement('div')
+  zone.id = 'gs-dropzone'
+  zone.dataset.position = position
+  zone.setAttribute('data-dp-theme', _currentTheme)
+  zone.style.width = `${width}px`
+  zone.style.height = `${height}px`
+  zone.innerHTML = `<span class="gs-drop-hint">${t('dropHintZone')}</span>`
+  return zone
+}
+
+function _bindDropZoneEvents(dropZone) {
+  const onDragStart = (event) => {
+    const url = detectDraggedLink(event)
+    if (!url) {
+      return
+    }
+    state.draggedLink = url
+    setTimeout(() => {
+      dropZone.classList.add('active')
+    }, 100)
+  }
+
+  const onDragEnd = () => {
+    setTimeout(() => {
+      dropZone.classList.remove('active', 'hovered')
+      state.draggedLink = null
+    }, 100)
+  }
+
+  document.addEventListener('dragstart', onDragStart)
+  document.addEventListener('dragend', onDragEnd)
+  _dragHandlers.push(
+    { target: document, type: 'dragstart', fn: onDragStart },
+    { target: document, type: 'dragend', fn: onDragEnd }
+  )
+
+  dropZone.addEventListener('dragenter', (event) => {
+    event.preventDefault()
+    dropZone.classList.add('hovered')
+  })
+
+  dropZone.addEventListener('dragleave', (event) => {
+    if (event.relatedTarget && !dropZone.contains(event.relatedTarget)) {
+      dropZone.classList.remove('hovered')
+    }
+  })
+
+  dropZone.addEventListener('dragover', (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    event.dataTransfer.dropEffect = 'copy'
+  })
+
+  dropZone.addEventListener('drop', (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    dropZone.classList.remove('active', 'hovered')
+
+    const url = state.draggedLink ||
+      event.dataTransfer.getData('text/uri-list') ||
+      event.dataTransfer.getData('URL') ||
+      event.dataTransfer.getData('text/plain')
+
+    state.draggedLink = null
+    if (validateURL(url)) {
+      openPreview(url)
+    } else {
+      console.warn(t('warnInvalidUrl'))
+    }
+  })
+}
+
+function _bindFrameDragBridge() {
+  const onDragStart = (event) => {
+    const url = detectDraggedLink(event)
+    if (!url || !validateURL(url)) {
+      return
+    }
+
+    try {
+      window.top.postMessage({ type: FRAME_DRAG_MESSAGE, url }, '*')
+    } catch (e) {
+      _dlog('frame drag bridge failed', e)
+    }
+  }
+
+  const onDragEnd = () => {
+    try {
+      window.top.postMessage({ type: FRAME_DRAG_END_MESSAGE }, '*')
+    } catch (e) {
+      _dlog('frame drag end bridge failed', e)
+    }
+  }
+
+  const onPointerDown = () => {
+    try {
+      window.top.postMessage({ type: FRAME_FOCUS_MESSAGE }, '*')
+    } catch (e) {
+      _dlog('frame focus bridge failed', e)
+    }
+  }
+
+  const onKeyDown = (event) => {
+    if (event.key !== 'Escape') {
+      return
+    }
+
+    try {
+      event.preventDefault()
+      event.stopPropagation()
+      window.top.postMessage({ type: FRAME_ESCAPE_MESSAGE }, '*')
+    } catch (e) {
+      _dlog('frame escape bridge failed', e)
+    }
+  }
+
+  document.addEventListener('dragstart', onDragStart)
+  document.addEventListener('dragend', onDragEnd)
+  document.addEventListener('pointerdown', onPointerDown)
+  document.addEventListener('keydown', onKeyDown, true)
+}
+
+function _getPreviewByFrameWindow(frameWindow) {
+  for (const preview of previewManager.previews.values()) {
+    if (preview.elements.iframe.contentWindow === frameWindow) {
+      return preview
+    }
+  }
+  return null
+}
+
+function _hideFullscreenOverlay() {
+  const overlay = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
+  if (overlay) {
+    overlay.classList.remove('active')
+  }
+  document.body.classList.remove('gs-dropzone-fullscreen-active')
+  state.draggedLink = null
+}
+
+function _ensureFullscreenOverlay() {
+  let overlay = _shadowRoot.getElementById('gs-dropzone-overlay')
+  if (overlay) {
+    overlay.setAttribute('data-dp-theme', _currentTheme)
+    return overlay
+  }
+
+  overlay = document.createElement('div')
+  overlay.id = 'gs-dropzone-overlay'
+  overlay.setAttribute('data-dp-theme', _currentTheme)
+  overlay.innerHTML = `<span class="gs-drop-hint">${t('dropHintFullscreen')}</span>`
+  _shadowRoot.appendChild(overlay)
+  return overlay
+}
+
+function _bindFullscreenDragEvents() {
+  const onDragStart = (event) => {
+    const url = detectDraggedLink(event)
+    if (!url) {
+      return
+    }
+    state.draggedLink = url
+    setTimeout(() => {
+      const overlay = _ensureFullscreenOverlay()
+      overlay.classList.add('active')
+      document.body.classList.add('gs-dropzone-fullscreen-active')
+    }, 100)
+  }
+
+  const onDragEnd = () => {
+    setTimeout(() => {
+      _hideFullscreenOverlay()
+    }, 100)
+  }
+
+  const onOverlayDragOver = (event) => {
+    if (state.draggedLink) {
+      event.preventDefault()
+      event.stopPropagation()
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'copy'
+      }
+    }
+  }
+
+  const onOverlayDrop = (event) => {
+    if (!state.draggedLink) {
+      return
+    }
+    event.preventDefault()
+    event.stopPropagation()
+    const url = state.draggedLink
+    _hideFullscreenOverlay()
+    openPreview(url)
+  }
+
+  const overlay = _ensureFullscreenOverlay()
+  overlay.addEventListener('dragover', onOverlayDragOver)
+  overlay.addEventListener('drop', onOverlayDrop)
+
+  document.addEventListener('dragstart', onDragStart)
+  document.addEventListener('dragend', onDragEnd)
+  _dragHandlers.push(
+    { target: document, type: 'dragstart', fn: onDragStart },
+    { target: document, type: 'dragend', fn: onDragEnd },
+    { target: overlay, type: 'dragover', fn: onOverlayDragOver },
+    { target: overlay, type: 'drop', fn: onOverlayDrop }
+  )
+}
+
 function reinitDropZone() {
-  // Remove old drag event listeners
-  _removeDragHandlers();
+  _removeDragHandlers()
 
-  // Remove existing drop zone element
-  const oldZone = _shadowRoot.getElementById('glimpser-zone');
-  if (oldZone) oldZone.remove();
-
-  // Remove fullscreen overlay if present
-  const oldFsOverlay = _shadowRoot.getElementById('glimpser-fullscreen-overlay');
-  if (oldFsOverlay) oldFsOverlay.remove();
-  document.body.classList.remove('glimpser-fullscreen-active');
-
-  // Use already-updated _settings (set by caller before reinitDropZone)
-  state.draggedLink = null;
-
-  // Apply modal size immediately
-  if (_overlay && _settings.modalSize) {
-    const size = MODAL_SIZES[_settings.modalSize] || MODAL_SIZES.medium;
-    _overlay.style.width = size.width;
-    _overlay.style.height = size.height;
+  const oldZone = _shadowRoot.getElementById('gs-dropzone')
+  if (oldZone) {
+    oldZone.remove()
   }
 
-  const position = _settings.dropZonePosition || 'bottom';
+  const oldFullscreen = _shadowRoot.getElementById('gs-dropzone-overlay')
+  if (oldFullscreen) {
+    oldFullscreen.remove()
+  }
+
+  state.draggedLink = null
+
+  const position = _settings.dropZonePosition || 'bottom'
   if (position === 'fullscreen') {
-    _bindFullscreenDragEvents();
+    _bindFullscreenDragEvents()
   } else {
-    const dropZone = _createDropZoneElement(position, _settings.dropZoneCustomSize);
-    _shadowRoot.appendChild(dropZone);
-    _bindDropZoneEvents(dropZone);
+    const dropZone = _createDropZoneElement(position, _settings.dropZoneCustomSize)
+    _shadowRoot.appendChild(dropZone)
+    _bindDropZoneEvents(dropZone)
   }
 }
 
-/**
- * Initializes the Glimpser extension UI.
- * Injects Drop Zone and Modal overlay into the page, binds events.
- * Guards against duplicate injection via singleton check.
- *
- * @returns {Promise<void>}
- */
 async function initGlimpser() {
-  // Singleton guard via shadow host id
-  if (document.getElementById('glimpser-host')) {
-    return;
+  if (window !== top) {
+    _bindFrameDragBridge()
+    return
   }
 
-  // Inject page-level styles (scroll lock, fullscreen blur) into document head
-  // These must live outside shadow DOM since they target html/body
-  const pageStyle = document.createElement('style');
-  pageStyle.id = 'glimpser-page-style';
+  if (document.getElementById('gs-host')) {
+    return
+  }
+
+  const pageStyle = document.createElement('style')
+  pageStyle.id = 'gs-page-style'
   pageStyle.textContent = `
-    html.glimpser-open { overflow: hidden; scrollbar-gutter: stable; }
-    body.glimpser-fullscreen-active > *:not(#glimpser-host) {
+    body.gs-dropzone-fullscreen-active > *:not(#gs-host) {
       filter: blur(3px);
       transition: filter 0.2s ease;
     }
-  `;
-  document.head.appendChild(pageStyle);
+  `
+  document.head.appendChild(pageStyle)
 
-  // Create shadow host and attach shadow root
-  _shadowHost = document.createElement('div');
-  _shadowHost.id = 'glimpser-host';
-  _shadowHost.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;pointer-events:none;z-index:2147483645';
-  document.documentElement.appendChild(_shadowHost);
-  _shadowRoot = _shadowHost.attachShadow({ mode: 'open' });
+  _shadowHost = document.createElement('div')
+  _shadowHost.id = 'gs-host'
+  _shadowHost.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;pointer-events:none;z-index:2147483645'
+  document.documentElement.appendChild(_shadowHost)
+  _shadowRoot = _shadowHost.attachShadow({ mode: 'open' })
 
-  // Inject styles.css into shadow root
   try {
-    const nativeAPI = typeof browser !== 'undefined' ? browser : chrome;
-    const cssUrl = nativeAPI.runtime.getURL('styles.css');
-    const cssText = await fetch(cssUrl).then(r => r.text());
-    const styleEl = document.createElement('style');
-    styleEl.textContent = cssText;
-    _shadowRoot.appendChild(styleEl);
+    const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
+    const cssUrl = nativeAPI.runtime.getURL('styles.css')
+    const cssText = await fetch(cssUrl).then((response) => response.text())
+    const styleEl = document.createElement('style')
+    styleEl.textContent = cssText
+    _shadowRoot.appendChild(styleEl)
   } catch (e) {
-    console.warn('[Glimpser] Failed to load styles.css into shadow root', e);
+    console.warn('[Glimpser] Failed to load styles.css into shadow root', e)
   }
 
-  // Load user settings, falling back to defaults on failure
-  const settings = await loadSettings();
-  _settings = settings;
-  _dlog('settings loaded', _settings);
-  await applyLangPref(settings.language);
+  _settings = await loadSettings()
+  await applyLangPref(_settings.language)
 
-  // Inject Modal overlay DOM structure
-  ({ overlay: _overlay, iframe: _iframe, spinner: _spinner, errorMsg: _errorMsg, controlBar: _controlBar, backdrop: _backdrop } = _createModalOverlay(settings));
+  ensurePreviewLayer()
+  const theme = _settings.theme || _detectSystemTheme()
+  applyContentTheme(theme)
+  applyContentCorners(_settings.corners || 'rounded')
+  reinitDropZone()
+  ensureTooltipLayer()
 
-  // Apply theme to injected elements
-  const theme = settings.theme || _detectSystemTheme();
-  applyContentTheme(theme);
-  applyContentCorners(settings.corners || 'rounded');
-  applyContentControlBarSide(settings.controlBarSide || 'right');
-
-  // Click backdrop to close modal
-  _backdrop.addEventListener('click', () => closeModal());
-
-  // Bind control bar click events
-  _controlBar.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-action]');
-    if (!btn) return;
-    const action = btn.dataset.action;
-    handleControlAction(action, state.currentUrl, action === 'copy-url' ? btn : null);
-  });
-
-  // Bind iframe load/error events
-  _iframe.onload = () => {
-    if (_iframe.src === 'about:blank') return;
-    hideLoadingSpinner();
-    state.isLoading = false;
-    _iframe.classList.add('loaded');
-    _dlog('iframe loaded', _iframe.src);
-  };
-
-  _iframe.onerror = () => {
-    hideLoadingSpinner();
-    _errorMsg.style.display = '';
-    _errorMsg.textContent = t('errorLoadFailed');
-    _dlog('iframe error', _iframe.src);
-  };
-
-  // Bind ESC key to close Modal
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && state.isVisible) closeModal();
-  });
-
-  const position = settings.dropZonePosition || 'bottom';
-
-  if (position === 'fullscreen') {
-    _bindFullscreenDragEvents();
-  } else {
-    const dropZone = _createDropZoneElement(position, settings.dropZoneCustomSize);
-    _shadowRoot.appendChild(dropZone);
-    _bindDropZoneEvents(dropZone);
-  }
-}
-
-/**
- * Creates and returns the Drop Zone element for bottom/top modes.
- * @param {'bottom'|'top'} position
- * @param {{ width: number, height: number }} customSize
- * @returns {HTMLElement}
- */
-function _createDropZoneElement(position, customSize) {
-  const width = clamp((customSize && customSize.width) || 300, 100, 1200);
-  const height = clamp((customSize && customSize.height) || 150, 60, 400);
-
-  const zone = document.createElement('div');
-  zone.id = 'glimpser-zone';
-  zone.dataset.position = position;
-  zone.setAttribute('data-dp-theme', _currentTheme);
-  zone.style.width = width + 'px';
-  zone.style.height = height + 'px';
-  zone.innerHTML = `<span class="gs-drop-hint">${t('dropHintZone')}</span>`;
-
-  return zone;
-}
-
-/**
- * Shows the loading spinner and hides the error message area.
- */
-function showLoadingSpinner() {
-  if (_spinner) {
-    _spinner.style.display = '';
-  }
-  if (_errorMsg) {
-    _errorMsg.style.display = 'none';
-  }
-}
-
-/**
- * Hides the loading spinner.
- */
-function hideLoadingSpinner() {
-  if (_spinner) {
-    _spinner.style.display = 'none';
-  }
-}
-
-/**
- * Opens the Modal preview for the given URL.
- * Sets iframe src, shows overlay, updates state, shows loading spinner,
- * and optionally updates history (dedup + max 20 + persist).
- *
- * @param {string} url - A validated http/https URL
- * @param {typeof state} stateObj - The module state object
- * @param {typeof DEFAULT_SETTINGS} settingsObj - The current settings
- */
-function openModal(url, stateObj, settingsObj) {
-  if (_iframe) {
-    _iframe.src = url;
-  }
-  if (_overlay) {
-    _overlay.classList.add('visible');
-  }
-  if (_backdrop) {
-    _backdrop.classList.add('visible');
-  }
-  document.documentElement.classList.add('glimpser-open');
-
-  stateObj.isVisible = true;
-  stateObj.currentUrl = url;
-  stateObj.isLoading = true;
-
-  showLoadingSpinner();
-  _dlog('modal opened', url);
-}
-
-/**
- * Handles the drop event on the Drop Zone.
- * Reads the URL from state or dataTransfer, validates it, and opens the Modal.
- *
- * @param {DragEvent} event
- * @param {{ draggedLink: string|null }} state
- * @param {HTMLElement} dropZone
- */
-function handleDrop(event, state, dropZone) {
-  event.preventDefault();
-  event.stopPropagation();
-
-  dropZone.classList.remove('active', 'hovered');
-
-  const url =
-    state.draggedLink ||
-    event.dataTransfer.getData('text/uri-list') ||
-    event.dataTransfer.getData('URL') ||
-    event.dataTransfer.getData('text/plain');
-
-  if (_isDebugEnabled() && event.dataTransfer) {
-    _dlog('drop data', {
-      types: Array.from(event.dataTransfer.types || []),
-      hasDraggedLink: !!state.draggedLink,
-    });
-  }
-
-  if (validateURL(url)) {
-    openModal(url, state, _settings || DEFAULT_SETTINGS);
-  } else {
-    console.warn(t('warnInvalidUrl'));
-    _dlog('drop ignored: invalid url', url);
-  }
-
-  state.draggedLink = null;
-}
-
-/**
- * Binds drag events for bottom/top drop zone element.
- * @param {HTMLElement} dropZone
- */
-function _bindDropZoneEvents(dropZone) {
-  const onDragStart = (event) => {
-    const url = detectDraggedLink(event);
-    if (!url) return;
-    state.draggedLink = url;
-    // Small timeout matches nozo's approach: avoids triggering on accidental
-    // micro-movements during a regular click
-    setTimeout(() => {
-      dropZone.classList.add('active');
-    }, 100);
-  };
-
-  const onDragEnd = () => {
-    setTimeout(() => {
-      dropZone.classList.remove('active', 'hovered');
-      state.draggedLink = null;
-    }, 100);
-  };
-
-  document.addEventListener('dragstart', onDragStart);
-  document.addEventListener('dragend', onDragEnd);
-  _dragHandlers.push(
-    { target: document, type: 'dragstart', fn: onDragStart },
-    { target: document, type: 'dragend',   fn: onDragEnd }
-  );
-
-  dropZone.addEventListener('dragenter', (event) => {
-    event.preventDefault();
-    dropZone.classList.add('hovered');
-  });
-  dropZone.addEventListener('dragleave', (event) => {
-    if (event.relatedTarget && !dropZone.contains(event.relatedTarget)) {
-      dropZone.classList.remove('hovered');
-    }
-  });
-  dropZone.addEventListener('dragover', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    event.dataTransfer.dropEffect = 'copy';
-  });
-  dropZone.addEventListener('drop', (event) => {
-    handleDrop(event, state, dropZone);
-  });
-}
-
-/**
- * Binds drag events for fullscreen mode.
- * On dragstart, shows a fullscreen overlay; on dragend/drop, hides it.
- */
-function _bindFullscreenDragEvents() {
-  const onDragStart = (event) => {
-    const url = detectDraggedLink(event);
-    if (!url) return;
-    state.draggedLink = url;
-    setTimeout(() => {
-      let overlay = _shadowRoot.getElementById('glimpser-fullscreen-overlay');
-      if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'glimpser-fullscreen-overlay';
-        overlay.setAttribute('data-dp-theme', _currentTheme);
-        overlay.innerHTML = `<span class="gs-drop-hint">${t('dropHintFullscreen')}</span>`;
-        _shadowRoot.appendChild(overlay);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      const active = getActivePreview()
+      if (active) {
+        closePreview(active.id)
       }
-      overlay.classList.add('active');
-      document.body.classList.add('glimpser-fullscreen-active');
-    }, 100);
-  };
-
-  const onDragEnd = () => {
-    setTimeout(() => {
-      _hideFullscreenOverlay();
-    }, 100);
-  };
-
-  const onBodyDragOver = (event) => { if (state.draggedLink) event.preventDefault(); };
-  const onBodyDrop = (event) => {
-    if (!state.draggedLink) return;
-    event.preventDefault();
-    const url = state.draggedLink;
-    _hideFullscreenOverlay();
-    openModal(url, state, _settings || DEFAULT_SETTINGS);
-  };
-
-  document.addEventListener('dragstart', onDragStart);
-  document.addEventListener('dragend', onDragEnd);
-  document.body.addEventListener('dragover', onBodyDragOver);
-  document.body.addEventListener('drop', onBodyDrop);
-  _dragHandlers.push(
-    { target: document,      type: 'dragstart', fn: onDragStart },
-    { target: document,      type: 'dragend',   fn: onDragEnd },
-    { target: document.body, type: 'dragover',  fn: onBodyDragOver },
-    { target: document.body, type: 'drop',      fn: onBodyDrop }
-  );
-}
-
-/**
- * Hides and removes the fullscreen overlay.
- */
-function _hideFullscreenOverlay() {
-  const overlay = _shadowRoot ? _shadowRoot.getElementById('glimpser-fullscreen-overlay') : null;
-  if (overlay) {
-    overlay.classList.remove('active');
-  }
-  document.body.classList.remove('glimpser-fullscreen-active');
-  state.draggedLink = null;
-}
-
-/**
- * Handles a control bar button action.
- *
- * Actions:
- *   close         — closes the Modal
- *   open-current  — closes the Modal then navigates to url
- *   open-new-tab  — opens url in a new tab then closes the Modal
- *   copy-url      — writes url to clipboard; on success briefly shows ✓ on copyBtn
- *   open-settings — opens the extension options page via nativeAPI
- *
- * Requirements 7.3, 7.4, 7.5, 7.6, 7.7, 7.8
- *
- * @param {string} action - One of the ControlAction values
- * @param {string|null} url - The current preview URL
- * @param {HTMLElement|null} [copyBtn] - The copy button element (used for icon feedback)
- */
-function handleControlAction(action, url, copyBtn) {
-  switch (action) {
-    case 'close':
-      closeModal();
-      break;
-
-    case 'open-current':
-      closeModal();
-      location.href = url;
-      break;
-
-    case 'open-new-tab':
-      window.open(url, '_blank');
-      closeModal();
-      break;
-
-    case 'copy-url':
-      navigator.clipboard.writeText(url).then(() => {
-        if (copyBtn) {
-          copyBtn.textContent = '✓';
-          setTimeout(() => {
-            copyBtn.textContent = '⎘';
-          }, 1500);
-        }
-      }).catch((err) => {
-        console.error(t('errorClipboard'), err);
-      });
-      break;
-
-    case 'open-settings':
-      window.__glimpserSettingsPanel?.toggle();
-      break;
-  }
-}
-
-/**
- * Closes the Modal overlay.
- * Hides the overlay immediately, updates state, and resets iframe src after 350ms.
- *
- * Requirements 8.2, 8.3
- */
-function closeModal() {
-  if (_overlay) {
-    _overlay.classList.remove('visible');
-  }
-  if (_backdrop) {
-    _backdrop.classList.remove('visible');
-  }
-  document.documentElement.classList.remove('glimpser-open');
-
-  state.isVisible = false;
-  state.currentUrl = null;
-  _dlog('modal closed');
-
-  setTimeout(() => {
-    if (_iframe) {
-      _iframe.src = 'about:blank';
-      _iframe.classList.remove('loaded');
     }
-  }, 350);
+  })
+
+  window.addEventListener('resize', _refreshPreviewViewportBounds)
+  window.addEventListener('scroll', () => _hideTooltip(), true)
 }
 
-// Auto-initialize when running as a content script in the browser
 if (typeof exports === 'undefined') {
-  initGlimpser();
+  initGlimpser()
 
-  // Listen for settings panel toggle from background.js
-  const _nativeAPI = typeof browser !== 'undefined' ? browser : chrome;
-  _nativeAPI.runtime.onMessage.addListener((msg) => {
+  const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
+  window.addEventListener('message', (event) => {
+    if (event.source === window) {
+      return
+    }
+
+    if (event.data?.type === FRAME_DRAG_MESSAGE && validateURL(event.data.url)) {
+      state.draggedLink = event.data.url
+      const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
+      const fullscreen = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
+      if (zone) {
+        zone.classList.add('active')
+      }
+      if (fullscreen) {
+        fullscreen.classList.add('active')
+      }
+    }
+
+    if (event.data?.type === FRAME_DRAG_END_MESSAGE) {
+      const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
+      const fullscreen = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
+      if (zone) {
+        zone.classList.remove('active', 'hovered')
+      }
+      if (fullscreen) {
+        fullscreen.classList.remove('active')
+      }
+      state.draggedLink = null
+    }
+
+    if (event.data?.type === FRAME_FOCUS_MESSAGE) {
+      const preview = _getPreviewByFrameWindow(event.source)
+      if (preview) {
+        focusPreview(preview.id)
+      }
+    }
+
+    if (event.data?.type === FRAME_ESCAPE_MESSAGE) {
+      const preview = getActivePreview() || _getPreviewByFrameWindow(event.source)
+      if (preview) {
+        closePreview(preview.id)
+      }
+    }
+  })
+
+  nativeAPI.runtime.onMessage.addListener((msg) => {
+    if (window !== top) {
+      return
+    }
     if (msg.action === 'toggleSettings') {
-      window.__glimpserSettingsPanel?.toggle();
+      window.__gsSettingsPanel?.toggle()
     }
-  });
+  })
 
-  // Listen for settings changes from the panel
-  _nativeAPI.storage.onChanged.addListener((changes) => {
-    const newSettings = {};
+  nativeAPI.storage.onChanged.addListener((changes) => {
+    const newSettings = {}
     for (const [key, { newValue }] of Object.entries(changes)) {
-      newSettings[key] = newValue;
+      newSettings[key] = newValue
     }
-    _settings = { ...(_settings || DEFAULT_SETTINGS), ...newSettings };
-    if (Object.prototype.hasOwnProperty.call(newSettings, 'debug')) {
-      _dlog('debug logging updated', _settings.debug);
+
+    _settings = { ...(_settings || DEFAULT_SETTINGS), ...newSettings }
+
+    if (newSettings.maxPreviewWindows) {
+      _enforcePreviewWindowLimit()
     }
-    if (newSettings.theme) {
-      applyContentTheme(newSettings.theme);
+
+    if (newSettings.theme || newSettings.language) {
+      const theme = _settings.theme || _detectSystemTheme()
+      applyContentTheme(theme)
     }
-    if (newSettings.corners) {
-      applyContentCorners(newSettings.corners);
+
+    if (newSettings.corners || typeof newSettings.cornerRadius === 'number') {
+      applyContentCorners(_settings.corners)
     }
-    if (newSettings.controlBarSide) {
-      applyContentControlBarSide(newSettings.controlBarSide);
-    }
-    applyLangPref(_settings.language).then(() => reinitDropZone());
-  });
+
+    applyLangPref(_settings.language).then(() => {
+      _updatePreviewLabels()
+      _syncAllPreviewActionVisibility()
+      reinitDropZone()
+    })
+  })
 }
 
-// Export for testing (Node.js / vitest environment only)
 if (typeof exports !== 'undefined') {
-  Object.assign(exports, { validateURL, detectDraggedLink, initGlimpser, state, handleDrop, MODAL_SIZES, _createModalOverlay, _createControlBar, openModal, showLoadingSpinner, hideLoadingSpinner, closeModal, handleControlAction, loadSettings, DEFAULT_SETTINGS });
+  Object.assign(exports, {
+    validateURL,
+    detectDraggedLink,
+    loadSettings,
+    DEFAULT_SETTINGS,
+    state,
+    openPreview,
+    closePreview,
+    reloadPreview,
+    handlePreviewAction,
+    focusPreview,
+    previewManager,
+  })
 }

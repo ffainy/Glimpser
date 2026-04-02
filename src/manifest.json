@@ -23,12 +23,16 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
+      "all_frames": true,
       "js": ["i18n.js", "settings-panel.js", "content.js"],
       "run_at": "document_idle"
     }
   ],
   "background": {
     "scripts": ["background.js"]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"
   },
   "browser_specific_settings": {
     "gecko": {
