@@ -39,130 +39,6 @@
     },
   ];
 
-  // ── i18n labels ────────────────────────────────────────────────────────
-  const LABELS = {
-    en: {
-      title:          'Glimpser Settings',
-      tabAppearance:  'Appearance',
-      tabDropzone:    'Drop Zone',
-      tabPreview:     'Preview',
-      tabAbout:       'About',
-      labelTheme:     'Theme',
-      themeDark:      'Dark',
-      themeLight:     'Light',
-      hintThemeDark:  'Dark background — easier on the eyes in low light.',
-      hintThemeLight: 'Light background — matches bright pages.',
-      labelDebug:     'Debug logging',
-      debugOn:        'On',
-      debugOff:       'Off',
-      hintDebug:      'Write diagnostic logs to the console.',
-      labelCorners:   'Window corners',
-      cornersRounded: 'Rounded',
-      cornersSquare:  'Square',
-      hintCorners:    'Controls the border-radius of the preview window.',
-      labelCornerRadius: 'Corner radius',
-      hintCornerRadius: 'Adjusts the roundness of preview window corners.',
-      labelLang:      'Language',
-      labelPos:       'Drop Zone position',
-      posBottom:      'Bottom',
-      posTop:         'Top',
-      posFullscreen:  'Fullscreen',
-      hintPosBottom:  'A fixed bar at the bottom of the page. Drag a link onto it to preview.',
-      hintPosTop:     'A fixed bar at the top of the page.',
-      hintPosFullscreen: 'While dragging a link, a full-screen blurred overlay appears above the page and existing preview windows. Release anywhere on it to create a new preview window.',
-      labelSize:      'Drop Zone size',
-      hintSize:       'Width and height of the drop bar (not applicable in Fullscreen mode).',
-      labelW:         'W',
-      labelH:         'H',
-      labelDefaultWindowSize: 'Default window size',
-      labelWindowWidth: 'Width',
-      labelWindowHeight: 'Height',
-      hintDefaultWindowSize: 'Controls the initial size of newly created preview windows as a percentage of the current browser viewport.',
-      labelMaxPreviewWindows: 'Maximum preview windows',
-      hintMaxPreviewWindows: 'When the limit is reached, the oldest preview window closes automatically.',
-      labelWindowOffset: 'New window offset',
-      hintWindowOffset: 'Controls how far each new preview window is offset from the active one.',
-      labelClosePreviewOnOpenNewTab: 'Close preview after opening in a new tab',
-      hintClosePreviewOnOpenNewTab: 'If enabled, opening a link in a new tab also closes its preview window.',
-      labelHeaderActions: 'Header actions',
-      labelShowCloseOthersButton: 'Show "Close other previews"',
-      hintShowCloseOthersButton: 'Adds a button that closes every preview window except the current one.',
-      labelShowCloseAllButton: 'Show "Close all previews"',
-      hintShowCloseAllButton: 'Adds a button that closes every open preview window at once.',
-      btnReset:       'Reset',
-      btnSave:        'Save',
-      btnClose:       'Close',
-      saved:          'Saved ✓',
-      saveFailed:     'Save failed',
-      aboutName:      'Name',
-      aboutVersion:   'Version',
-      aboutDesc:      'Description',
-      aboutAuthor:    'Author',
-      aboutHomepage:  'Homepage',
-      aboutDescText:  'Drag links into Glimpser to open lightweight preview windows without leaving the current page. Multiple preview windows can stay open at the same time.',
-    },
-    zh: {
-      title:          'Glimpser 设置',
-      tabAppearance:  '外观',
-      tabDropzone:    '拖放区',
-      tabPreview:     '预览',
-      tabAbout:       '关于',
-      labelTheme:     '主题',
-      themeDark:      '深色',
-      themeLight:     '浅色',
-      hintThemeDark:  '深色背景，适合低光环境。',
-      hintThemeLight: '浅色背景，与亮色页面更协调。',
-      labelDebug:     '调试日志',
-      debugOn:        '开启',
-      debugOff:       '关闭',
-      hintDebug:      '将诊断日志输出到控制台。',
-      labelCorners:   '窗口圆角',
-      cornersRounded: '圆角',
-      cornersSquare:  '直角',
-      hintCorners:    '控制预览窗口的圆角大小。',
-      labelCornerRadius: '圆角半径',
-      hintCornerRadius: '调整预览窗口圆角的大小。',
-      labelLang:      '语言',
-      labelPos:       'Drop Zone 位置',
-      posBottom:      '底部',
-      posTop:         '顶部',
-      posFullscreen:  '全屏',
-      hintPosBottom:  '页面底部的固定拖放条，将链接拖到上面即可预览。',
-      hintPosTop:     '页面顶部的固定拖放条。',
-      hintPosFullscreen: '拖曳链接时，会出现一个覆盖原网页和现有预览窗口的全屏模糊遮罩；在遮罩上的任意位置松开即可创建新的预览窗口。',
-      labelSize:      'Drop Zone 尺寸',
-      hintSize:       '拖放条的宽度和高度（全屏模式下不适用）。',
-      labelW:         '宽',
-      labelH:         '高',
-      labelDefaultWindowSize: '默认窗口尺寸',
-      labelWindowWidth: '宽度',
-      labelWindowHeight: '高度',
-      hintDefaultWindowSize: '以当前浏览器视口百分比的方式控制新建预览窗口的默认宽度和高度。',
-      labelMaxPreviewWindows: '预览窗口数量上限',
-      hintMaxPreviewWindows: '达到上限后，会自动关闭最早创建的预览窗口。',
-      labelWindowOffset: '新窗口偏移',
-      hintWindowOffset: '控制新建预览窗口相对于当前激活窗口的偏移距离。',
-      labelClosePreviewOnOpenNewTab: '在新标签页打开后关闭预览',
-      hintClosePreviewOnOpenNewTab: '开启后，点击“在新标签页打开”会同时关闭对应的预览窗口。',
-      labelHeaderActions: '标题栏操作',
-      labelShowCloseOthersButton: '显示“关闭其他预览”',
-      hintShowCloseOthersButton: '在预览窗口标题栏中显示一个按钮，用来关闭除当前窗口外的其他预览。',
-      labelShowCloseAllButton: '显示“关闭全部预览”',
-      hintShowCloseAllButton: '在预览窗口标题栏中显示一个按钮，用来一次性关闭所有预览窗口。',
-      btnReset:       '重置',
-      btnSave:        '保存',
-      btnClose:       '关闭',
-      saved:          '已保存 ✓',
-      saveFailed:     '保存失败',
-      aboutName:      '名称',
-      aboutVersion:   '版本',
-      aboutDesc:      '简介',
-      aboutAuthor:    '作者',
-      aboutHomepage:  '主页',
-      aboutDescText:  '将链接拖入 Glimpser，在当前页面内打开轻量预览窗口，无需离开当前浏览上下文。支持多个预览窗口同时存在。',
-    },
-  };
-
   const DEFAULT_SETTINGS = {
     dropZonePosition:   'bottom',
     dropZoneCustomSize: { width: 300, height: 150 },
@@ -187,8 +63,7 @@
   let _scrollLockState = null;
 
   function _t(key) {
-    const lang = (_settings?.language === 'zh') ? 'zh' : 'en';
-    return LABELS[lang]?.[key] ?? LABELS.en[key] ?? key;
+    return typeof t === 'function' ? t(key) : key;
   }
 
   function _resolveDefaultWindowScale(settings) {
@@ -321,7 +196,7 @@
 
     const title = document.createElement('div');
     title.className = 'gs-settings-title';
-    title.textContent = _t('title');
+    title.textContent = _t('settingsTitle');
 
     const scroll = document.createElement('div');
     scroll.className = 'gs-settings-scroll';
@@ -355,7 +230,7 @@
 
     const closeBtn = document.createElement('button');
     closeBtn.className = 'gs-btn gs-btn-secondary';
-    closeBtn.textContent = _t('btnClose');
+    closeBtn.textContent = _t('settingsClose');
     if (document.documentElement.dataset.dpStandalone) {
       closeBtn.addEventListener('click', () => window.close());
     } else {
@@ -869,6 +744,8 @@
     } catch (e) {
       _settings = _cloneDefaultSettings();
     }
+
+    await applyLangPref(_settings?.language);
 
     // Auto-detect theme on first use
     if (!_settings.theme) {

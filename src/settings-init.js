@@ -12,4 +12,4 @@ _api.storage.sync.get({ theme: null }).then(({ theme }) => {
 }).catch(() => {});
 
 // Open the settings panel
-window.__glimpserSettingsPanel?.show();
+window.__gsSettingsPanel?.show();
