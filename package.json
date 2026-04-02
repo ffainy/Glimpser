@@ -1,6 +1,6 @@
 ﻿{
   "name": "glimpser",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Browser extension to preview links in a Modal iframe via drag-and-drop",
   "type": "module",
   "scripts": {
