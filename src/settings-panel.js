@@ -787,4 +787,17 @@
 
   // Expose for content.js
   window.__gsSettingsPanel = { toggle, show, hide };
+
+  if (document.documentElement.dataset.dpStandalone) {
+    nativeAPI.storage.sync.get({ theme: null }).then(({ theme }) => {
+      const resolved = theme === 'light'
+        ? 'light'
+        : theme === 'dark'
+          ? 'dark'
+          : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.body.setAttribute('data-dp-theme', resolved);
+    }).catch(() => {});
+
+    show();
+  }
 })();

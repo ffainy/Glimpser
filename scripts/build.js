@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 // scripts/build.js — Build script for Glimpser extension
 // Merges manifests, copies source files, and packages into zip archives.
 
@@ -22,7 +22,6 @@ const SOURCE_FILES = [
   'styles.css',
   'settings.html',
   'settings-panel.js',
-  'settings-init.js',
 ]
 const SOURCE_DIRS = ['icons', '_locales']
 
