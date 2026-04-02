@@ -33,6 +33,11 @@ jobs:
         run: |
           npm version "${{ steps.version.outputs.VERSION }}" --no-git-tag-version
 
+      - name: Run release quality gates
+        run: |
+          npm test
+          node scripts/build.js ${{ steps.version.outputs.VERSION }}
+
       - name: Generate changelog and release notes
         run: node scripts/update-changelog.mjs --tag ${{ github.ref_name }}
 
@@ -61,9 +66,6 @@ jobs:
           git add CHANGELOG.md package.json package-lock.json
           git commit -m "build(release): sync metadata for ${{ github.ref_name }}"
           git push origin "HEAD:$DEFAULT_BRANCH"
-
-      - name: Build Firefox and Chrome packages
-        run: node scripts/build.js ${{ steps.version.outputs.VERSION }}
 
       - name: Create Firefox XPI (rename from zip)
         run: |
