@@ -3,3 +3,4 @@
 .secret
 _temp
 .github/release-notes.md
+node_modules
