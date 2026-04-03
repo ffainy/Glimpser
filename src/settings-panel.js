@@ -23,19 +23,19 @@
   const TABS = [
     {
       key: 'appearance',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14.4 3.419a.639.639 0 0 1 1.2 0l.61 1.668a9.59 9.59 0 0 0 5.703 5.703l1.668.61a.639.639 0 0 1 0 1.2l-1.668.61a9.59 9.59 0 0 0-5.703 5.703l-.61 1.668a.639.639 0 0 1-1.2 0l-.61-1.668a9.59 9.59 0 0 0-5.703-5.703l-1.668-.61a.639.639 0 0 1 0-1.2l1.668-.61a9.59 9.59 0 0 0 5.703-5.703zM8 16.675a.266.266 0 0 1 .5 0l.254.694a4 4 0 0 0 2.376 2.377l.695.254a.266.266 0 0 1 0 .5l-.695.254a4 4 0 0 0-2.376 2.377l-.254.694a.266.266 0 0 1-.5 0l-.254-.694a4 4 0 0 0-2.376-2.377l-.695-.254a.266.266 0 0 1 0-.5l.695-.254a4 4 0 0 0 2.376-2.377zM4.2.21a.32.32 0 0 1 .6 0l.305.833a4.8 4.8 0 0 0 2.852 2.852l.833.305a.32.32 0 0 1 0 .6l-.833.305a4.8 4.8 0 0 0-2.852 2.852L4.8 8.79a.32.32 0 0 1-.6 0l-.305-.833a4.8 4.8 0 0 0-2.852-2.852L.21 4.8a.32.32 0 0 1 0-.6l.833-.305a4.8 4.8 0 0 0 2.852-2.852z"/></svg>',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m7.533 11.862l.01-.003m5.581 7.143c-.5.515-.92.847-1.06.89c-.48.145-5.43-1.28-6.238-3.33c-.81-2.051-1.831-5.816-1.89-6.22c-.06-.404 1.56-1.724 3.597-2.61m1.989 8.055c-.227.262-.39.56-.556.847M13.5 12c.5.5 1 1.049 2 1.049S17 12.5 17.5 12m-4-4h.01m3.99 0h.01M10.5 5.5c0-.29 2.5-1.5 5-1.5s5 1.136 5 1.5V12c0 1.966-4.291 5-5 5c-.743 0-5-3.034-5-5z"/></svg>',
     },
     {
       key: 'dropzone',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M2 3.75C2 2.784 2.784 2 3.75 2h16.5c.966 0 1.75.784 1.75 1.75v16.5A1.75 1.75 0 0 1 20.25 22H9.75a.75.75 0 0 1 0-1.5h10.5a.25.25 0 0 0 .25-.25V9h-17v3A.75.75 0 0 1 2 12ZM9 7.5h11.5V3.75a.25.25 0 0 0-.25-.25H9Zm-5.5 0h4v-4H3.75a.25.25 0 0 0-.25.25Z"/><path fill="currentColor" d="m9.308 14.5l-2.104-2.236a.75.75 0 1 1 1.092-1.028l3.294 3.5a.75.75 0 0 1 0 1.028l-3.294 3.5a.75.75 0 1 1-1.092-1.028L9.308 16H6.09a2.59 2.59 0 0 0-2.59 2.59v2.66a.75.75 0 0 1-1.5 0v-2.66a4.09 4.09 0 0 1 4.09-4.09z"/></svg>',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 11.5h13m-13 0V18a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-6.5m-13 0V9a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v2.5M9 5h11a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1"/></svg>',
     },
     {
       key: 'preview',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M11.063 1.456a1.75 1.75 0 0 1 1.874 0l8.383 5.316a1.75 1.75 0 0 1 0 2.956l-8.383 5.316a1.75 1.75 0 0 1-1.874 0L2.68 9.728a1.75 1.75 0 0 1 0-2.956Zm1.071 1.267a.25.25 0 0 0-.268 0L3.483 8.039a.25.25 0 0 0 0 .422l8.383 5.316a.25.25 0 0 0 .268 0l8.383-5.316a.25.25 0 0 0 0-.422Z"/><path fill="currentColor" d="M1.867 12.324a.75.75 0 0 1 1.035-.232l8.964 5.685a.25.25 0 0 0 .268 0l8.964-5.685a.75.75 0 0 1 .804 1.267l-8.965 5.685a1.75 1.75 0 0 1-1.874 0l-8.965-5.685a.75.75 0 0 1-.231-1.035"/><path fill="currentColor" d="M1.867 16.324a.75.75 0 0 1 1.035-.232l8.964 5.685a.25.25 0 0 0 .268 0l8.964-5.685a.75.75 0 0 1 .804 1.267l-8.965 5.685a1.75 1.75 0 0 1-1.874 0l-8.965-5.685a.75.75 0 0 1-.231-1.035"/></svg>',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.005 11.19V12l6.998 4.042L19 12v-.81M5 16.15v.81L11.997 21l6.998-4.042v-.81M12.003 3L5.005 7.042l6.998 4.042L19 7.042z"/></svg>',
     },
     {
       key: 'about',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M9.197 10a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5zm-2.382 4a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5zm-1.581 4a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5z"/><path fill="currentColor" d="M4.125 0h15.75a4.1 4.1 0 0 1 2.92 1.205A4.1 4.1 0 0 1 24 4.125c0 1.384-.476 2.794-1.128 4.16c-.652 1.365-1.515 2.757-2.352 4.104l-.008.013c-.849 1.368-1.669 2.691-2.28 3.97c-.614 1.283-.982 2.45-.982 3.503a2.625 2.625 0 1 0 4.083-2.183a.75.75 0 1 1 .834-1.247A4.126 4.126 0 0 1 19.875 24H4.5a4.125 4.125 0 0 1-4.125-4.125c0-2.234 1.258-4.656 2.59-6.902c.348-.586.702-1.162 1.05-1.728c.8-1.304 1.567-2.553 2.144-3.738H3.39c-.823 0-1.886-.193-2.567-1.035A3.65 3.65 0 0 1 0 4.125A4.125 4.125 0 0 1 4.125 0M15.75 19.875c0-1.38.476-2.786 1.128-4.15c.649-1.358 1.509-2.743 2.343-4.086l.017-.028c.849-1.367 1.669-2.692 2.28-3.972c.614-1.285.982-2.457.982-3.514A2.615 2.615 0 0 0 19.875 1.5a2.625 2.625 0 0 0-2.625 2.625c0 .865.421 1.509 1.167 2.009A.75.75 0 0 1 18 7.507H7.812c-.65 1.483-1.624 3.069-2.577 4.619c-.334.544-.666 1.083-.98 1.612c-1.355 2.287-2.38 4.371-2.38 6.137A2.625 2.625 0 0 0 4.5 22.5h12.193a4.1 4.1 0 0 1-.943-2.625M1.5 4.125c-.01.511.163 1.008.487 1.403c.254.313.74.479 1.402.479h12.86a3.65 3.65 0 0 1-.499-1.882a4.1 4.1 0 0 1 .943-2.625H4.125A2.625 2.625 0 0 0 1.5 4.125"/></svg>',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.714 15h4.268c.404 0 .732-.384.732-.857V3.857c0-.473-.328-.857-.732-.857H6.714a1 1 0 0 0-1 1v4m11 7v-3h3v3zm-3 6h-7a1 1 0 0 1-1-1a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3a1 1 0 0 1-1 1m-1-9.5a2.5 2.5 0 1 1-5 0a2.5 2.5 0 0 1 5 0"/></svg>',
     },
   ];
 
@@ -274,7 +274,11 @@
       { label: '中文',    value: 'zh' },
     ], _settings?.language === 'zh' ? 'zh' : 'en', v => {
       _settings.language = v;
-      _render();
+      applyLangPref(v).then(() => {
+        _render();
+      }).catch(() => {
+        _render();
+      });
     })));
 
     // Theme
@@ -370,48 +374,18 @@
     posContent.appendChild(posHintEl);
     tab.appendChild(_makeCard(_t('labelPos'), posContent));
 
-    // Size — sliders with live value display
     const sizeContent = document.createDocumentFragment();
-
-    const makeSliderRow = (labelKey, min, max, value, onChange) => {
-      const row = document.createElement('div');
-      row.className = 'gs-slider-row';
-
-      const header = document.createElement('div');
-      header.className = 'gs-slider-header';
-
-      const lbl = document.createElement('span');
-      lbl.className = 'gs-field-label';
-      lbl.style.marginBottom = '0';
-      lbl.textContent = _t(labelKey);
-
-      const val = document.createElement('span');
-      val.className = 'gs-value-chip';
-      val.textContent = value + ' px';
-
-      const slider = document.createElement('input');
-      slider.type = 'range';
-      slider.className = 'gs-slider';
-      slider.min = min; slider.max = max; slider.value = value;
-      slider.addEventListener('input', () => {
-        val.textContent = slider.value + ' px';
-        onChange(parseInt(slider.value));
-      });
-
-      header.append(lbl, val);
-      row.append(header, slider);
-      return row;
-    };
-
-    sizeContent.appendChild(makeSliderRow(
+    sizeContent.appendChild(_makeSliderRow(
       'labelW', 100, 1200,
       _settings?.dropZoneCustomSize?.width ?? 300,
-      v => { _settings.dropZoneCustomSize.width = v; }
+      v => { _settings.dropZoneCustomSize.width = v; },
+      'px'
     ));
-    sizeContent.appendChild(makeSliderRow(
+    sizeContent.appendChild(_makeSliderRow(
       'labelH', 60, 400,
       _settings?.dropZoneCustomSize?.height ?? 150,
-      v => { _settings.dropZoneCustomSize.height = v; }
+      v => { _settings.dropZoneCustomSize.height = v; },
+      'px'
     ));
     sizeContent.appendChild(_makeHint(_t('hintSize')));
 
@@ -436,6 +410,8 @@
 
     const card = document.createElement('div');
     card.className = 'gs-card';
+    const content = document.createElement('div');
+    content.className = 'gs-card-content gs-settings-about-content';
 
     // Extension name + logo row
     const nameRow = document.createElement('div');
@@ -446,7 +422,7 @@
     logo.innerHTML = BRAND_ICON_SVG;
 
     const nameBlock = document.createElement('div');
-    nameBlock.style.cssText = 'display:flex;flex-direction:column;justify-content:center';
+    nameBlock.className = 'gs-settings-about-name-block';
 
     const extName = document.createElement('div');
     extName.className = 'gs-settings-about-name';
@@ -454,13 +430,13 @@
 
     nameBlock.append(extName);
     nameRow.append(logo, nameBlock);
-    card.appendChild(nameRow);
+    content.appendChild(nameRow);
 
     // Description
     const desc = document.createElement('div');
     desc.className = 'gs-settings-about-desc';
     desc.textContent = _t('aboutDescText');
-    card.appendChild(desc);
+    content.appendChild(desc);
 
     // Info rows — values use accent color
     const rows = [
@@ -487,9 +463,10 @@
       }
 
       row.append(lbl, val);
-      card.appendChild(row);
+      content.appendChild(row);
     });
 
+    card.appendChild(content);
     tab.appendChild(card);
     return tab;
   }
@@ -561,7 +538,7 @@
     const headerActionsContent = document.createDocumentFragment();
 
     const closeOthersContent = document.createElement('div');
-    closeOthersContent.style.cssText = 'margin-bottom:16px';
+    closeOthersContent.className = 'gs-option-hint-group';
     closeOthersContent.appendChild(_makeOptionGroup([
       { label: _t('debugOn'), value: true },
       { label: _t('debugOff'), value: false },
@@ -572,6 +549,7 @@
     headerActionsContent.appendChild(_makeLabeledBlock(_t('labelShowCloseOthersButton'), closeOthersContent));
 
     const closeAllContent = document.createElement('div');
+    closeAllContent.className = 'gs-option-hint-group';
     closeAllContent.appendChild(_makeOptionGroup([
       { label: _t('debugOn'), value: true },
       { label: _t('debugOff'), value: false },
@@ -600,17 +578,20 @@
     const t = document.createElement('div');
     t.className = 'gs-card-title';
     t.textContent = titleText;
+    const contentWrap = document.createElement('div');
+    contentWrap.className = 'gs-card-content';
     card.appendChild(t);
     if (typeof content === 'function') {
       const result = content();
       if (result instanceof DocumentFragment || result instanceof Node) {
-        card.appendChild(result);
+        contentWrap.appendChild(result);
       }
     } else if (content instanceof Node) {
-      card.appendChild(content);
+      contentWrap.appendChild(content);
     } else if (content instanceof DocumentFragment) {
-      card.appendChild(content);
+      contentWrap.appendChild(content);
     }
+    card.appendChild(contentWrap);
     return card;
   }
 
@@ -643,7 +624,6 @@
 
     const lbl = document.createElement('span');
     lbl.className = 'gs-field-label';
-    lbl.style.marginBottom = '0';
     lbl.textContent = label;
 
     const val = document.createElement('span');
@@ -670,6 +650,7 @@
   // Option group where each option shows a per-option hint below when active
   function _makeOptionGroupWithHints(options, currentValue, onChange) {
     const wrap = document.createElement('div');
+    wrap.className = 'gs-option-hint-group';
 
     const group = document.createElement('div');
     group.className = 'gs-option-group';

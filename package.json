@@ -1,10 +1,10 @@
-﻿{
+{
   "name": "glimpser",
   "version": "0.0.3",
   "description": "Browser extension to preview links in a Modal iframe via drag-and-drop",
   "type": "module",
   "scripts": {
-    "test": "vitest --run",
+    "test": "vitest --run --passWithNoTests",
     "test:watch": "vitest",
     "build": "node scripts/build.js"
   },

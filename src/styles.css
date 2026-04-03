@@ -3,8 +3,6 @@
    Both inject this file into their respective shadow roots via fetch().
    ─────────────────────────────────────────────────────────────────────────── */
 
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
-
 /* ── 1. Shadow DOM reset ─────────────────────────────────────────────────── */
 /* Must come first — resets inherited page styles before we define our own.   */
 :host {
@@ -33,8 +31,8 @@
   --c-red:     239 68 68;
 
   /* Typography */
-  --font:      "Poppins", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  --font:      "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "Cascadia Code", monospace;
   --fw-regular: 400;
   --fw-medium:  500;
   --fw-semibold: 600;
@@ -866,6 +864,7 @@
   height: 68vh;
   max-height: 600px;
   min-height: 400px;
+  gap: 12px;
   transform: scale(0.94) translateY(12px);
   opacity: 0;
   transition: transform var(--t-slow), opacity var(--t-base);
@@ -880,7 +879,7 @@
 
 .gs-settings-tabs {
   position: absolute;
-  right: calc(100% + 10px);
+  right: calc(100% + 12px);
   top: 50%;
   transform: translateY(-50%);
   width: 48px;
@@ -1006,7 +1005,7 @@
 }
 
 .gs-settings-title {
-  padding: 22px 24px 18px;
+  padding: 24px 24px 20px;
   font-size: var(--fs-lg);
   font-weight: var(--fw-heavy);
   letter-spacing: 1.8px;
@@ -1026,7 +1025,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 20px 20px 8px;
+  padding: 18px 20px 18px;
 }
 
 .gs-settings-scroll::-webkit-scrollbar { width: 4px; }
@@ -1048,18 +1047,22 @@
 }
 
 .gs-settings-section.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   animation: gs-tab-in 0.2s var(--ease) both;
 }
 
 /* ── 14. Shared cards ────────────────────────────────────────────────────── */
 
 .gs-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   background: rgb(248 249 247 / 0.74);
   border: 1px solid var(--gs-border);
   border-radius: var(--r-md);
-  padding: 18px;
-  margin-bottom: 12px;
+  padding: 20px;
   position: relative;
   overflow: hidden;
   transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
@@ -1096,7 +1099,7 @@
   letter-spacing: 1.2px;
   text-transform: uppercase;
   color: var(--text-strong);
-  margin-bottom: 15px;
+  margin: 0;
   text-shadow: 0 0 0.6px rgb(var(--c-black) / 0.08);
 }
 
@@ -1105,13 +1108,20 @@
   text-shadow: 0 0 0.6px rgb(var(--c-white) / 0.08);
 }
 
+.gs-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 /* ── 15. Shared field text ───────────────────────────────────────────────── */
 
 .gs-field-label {
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
   color: var(--text-label);
-  margin-bottom: 8px;
+  margin-bottom: 0;
+  line-height: 1.4;
   letter-spacing: 0.18px;
 }
 
@@ -1119,19 +1129,19 @@
   font-size: var(--fs-xs);
   font-weight: var(--fw-regular);
   color: var(--text-faint);
-  margin-top: 10px;
+  margin-top: 0;
   line-height: 1.5;
 }
 
 .gs-setting-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .gs-setting-group + .gs-setting-group {
-  margin-top: 18px;
-  padding-top: 18px;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid rgb(var(--c-green) / 0.08);
 }
 
@@ -1141,11 +1151,19 @@
 }
 
 .gs-slider-row {
-  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.gs-slider-row:last-child {
-  margin-bottom: 0;
+.gs-option-hint-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gs-card-content > .gs-field-hint:first-child {
+  margin-top: -2px;
 }
 
 .gs-slider-header {
@@ -1153,7 +1171,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 6px;
+  min-height: 20px;
 }
 
 .gs-value-chip {
@@ -1161,20 +1179,31 @@
   font-weight: var(--fw-semibold);
   font-family: var(--font-mono);
   color: var(--gs-accent);
+  line-height: 1.4;
   letter-spacing: 0.18px;
 }
 
 /* ── 16. Shared option buttons ───────────────────────────────────────────── */
 
-.gs-option-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.gs-option-group {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  flex-wrap: wrap;
+}
 
 .gs-option-btn {
   flex: 1;
   min-width: 60px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 10px;
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
   font-family: var(--font);
+  line-height: 1.35;
   text-align: center;
   border-radius: var(--r-sm);
   border: 1px solid var(--gs-border);
@@ -1299,12 +1328,12 @@
 /* ── 18. Settings footer & buttons ───────────────────────────────────────── */
 
 .gs-settings-footer {
-  padding: 14px 20px;
+  padding: 16px 20px;
   border-top: 1px solid var(--gs-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   flex-shrink: 0;
   background: linear-gradient(to top, rgb(87 133 103 / 0.035), transparent);
 }
@@ -1313,7 +1342,7 @@
 .gs-settings-footer-end {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .gs-btn {
@@ -1409,6 +1438,7 @@
   font-size: var(--fs-xs);
   font-weight: var(--fw-medium);
   color: var(--gs-accent);
+  line-height: 1.4;
   margin-right: auto;
   opacity: 0;
   transition: opacity var(--t-fast);
@@ -1421,8 +1451,18 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
   min-height: 48px;
+}
+
+.gs-settings-about-content {
+  gap: 16px;
+}
+
+.gs-settings-about-name-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 
 .gs-settings-about-logo {
@@ -1468,7 +1508,6 @@
   font-weight: var(--fw-regular);
   color: var(--text-muted);
   line-height: 1.65;
-  margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--gs-border);
 }
@@ -1482,11 +1521,17 @@
   font-size: var(--fs-sm);
 }
 
+.gs-settings-about-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
 .gs-settings-about-label {
   color: var(--text-faint);
-  min-width: 80px;
+  min-width: 40px;
   flex-shrink: 0;
   font-weight: var(--fw-semibold);
+  line-height: 1.45;
 }
 
 .gs-settings-about-value {
@@ -1494,6 +1539,7 @@
   word-break: break-all;
   font-family: var(--font-mono);
   font-weight: var(--fw-medium);
+  line-height: 1.45;
   letter-spacing: 0.2px;
 }
 
