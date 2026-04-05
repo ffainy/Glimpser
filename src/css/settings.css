@@ -6,48 +6,118 @@
 :host,
 [data-dp-theme] {
   --gs-settings-inset-highlight: inset 0 1px 0 var(--gs-settings-highlight);
-  --gs-settings-pill-border: rgb(var(--gs-settings-accent) / 0.14);
-  --gs-settings-pill-bg: linear-gradient(135deg, rgb(var(--gs-settings-accent) / 0.12), rgb(var(--gs-settings-support) / 0.08));
+  --gs-settings-pill-border: rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-pill-bg: linear-gradient(135deg, rgb(var(--gs-settings-accent) / 0.09), rgb(var(--gs-settings-support) / 0.07));
   --gs-settings-pill-text: rgb(var(--gs-settings-accent));
-  --gs-settings-icon-surface: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.16), rgb(var(--gs-settings-support) / 0.08));
-  --gs-settings-icon-surface-hover: rgb(var(--gs-settings-accent) / 0.12);
-  --gs-settings-icon-surface-active: rgb(var(--gs-settings-accent) / 0.16);
-  --gs-settings-icon-border: rgb(var(--gs-settings-accent) / 0.2);
-  --gs-settings-icon-border-strong: rgb(var(--gs-settings-accent) / 0.22);
-  --gs-settings-icon-shadow: 0 22px 42px rgb(var(--gs-settings-accent) / 0.14);
-  --gs-settings-hover-border-soft: rgb(var(--gs-settings-accent) / 0.14);
-  --gs-settings-hover-border: rgb(var(--gs-settings-accent) / 0.18);
-  --gs-settings-active-border-soft: rgb(var(--gs-settings-accent) / 0.18);
-  --gs-settings-active-border: rgb(var(--gs-settings-accent) / 0.24);
-  --gs-settings-active-border-strong: rgb(var(--gs-settings-accent) / 0.28);
+  --gs-settings-icon-surface: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.14), rgb(var(--gs-settings-support) / 0.08));
+  --gs-settings-icon-surface-hover: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.16), rgb(var(--gs-settings-support) / 0.1));
+  --gs-settings-icon-surface-active: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.2), rgb(var(--gs-settings-support) / 0.12));
+  --gs-settings-icon-border: rgb(var(--gs-settings-accent) / 0.18);
+  --gs-settings-icon-border-strong: rgb(var(--gs-settings-accent) / 0.2);
+  --gs-settings-icon-shadow: 0 18px 34px rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-hover-border-soft: rgb(var(--gs-settings-accent) / 0.1);
+  --gs-settings-hover-border: rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-active-border-soft: rgb(var(--gs-settings-accent) / 0.16);
+  --gs-settings-active-border: rgb(var(--gs-settings-accent) / 0.2);
+  --gs-settings-active-border-strong: rgb(var(--gs-settings-accent) / 0.24);
   --gs-settings-accent-text: rgb(var(--gs-settings-accent));
   --gs-settings-accent-text-strong: rgb(var(--gs-settings-accent-strong));
-  --gs-settings-option-bg: rgb(var(--c-white) / 0.1);
-  --gs-settings-option-bg-hover: rgb(var(--c-white) / 0.18);
-  --gs-settings-button-secondary-bg: rgb(var(--c-white) / 0.12);
-  --gs-settings-button-secondary-bg-hover: rgb(var(--c-white) / 0.2);
-  --gs-settings-white-highlight-soft: rgb(var(--c-white) / 0.08);
-  --gs-settings-white-highlight-medium: rgb(var(--c-white) / 0.16);
+  --gs-settings-option-bg: rgb(255 255 255 / 0.12);
+  --gs-settings-option-bg-hover: rgb(255 255 255 / 0.18);
+  --gs-settings-button-secondary-bg: rgb(255 255 255 / 0.14);
+  --gs-settings-button-secondary-bg-hover: rgb(255 255 255 / 0.2);
+  --gs-settings-white-highlight-soft: rgb(255 255 255 / 0.08);
+  --gs-settings-white-highlight-medium: rgb(255 255 255 / 0.16);
   --gs-settings-panel-glow: radial-gradient(circle at top left, rgb(var(--gs-settings-accent) / 0.08), transparent 32%);
-  --gs-settings-panel-sheen: linear-gradient(180deg, rgb(var(--c-white) / 0.1), transparent 38%);
+  --gs-settings-panel-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.1), transparent 38%);
   --gs-settings-header-glow: radial-gradient(circle at top left, var(--gs-settings-halo-a), transparent 34%);
   --gs-settings-header-sheen: linear-gradient(180deg, var(--gs-settings-white-highlight-soft), transparent);
   --gs-settings-card-glow: radial-gradient(circle at top right, var(--gs-settings-halo-a), transparent 30%);
   --gs-settings-card-sheen: linear-gradient(180deg, var(--gs-settings-white-highlight-soft), transparent 34%);
-  --gs-settings-depth-soft: 0 10px 24px rgb(var(--c-black) / 0.05);
-  --gs-settings-depth-hover: 0 12px 24px rgb(var(--c-black) / 0.08);
-  --gs-settings-card-shadow: 0 18px 38px rgb(var(--c-black) / 0.08);
-  --gs-settings-card-shadow-hover: 0 24px 48px rgb(var(--c-black) / 0.12);
+  --gs-settings-depth-soft: 0 10px 24px rgb(0 0 0 / 0.05);
+  --gs-settings-depth-hover: 0 12px 24px rgb(0 0 0 / 0.08);
+  --gs-settings-card-shadow: 0 18px 38px rgb(0 0 0 / 0.08);
+  --gs-settings-card-shadow-hover: 0 24px 48px rgb(0 0 0 / 0.12);
   --gs-settings-accent-shadow: 0 14px 32px rgb(var(--gs-settings-accent) / 0.14);
   --gs-settings-accent-shadow-strong: 0 12px 24px rgb(var(--gs-settings-accent) / 0.16);
   --gs-settings-primary-shadow: 0 16px 32px rgb(var(--gs-settings-accent) / 0.26);
   --gs-settings-primary-shadow-hover: 0 18px 34px rgb(var(--gs-settings-accent) / 0.3);
   --gs-settings-slider-track: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.42), rgb(var(--gs-settings-support) / 0.2));
-  --gs-settings-slider-thumb-bg: linear-gradient(135deg, rgb(var(--c-white)), rgb(var(--gs-settings-accent) / 0.98));
+  --gs-settings-slider-thumb-bg: linear-gradient(135deg, rgb(255 255 255), rgb(var(--gs-settings-accent) / 0.98));
+  --gs-settings-display-glow: 0 1px 0 rgb(255 255 255 / 0.24);
+  --gs-settings-display-glow-strong: 0 1px 0 rgb(255 255 255 / 0.32);
   --gs-settings-slider-thumb-shadow: 0 0 0 4px rgb(var(--gs-settings-accent) / 0.16),
     0 8px 18px rgb(var(--gs-settings-accent) / 0.22);
   --gs-settings-slider-thumb-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.18),
     0 12px 20px rgb(var(--gs-settings-support) / 0.24);
+}
+
+:host([data-dp-theme="dark"]),
+[data-dp-theme="dark"] {
+  --gs-settings-pill-border: rgb(var(--gs-settings-accent) / 0.16);
+  --gs-settings-pill-bg: linear-gradient(135deg, rgb(var(--gs-settings-accent) / 0.14), rgb(var(--gs-settings-support) / 0.1));
+  --gs-settings-icon-surface: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.2), rgb(var(--gs-settings-support) / 0.12));
+  --gs-settings-icon-surface-hover: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.24), rgb(var(--gs-settings-support) / 0.14));
+  --gs-settings-icon-surface-active: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.3), rgb(var(--gs-settings-support) / 0.18));
+  --gs-settings-icon-border: rgb(var(--gs-settings-accent) / 0.24);
+  --gs-settings-icon-border-strong: rgb(var(--gs-settings-accent) / 0.26);
+  --gs-settings-icon-shadow: 0 0 0 1px rgb(var(--gs-settings-accent) / 0.12), 0 18px 36px rgb(var(--gs-settings-accent) / 0.2), 0 10px 26px rgb(var(--gs-settings-support) / 0.1);
+  --gs-settings-hover-border-soft: rgb(var(--gs-settings-accent) / 0.16);
+  --gs-settings-hover-border: rgb(var(--gs-settings-accent) / 0.22);
+  --gs-settings-active-border-soft: rgb(var(--gs-settings-accent) / 0.24);
+  --gs-settings-active-border: rgb(var(--gs-settings-accent) / 0.3);
+  --gs-settings-active-border-strong: rgb(var(--gs-settings-accent) / 0.36);
+  --gs-settings-option-bg: rgb(255 255 255 / 0.08);
+  --gs-settings-option-bg-hover: rgb(255 255 255 / 0.12);
+  --gs-settings-button-secondary-bg: rgb(255 255 255 / 0.08);
+  --gs-settings-button-secondary-bg-hover: rgb(255 255 255 / 0.12);
+  --gs-settings-panel-glow: radial-gradient(circle at top left, rgb(var(--gs-settings-accent) / 0.16), transparent 30%);
+  --gs-settings-panel-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 38%);
+  --gs-settings-card-glow: radial-gradient(circle at top right, rgb(var(--gs-settings-accent) / 0.14), transparent 30%);
+  --gs-settings-depth-soft: 0 12px 28px rgb(4 3 10 / 0.28);
+  --gs-settings-depth-hover: 0 16px 32px rgb(4 3 10 / 0.34);
+  --gs-settings-card-shadow: 0 22px 46px rgb(4 3 10 / 0.34), 0 0 24px rgb(var(--gs-settings-accent) / 0.07);
+  --gs-settings-card-shadow-hover: 0 28px 58px rgb(4 3 10 / 0.42), 0 0 28px rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-accent-shadow: 0 0 0 1px rgb(var(--gs-settings-accent) / 0.12), 0 18px 34px rgb(var(--gs-settings-accent) / 0.18), 0 0 24px rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-accent-shadow-strong: 0 0 0 1px rgb(var(--gs-settings-accent) / 0.16), 0 18px 34px rgb(var(--gs-settings-accent) / 0.22), 0 0 28px rgb(var(--gs-settings-support) / 0.12);
+  --gs-settings-primary-shadow: 0 18px 36px rgb(var(--gs-settings-accent) / 0.28), 0 0 24px rgb(var(--gs-settings-support) / 0.12);
+  --gs-settings-primary-shadow-hover: 0 22px 42px rgb(var(--gs-settings-accent) / 0.34), 0 0 32px rgb(var(--gs-settings-support) / 0.16);
+  --gs-settings-slider-thumb-shadow: 0 0 0 4px rgb(var(--gs-settings-accent) / 0.18), 0 10px 20px rgb(var(--gs-settings-accent) / 0.28), 0 0 18px rgb(var(--gs-settings-support) / 0.1);
+  --gs-settings-slider-thumb-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.22), 0 12px 22px rgb(var(--gs-settings-accent) / 0.32), 0 0 24px rgb(var(--gs-settings-support) / 0.14);
+  --gs-settings-display-glow: 0 0 12px rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-display-glow-strong: 0 0 18px rgb(var(--gs-settings-accent) / 0.18), 0 0 30px rgb(var(--gs-settings-support) / 0.08);
+}
+
+:host([data-dp-theme="light"]),
+[data-dp-theme="light"] {
+  --gs-settings-pill-border: rgb(var(--gs-settings-accent) / 0.1);
+  --gs-settings-pill-bg: linear-gradient(135deg, rgb(var(--gs-settings-accent) / 0.06), rgb(var(--gs-settings-support) / 0.05));
+  --gs-settings-icon-surface: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.08), rgb(var(--gs-settings-support) / 0.06));
+  --gs-settings-icon-surface-hover: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.1), rgb(var(--gs-settings-support) / 0.08));
+  --gs-settings-icon-surface-active: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.14), rgb(var(--gs-settings-support) / 0.1));
+  --gs-settings-icon-border: rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-icon-border-strong: rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-icon-shadow: 0 14px 26px rgb(44 37 48 / 0.08);
+  --gs-settings-hover-border-soft: rgb(var(--gs-settings-accent) / 0.08);
+  --gs-settings-hover-border: rgb(var(--gs-settings-accent) / 0.1);
+  --gs-settings-active-border-soft: rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-active-border: rgb(var(--gs-settings-accent) / 0.16);
+  --gs-settings-active-border-strong: rgb(var(--gs-settings-accent) / 0.2);
+  --gs-settings-option-bg: rgb(255 255 255 / 0.66);
+  --gs-settings-option-bg-hover: rgb(255 255 255 / 0.82);
+  --gs-settings-button-secondary-bg: rgb(255 255 255 / 0.7);
+  --gs-settings-button-secondary-bg-hover: rgb(255 255 255 / 0.84);
+  --gs-settings-panel-glow: radial-gradient(circle at top left, rgb(var(--gs-settings-accent) / 0.04), transparent 32%);
+  --gs-settings-panel-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.82), transparent 38%);
+  --gs-settings-card-glow: radial-gradient(circle at top right, rgb(var(--gs-settings-support) / 0.04), transparent 30%);
+  --gs-settings-depth-soft: 0 8px 18px rgb(44 37 48 / 0.05);
+  --gs-settings-depth-hover: 0 10px 22px rgb(44 37 48 / 0.08);
+  --gs-settings-card-shadow: 0 16px 30px rgb(44 37 48 / 0.06);
+  --gs-settings-card-shadow-hover: 0 18px 34px rgb(44 37 48 / 0.1);
+  --gs-settings-accent-shadow: 0 12px 24px rgb(var(--gs-settings-accent) / 0.08);
+  --gs-settings-accent-shadow-strong: 0 14px 28px rgb(var(--gs-settings-accent) / 0.1);
+  --gs-settings-primary-shadow: 0 14px 28px rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-primary-shadow-hover: 0 18px 32px rgb(var(--gs-settings-accent) / 0.18);
 }
 
 /* ── Settings overlay & shell ────────────────────────────────────────────── */
@@ -66,10 +136,10 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  font-family: var(--font);
+  font-family: var(--gs-font-family);
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--t-slow);
+  transition: opacity var(--gs-motion-slow);
 }
 
 .gs-settings-overlay.visible { opacity: 1; pointer-events: all; }
@@ -83,7 +153,7 @@
   gap: 18px;
   transform: scale(0.97) translateY(14px);
   opacity: 0;
-  transition: transform var(--t-slow), opacity var(--t-base);
+  transition: transform var(--gs-motion-slow), opacity var(--gs-motion-base);
 }
 
 .gs-settings-overlay.visible .gs-settings-shell {
@@ -107,11 +177,11 @@
   flex-direction: column;
   gap: 18px;
   padding: 24px;
-  border-radius: var(--r-3xl);
+  border-radius: var(--gs-radius-3xl);
   border: 1px solid var(--gs-settings-border);
   background:
     radial-gradient(circle at top right, var(--gs-settings-halo-a), transparent 32%),
-    linear-gradient(180deg, rgb(var(--c-white) / 0.16), transparent 46%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.16), transparent 46%),
     var(--gs-settings-surface);
   box-shadow: var(--gs-settings-shadow);
   overflow: hidden;
@@ -125,7 +195,7 @@
   height: 160px;
   border-radius: 50%;
   background: var(--gs-settings-halo-a);
-  filter: blur(30px);
+  filter: blur(38px);
   pointer-events: none;
 }
 
@@ -138,7 +208,7 @@
   background: var(--gs-settings-icon-surface);
   box-shadow:
     var(--gs-settings-icon-shadow),
-    inset 0 1px 0 rgb(var(--c-white) / 0.2);
+    inset 0 1px 0 rgb(255 255 255 / 0.2);
 }
 
 .gs-settings-brand-badge svg {
@@ -160,27 +230,28 @@
   width: fit-content;
   min-height: 28px;
   padding: 0 12px;
-  border-radius: var(--r-pill);
+  border-radius: var(--gs-radius-pill);
   border: 1px solid var(--gs-settings-pill-border);
   background: var(--gs-settings-pill-bg);
   color: var(--gs-settings-pill-text);
-  font-size: var(--fs-2xs);
-  font-weight: var(--fw-bold);
+  font-size: var(--gs-font-size-2xs);
+  font-weight: var(--gs-font-weight-bold);
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .gs-settings-brand-title {
   font-size: clamp(28px, 2.6vw, 40px);
-  font-weight: var(--fw-heavy);
+  font-weight: var(--gs-font-weight-heavy);
   line-height: 1.02;
   letter-spacing: -0.04em;
   color: var(--text-strong);
+  text-shadow: var(--gs-settings-display-glow);
 }
 
 .gs-settings-brand-hint,
 .gs-settings-subtitle {
-  font-size: var(--fs-sm);
+  font-size: var(--gs-font-size-sm);
   line-height: 1.7;
   color: var(--gs-settings-muted);
   max-width: 42ch;
@@ -191,7 +262,7 @@
   flex-direction: column;
   gap: 8px;
   padding: 10px;
-  border-radius: var(--r-3xl);
+  border-radius: var(--gs-radius-3xl);
   border: 1px solid var(--gs-settings-border);
   background: var(--gs-settings-surface);
   box-shadow: var(--gs-settings-shadow);
@@ -205,13 +276,13 @@
   gap: 14px;
   min-height: 70px;
   padding: 14px;
-  border-radius: var(--r-xl);
+  border-radius: var(--gs-radius-xl);
   border: 1px solid transparent;
   background: transparent;
   cursor: pointer;
   color: var(--gs-settings-tab-text);
   text-align: left;
-  transition: background var(--t-fast), color var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+  transition: background var(--gs-motion-fast), color var(--gs-motion-fast), box-shadow var(--gs-motion-fast), border-color var(--gs-motion-fast), transform var(--gs-motion-fast);
 }
 
 .gs-settings-tab-icon {
@@ -224,7 +295,7 @@
   border-radius: 14px;
   background: rgb(var(--gs-settings-accent-strong) / 0.08);
   color: inherit;
-  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
+  transition: background var(--gs-motion-fast), color var(--gs-motion-fast), transform var(--gs-motion-fast);
 }
 
 .gs-settings-tab svg {
@@ -241,15 +312,15 @@
 }
 
 .gs-settings-tab-label {
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
+  font-size: var(--gs-font-size-sm);
+  font-weight: var(--gs-font-weight-semibold);
   letter-spacing: 0.01em;
   color: inherit;
 }
 
 .gs-settings-tab-hint {
   display: block;
-  font-size: var(--fs-xs);
+  font-size: var(--gs-font-size-xs);
   line-height: 1.45;
   color: var(--gs-settings-faint);
 }
@@ -295,11 +366,11 @@
   backdrop-filter: blur(var(--gs-blur-2xl)) saturate(1.08);
   -webkit-backdrop-filter: blur(var(--gs-blur-2xl)) saturate(1.08);
   border: 1px solid var(--gs-settings-border);
-  border-radius: var(--r-4xl);
+  border-radius: var(--gs-radius-4xl);
   box-shadow: var(--gs-settings-shadow);
   overflow: hidden;
   color: var(--text);
-  font-family: var(--font);
+  font-family: var(--gs-font-family);
 }
 
 .gs-settings-header {
@@ -329,10 +400,11 @@
 
 .gs-settings-title {
   font-size: clamp(30px, 3vw, 42px);
-  font-weight: var(--fw-heavy);
+  font-weight: var(--gs-font-weight-heavy);
   letter-spacing: -0.05em;
   line-height: 0.96;
   color: var(--text-strong);
+  text-shadow: var(--gs-settings-display-glow-strong);
 }
 
 .gs-settings-theme-badge {
@@ -342,19 +414,19 @@
   gap: 10px;
   min-height: 42px;
   padding: 0 14px;
-  border-radius: var(--r-pill);
+  border-radius: var(--gs-radius-pill);
   color: var(--text-strong);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
+  font-size: var(--gs-font-size-sm);
+  font-weight: var(--gs-font-weight-semibold);
 }
 
 .gs-settings-theme-swatch {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 1px solid rgb(var(--c-black) / 0.1);
+  border: 1px solid rgb(0 0 0 / 0.1);
   background: var(--gs-settings-theme-swatch-bg);
-  box-shadow: 0 0 0 4px rgb(var(--c-white) / 0.3);
+  box-shadow: 0 0 0 4px rgb(255 255 255 / 0.3);
 }
 
 .gs-settings-summary {
@@ -375,8 +447,8 @@
 }
 
 .gs-settings-summary-label {
-  font-size: var(--fs-2xs);
-  font-weight: var(--fw-bold);
+  font-size: var(--gs-font-size-2xs);
+  font-weight: var(--gs-font-weight-bold);
   line-height: 1.3;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -386,10 +458,11 @@
 
 .gs-settings-summary-value {
   font-size: 22px;
-  font-weight: var(--fw-heavy);
+  font-weight: var(--gs-font-weight-heavy);
   line-height: 1.1;
   letter-spacing: -0.03em;
   color: var(--text-strong);
+  text-shadow: var(--gs-settings-display-glow);
 }
 
 .gs-settings-scroll {
@@ -422,7 +495,7 @@
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 16px;
-  animation: gs-tab-in 0.2s var(--ease) both;
+  animation: gs-tab-in 0.2s var(--gs-ease-standard) both;
 }
 
 /* ── Shared cards ────────────────────────────────────────────────────────── */
@@ -437,14 +510,14 @@
     var(--gs-settings-card-glow),
     var(--gs-settings-surface);
   border: 1px solid var(--gs-settings-border);
-  border-radius: var(--r-2xl);
+  border-radius: var(--gs-radius-2xl);
   padding: 22px;
   position: relative;
   overflow: hidden;
   box-shadow:
     var(--gs-settings-card-shadow),
     var(--gs-settings-inset-highlight);
-  transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base), background var(--t-base);
+  transition: border-color var(--gs-motion-base), box-shadow var(--gs-motion-base), transform var(--gs-motion-base), background var(--gs-motion-base);
 }
 
 .gs-card::before {
@@ -473,8 +546,8 @@
 }
 
 .gs-card-title {
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);
+  font-size: var(--gs-font-size-sm);
+  font-weight: var(--gs-font-weight-bold);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-strong);
@@ -490,8 +563,8 @@
 /* ── Shared field text ───────────────────────────────────────────────────── */
 
 .gs-field-label {
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
+  font-size: var(--gs-font-size-xs);
+  font-weight: var(--gs-font-weight-semibold);
   color: var(--text-label);
   margin-bottom: 0;
   line-height: 1.4;
@@ -499,8 +572,8 @@
 }
 
 .gs-field-hint {
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-regular);
+  font-size: var(--gs-font-size-xs);
+  font-weight: var(--gs-font-weight-regular);
   color: var(--gs-settings-faint);
   margin-top: 0;
   line-height: 1.5;
@@ -543,9 +616,9 @@
 }
 
 .gs-value-chip {
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
-  font-family: var(--font-mono);
+  font-size: var(--gs-font-size-xs);
+  font-weight: var(--gs-font-weight-semibold);
+  font-family: var(--gs-font-family-mono);
   color: var(--gs-settings-accent-text);
   line-height: 1.4;
   letter-spacing: 0.18px;
@@ -565,20 +638,20 @@
   align-items: center;
   justify-content: center;
   padding: 10px 12px;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-  font-family: var(--font);
+  font-size: var(--gs-font-size-sm);
+  font-weight: var(--gs-font-weight-semibold);
+  font-family: var(--gs-font-family);
   line-height: 1.35;
   text-align: center;
-  border-radius: var(--r-lg);
+  border-radius: var(--gs-radius-lg);
   border: 1px solid var(--gs-settings-border);
   background: var(--gs-settings-option-bg);
   color: var(--text-dim);
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: background var(--t-fast), border-color var(--t-fast),
-              color var(--t-fast), transform var(--t-base), box-shadow var(--t-base);
+  transition: background var(--gs-motion-fast), border-color var(--gs-motion-fast),
+    color var(--gs-motion-fast), transform var(--gs-motion-base), box-shadow var(--gs-motion-base);
 }
 
 .gs-option-btn::after {
@@ -633,7 +706,7 @@
 .gs-slider::-webkit-slider-runnable-track {
   height: 8px;
   background: var(--gs-settings-slider-track);
-  border-radius: var(--r-pill);
+  border-radius: var(--gs-radius-pill);
 }
 
 .gs-slider::-webkit-slider-thumb {
@@ -646,7 +719,7 @@
   margin-top: -5px;
   border: none;
   box-shadow: var(--gs-settings-slider-thumb-shadow);
-  transition: box-shadow var(--t-fast), transform var(--t-fast);
+  transition: box-shadow var(--gs-motion-fast), transform var(--gs-motion-fast);
 }
 
 .gs-slider:hover::-webkit-slider-thumb {
@@ -657,7 +730,7 @@
 .gs-slider::-moz-range-track {
   height: 8px;
   background: var(--gs-settings-slider-track);
-  border-radius: var(--r-pill);
+  border-radius: var(--gs-radius-pill);
   border: none;
 }
 
@@ -669,7 +742,7 @@
   border: none;
   cursor: pointer;
   box-shadow: var(--gs-settings-slider-thumb-shadow);
-  transition: box-shadow var(--t-fast), transform var(--t-fast);
+  transition: box-shadow var(--gs-motion-fast), transform var(--gs-motion-fast);
 }
 
 .gs-slider:hover::-moz-range-thumb {
@@ -705,22 +778,22 @@
   justify-content: center;
   min-height: 44px;
   padding: 10px 18px;
-  border-radius: var(--r-lg);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-  font-family: var(--font);
+  border-radius: var(--gs-radius-lg);
+  font-size: var(--gs-font-size-sm);
+  font-weight: var(--gs-font-weight-semibold);
+  font-family: var(--gs-font-family);
   cursor: pointer;
   border: 1px solid var(--gs-settings-border);
   white-space: nowrap;
-  transition: transform var(--t-base), box-shadow var(--t-base),
-              background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+  transition: transform var(--gs-motion-base), box-shadow var(--gs-motion-base),
+    background var(--gs-motion-fast), border-color var(--gs-motion-fast), color var(--gs-motion-fast);
 }
 
 .gs-btn:active { transform: scale(0.97); transition-duration: 0.08s; }
 
 .gs-btn-primary {
   background: linear-gradient(135deg, rgb(var(--gs-settings-accent-strong)), rgb(var(--gs-settings-support)));
-  color: rgb(var(--c-white));
+  color: rgb(255 255 255);
   border-color: var(--gs-settings-active-border);
   box-shadow: var(--gs-settings-primary-shadow);
 }
@@ -759,13 +832,13 @@
 /* ── Status & about ─────────────────────────────────────────────────────── */
 
 .gs-settings-status {
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-medium);
+  font-size: var(--gs-font-size-xs);
+  font-weight: var(--gs-font-weight-medium);
   color: var(--gs-settings-accent-text);
   line-height: 1.4;
   margin-right: auto;
   opacity: 0;
-  transition: opacity var(--t-fast);
+  transition: opacity var(--gs-motion-fast);
 }
 
 .gs-settings-status.visible { opacity: 1; }
@@ -792,13 +865,13 @@
 .gs-settings-about-logo {
   width: 64px;
   height: 64px;
-  border-radius: var(--r-xl);
+  border-radius: var(--gs-radius-xl);
   background: var(--gs-settings-icon-surface);
   border: 1px solid var(--gs-settings-icon-border-strong);
   color: var(--gs-settings-accent-text);
   flex-shrink: 0;
   box-shadow:
-    inset 0 1px 0 rgb(var(--c-white) / 0.16),
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
     0 18px 34px rgb(var(--gs-settings-accent) / 0.16);
 }
 
@@ -840,15 +913,16 @@
 
 .gs-settings-about-name {
   font-size: clamp(32px, 4vw, 52px);
-  font-weight: var(--fw-heavy);
+  font-weight: var(--gs-font-weight-heavy);
   color: var(--text-strong);
   letter-spacing: -0.05em;
   line-height: 0.94;
+  text-shadow: var(--gs-settings-display-glow-strong);
 }
 
 .gs-settings-about-desc {
   font-size: 15px;
-  font-weight: var(--fw-regular);
+  font-weight: var(--gs-font-weight-regular);
   color: var(--gs-settings-muted);
   line-height: 1.75;
   padding-bottom: 18px;
@@ -861,7 +935,7 @@
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid var(--gs-settings-border);
-  font-size: var(--fs-sm);
+  font-size: var(--gs-font-size-sm);
 }
 
 .gs-settings-about-row:last-child {
@@ -873,22 +947,22 @@
   color: var(--gs-settings-faint);
   min-width: 40px;
   flex-shrink: 0;
-  font-weight: var(--fw-semibold);
+  font-weight: var(--gs-font-weight-semibold);
   line-height: 1.45;
 }
 
 .gs-settings-about-value {
   color: var(--gs-settings-accent-text);
   word-break: break-all;
-  font-family: var(--font-mono);
-  font-weight: var(--fw-medium);
+  font-family: var(--gs-font-family-mono);
+  font-weight: var(--gs-font-weight-medium);
   line-height: 1.45;
   letter-spacing: 0.2px;
 }
 
 .gs-settings-about-link {
   text-decoration: none;
-  transition: color var(--t-fast), opacity var(--t-fast), text-decoration-color var(--t-fast);
+  transition: color var(--gs-motion-fast), opacity var(--gs-motion-fast), text-decoration-color var(--gs-motion-fast);
 }
 
 .gs-settings-about-link:hover {
