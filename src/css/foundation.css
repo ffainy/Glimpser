@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap");
+
 /* foundation.css — Shadow DOM reset + shared design tokens
    Shared by preview and settings UI.
    ─────────────────────────────────────────────────────────────────────────── */
@@ -19,6 +21,14 @@
   -webkit-font-smoothing: antialiased;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
 /* ── 2. Global tokens ────────────────────────────────────────────────────── */
 /* Primitive values only. Everything else is derived from these.              */
 :host {
@@ -26,8 +36,10 @@
   --gs-danger-rgb: 239 68 68;
 
   /* Typography */
-  --gs-font-family:         "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --gs-font-family-mono:    "Cascadia Code", monospace;
+  --gs-font-family-sans:    "Manrope", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --gs-font-family-serif:   "Cormorant Garamond", "Times New Roman", "Microsoft YaHei", serif;
+  --gs-font-family-mono:    "IBM Plex Mono", "Cascadia Code", "Microsoft YaHei", ui-monospace, monospace;
+  --gs-font-family:         var(--gs-font-family-sans);
   --gs-font-weight-regular: 400;
   --gs-font-weight-medium:  500;
   --gs-font-weight-semibold: 600;

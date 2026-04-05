@@ -25,6 +25,8 @@
   "settingsSaved":        { "message": "已保存" },
   "settingsSaveFailed":   { "message": "保存失败" },
   "tabAppearance":        { "message": "外观" },
+  "tabWorkspace":         { "message": "工作区" },
+  "tabAdvanced":          { "message": "高级" },
   "tabDropzone":          { "message": "拖放区域" },
   "tabPreview":           { "message": "预览" },
   "tabAbout":             { "message": "关于" },

@@ -26,16 +26,12 @@
       svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m7.533 11.862l.01-.003m5.581 7.143c-.5.515-.92.847-1.06.89c-.48.145-5.43-1.28-6.238-3.33c-.81-2.051-1.831-5.816-1.89-6.22c-.06-.404 1.56-1.724 3.597-2.61m1.989 8.055c-.227.262-.39.56-.556.847M13.5 12c.5.5 1 1.049 2 1.049S17 12.5 17.5 12m-4-4h.01m3.99 0h.01M10.5 5.5c0-.29 2.5-1.5 5-1.5s5 1.136 5 1.5V12c0 1.966-4.291 5-5 5c-.743 0-5-3.034-5-5z"/></svg>',
     },
     {
-      key: 'dropzone',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 11.5h13m-13 0V18a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-6.5m-13 0V9a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v2.5M9 5h11a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1"/></svg>',
+      key: 'workspace',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-5l-3 3v-3H6a2 2 0 0 1-2-2zm4 3h8m-8-3h8"/></svg>',
     },
     {
-      key: 'preview',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.005 11.19V12l6.998 4.042L19 12v-.81M5 16.15v.81L11.997 21l6.998-4.042v-.81M12.003 3L5.005 7.042l6.998 4.042L19 7.042z"/></svg>',
-    },
-    {
-      key: 'about',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.714 15h4.268c.404 0 .732-.384.732-.857V3.857c0-.473-.328-.857-.732-.857H6.714a1 1 0 0 0-1 1v4m11 7v-3h3v3zm-3 6h-7a1 1 0 0 1-1-1a3 3 0 0 1 3-3h3a3 3 0 0 1 3 3a1 1 0 0 1-1 1m-1-9.5a2.5 2.5 0 1 1-5 0a2.5 2.5 0 0 1 5 0"/></svg>',
+      key: 'advanced',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7m7.5-3.5l1.5 1l-1.5 1l-.3 1.2l.8 1.6l-1.4 1.4l-1.6-.8L16 19.5l-1 1.5l-1 .3l-1-.3l-1 1.5l-1.2-.3L9.2 20l-1.6.8l-1.4-1.4l.8-1.6L6.5 17L5 16l-1.5-1l1.5-1l.3-1.2l-.8-1.6l1.4-1.4l1.6.8L8 8.5L9 7l1-.3l1 .3l1-1.5l1.2.3l.8 1.7l1.6-.8l1.4 1.4l-.8 1.6z"/></svg>',
     },
   ];
 
@@ -85,32 +81,54 @@
     switch (key) {
       case 'appearance':
         return `${_t('labelTheme')} · ${_t('labelLang')} · ${_t('labelCorners')}`;
-      case 'dropzone':
-        return `${_t('labelPos')} · ${_t('labelSize')}`;
-      case 'preview':
-        return `${_t('labelDefaultWindowSize')} · ${_t('labelMaxPreviewWindows')} · ${_t('labelHeaderActions')}`;
-      case 'about':
+      case 'workspace':
+        return `${_t('labelPos')} · ${_t('labelDefaultWindowSize')} · ${_t('labelHeaderActions')}`;
+      case 'advanced':
         return _t('aboutDescText');
       default:
         return _t('aboutDescText');
     }
   }
 
-  function _getSummaryItems() {
-    return [
-      { label: _t('labelTheme'), value: _getActiveThemeLabel() },
-      { label: _t('labelLang'), value: _settings?.language === 'zh' ? '中文' : 'English' },
-      { label: _t('labelPos'), value: _t(`pos${(_settings?.dropZonePosition || 'bottom').charAt(0).toUpperCase()}${(_settings?.dropZonePosition || 'bottom').slice(1)}`) },
-      { label: _t('labelMaxPreviewWindows'), value: String(_settings?.maxPreviewWindows ?? DEFAULT_SETTINGS.maxPreviewWindows) },
-    ];
+  function _getHeaderMetaItems() {
+    switch (_activeTab) {
+      case 'appearance':
+        return [
+          { label: _t('labelTheme'), value: _getActiveThemeLabel() },
+          { label: _t('labelLang'), value: _settings?.language === 'zh' ? '中文' : 'English' },
+          { label: _t('labelCorners'), value: _settings?.corners === 'square' ? _t('cornersSquare') : _t('cornersRounded') },
+        ];
+      case 'workspace':
+        return [
+          { label: _t('labelPos'), value: _t(`pos${(_settings?.dropZonePosition || 'bottom').charAt(0).toUpperCase()}${(_settings?.dropZonePosition || 'bottom').slice(1)}`) },
+          { label: _t('labelDefaultWindowSize'), value: `${_settings?.defaultWindowScale?.width ?? DEFAULT_SETTINGS.defaultWindowScale.width}% × ${_settings?.defaultWindowScale?.height ?? DEFAULT_SETTINGS.defaultWindowScale.height}%` },
+          { label: _t('labelMaxPreviewWindows'), value: String(_settings?.maxPreviewWindows ?? DEFAULT_SETTINGS.maxPreviewWindows) },
+        ];
+      case 'advanced': {
+        const manifest = nativeAPI.runtime.getManifest();
+        return [
+          { label: _t('aboutVersion'), value: `v${manifest.version || '—'}` },
+          { label: _t('labelDebug'), value: (_settings?.debug ?? false) ? _t('debugOn') : _t('debugOff') },
+          { label: _t('aboutAuthor'), value: manifest.author || '—' },
+        ];
+      }
+      default:
+        return [];
+    }
   }
 
-  function _syncHeaderState(sectionKicker, subtitle) {
+  function _syncHeaderState(sectionKicker, subtitle, metaRow) {
     if (sectionKicker) {
       sectionKicker.textContent = _getTabLabel(_activeTab);
     }
     if (subtitle) {
       subtitle.textContent = _getTabDescription(_activeTab);
+    }
+    if (metaRow) {
+      metaRow.innerHTML = '';
+      _getHeaderMetaItems().forEach(({ label, value }) => {
+        metaRow.appendChild(_makeMetaItem(label, value));
+      });
     }
   }
 
@@ -277,7 +295,7 @@
           c.classList.remove('active');
           if (isActive) { void c.offsetWidth; c.classList.add('active'); }
         });
-        _syncHeaderState(sectionKicker, subtitle);
+        _syncHeaderState(sectionKicker, subtitle, metaRow);
       });
       tabNav.appendChild(btn);
     });
@@ -318,21 +336,20 @@
 
     headerTop.append(titleGroup, themeBadge);
 
-    const summaryGrid = document.createElement('div');
-    summaryGrid.className = 'gs-settings-summary';
-    _getSummaryItems().forEach(({ label, value }) => {
-      summaryGrid.appendChild(_makeSummaryItem(label, value));
+    const metaRow = document.createElement('div');
+    metaRow.className = 'gs-settings-meta';
+    _getHeaderMetaItems().forEach(({ label, value }) => {
+      metaRow.appendChild(_makeMetaItem(label, value));
     });
 
-    header.append(headerTop, summaryGrid);
+    header.append(headerTop, metaRow);
 
     const scroll = document.createElement('div');
     scroll.className = 'gs-settings-scroll';
 
     scroll.appendChild(_renderAppearanceTab());
-    scroll.appendChild(_renderDropzoneTab());
-    scroll.appendChild(_renderPreviewTab());
-    scroll.appendChild(_renderAboutTab());
+    scroll.appendChild(_renderWorkspaceTab());
+    scroll.appendChild(_renderAdvancedTab());
 
     // Footer
     const footer = document.createElement('div');
@@ -421,17 +438,6 @@
       }
     })));
 
-    // Debug logging
-    tab.appendChild(_makeCard(_t('labelDebug'), () => {
-      const wrap = document.createDocumentFragment();
-      wrap.appendChild(_makeOptionGroup([
-        { label: _t('debugOn'),  value: true  },
-        { label: _t('debugOff'), value: false },
-      ], _settings?.debug ?? false, v => { _settings.debug = v; }));
-      wrap.appendChild(_makeHint(_t('hintDebug')));
-      return wrap;
-    }));
-
     // Corners
     tab.appendChild(_makeCard(_t('labelCorners'), () => {
       const wrap = document.createDocumentFragment();
@@ -476,8 +482,8 @@
   }
 
   // ── Tab: Drop Zone ─────────────────────────────────────────────────────
-  function _renderDropzoneTab() {
-    const tab = _makeTab('dropzone');
+  function _renderWorkspaceTab() {
+    const tab = _makeTab('workspace');
 
     // Position — each option has its own hint shown below the group
     const posHints = {
@@ -502,109 +508,28 @@
     posContent.appendChild(posHintEl);
     tab.appendChild(_makeCard(_t('labelPos'), posContent, 'gs-card--feature'));
 
-    const sizeContent = document.createDocumentFragment();
-    sizeContent.appendChild(_makeSliderRow(
+    const dropSizeContent = document.createDocumentFragment();
+    dropSizeContent.appendChild(_makeSliderRow(
       _t('labelW'), 100, 1200,
       _settings?.dropZoneCustomSize?.width ?? 300,
       v => { _settings.dropZoneCustomSize.width = v; },
       'px'
     ));
-    sizeContent.appendChild(_makeSliderRow(
+    dropSizeContent.appendChild(_makeSliderRow(
       _t('labelH'), 60, 400,
       _settings?.dropZoneCustomSize?.height ?? 150,
       v => { _settings.dropZoneCustomSize.height = v; },
       'px'
     ));
-    sizeContent.appendChild(_makeHint(_t('hintSize')));
+    dropSizeContent.appendChild(_makeHint(_t('hintSize')));
 
-    const sizeCard = _makeCard(_t('labelSize'), sizeContent);
+    const sizeCard = _makeCard(_t('labelSize'), dropSizeContent);
     if (_settings?.dropZonePosition === 'fullscreen') sizeCard.style.display = 'none';
     tab.appendChild(sizeCard);
 
-    return tab;
-  }
-
-  // ── Tab: About ─────────────────────────────────────────────────────────
-  function _renderAboutTab() {
-    const tab = _makeTab('about');
-
-    // Get version from manifest via runtime
-    const manifest = nativeAPI.runtime.getManifest();
-    const version    = manifest.version      || '—';
-    const author     = manifest.author       || '—';
-    const authorUrl  = 'https://github.com/ffainy';
-    const homepage   = manifest.homepage_url || '';
-    const releaseLink = homepage ? `${homepage.replace(/\/$/, '')}/releases/tag/v${version}` : '';
-
-    const card = document.createElement('div');
-    card.className = 'gs-card gs-card--about';
-    const content = document.createElement('div');
-    content.className = 'gs-card-content gs-settings-about-content';
-
-    // Extension name + logo row
-    const nameRow = document.createElement('div');
-    nameRow.className = 'gs-settings-about-header';
-
-    const logo = document.createElement('div');
-    logo.className = 'gs-settings-about-logo';
-    logo.innerHTML = BRAND_ICON_SVG;
-
-    const nameBlock = document.createElement('div');
-    nameBlock.className = 'gs-settings-about-name-block';
-
-    const extName = document.createElement('div');
-    extName.className = 'gs-settings-about-name';
-    extName.textContent = 'Glimpser';
-
-    nameBlock.append(extName);
-    nameRow.append(logo, nameBlock);
-    content.appendChild(nameRow);
-
-    // Description
-    const desc = document.createElement('div');
-    desc.className = 'gs-settings-about-desc';
-    desc.textContent = _t('aboutDescText');
-    content.appendChild(desc);
-
-    // Info rows — values use accent color
-    const rows = [
-      { label: _t('aboutVersion'),  value: `v${version}`, link: releaseLink },
-      { label: _t('aboutAuthor'),   value: author,         link: authorUrl  },
-      { label: _t('aboutHomepage'), value: homepage,       link: homepage   },
-    ];
-
-    rows.forEach(({ label, value, link }) => {
-      const row = document.createElement('div');
-      row.className = 'gs-settings-about-row';
-
-      const lbl = document.createElement('span');
-      lbl.className = 'gs-settings-about-label';
-      lbl.textContent = label;
-
-      const val = link ? document.createElement('a') : document.createElement('span');
-      val.className = link ? 'gs-settings-about-value gs-settings-about-link' : 'gs-settings-about-value';
-      val.textContent = value;
-      if (link) {
-        val.href = link;
-        val.target = '_blank';
-        val.rel = 'noopener noreferrer';
-      }
-
-      row.append(lbl, val);
-      content.appendChild(row);
-    });
-
-    card.appendChild(content);
-    tab.appendChild(card);
-    return tab;
-  }
-
-  // ── Tab: Preview ───────────────────────────────────────────────────────
-  function _renderPreviewTab() {
-    const tab = _makeTab('preview');
     const windowScale = _resolveDefaultWindowScale(_settings);
-    const sizeContent = document.createDocumentFragment();
-    sizeContent.appendChild(_makeSliderRow(
+    const previewSizeContent = document.createDocumentFragment();
+    previewSizeContent.appendChild(_makeSliderRow(
       _t('labelWindowWidth'),
       35,
       92,
@@ -615,7 +540,7 @@
       },
       '%'
     ));
-    sizeContent.appendChild(_makeSliderRow(
+    previewSizeContent.appendChild(_makeSliderRow(
       _t('labelWindowHeight'),
       35,
       92,
@@ -626,9 +551,9 @@
       },
       '%'
     ));
-    sizeContent.appendChild(_makeHint(_t('hintDefaultWindowSize')));
+    previewSizeContent.appendChild(_makeHint(_t('hintDefaultWindowSize')));
 
-    tab.appendChild(_makeCard(_t('labelDefaultWindowSize'), sizeContent));
+    tab.appendChild(_makeCard(_t('labelDefaultWindowSize'), previewSizeContent));
 
     const maxWindowsContent = document.createDocumentFragment();
     maxWindowsContent.appendChild(_makeSliderRow(
@@ -687,7 +612,92 @@
     closeAllContent.appendChild(_makeHint(_t('hintShowCloseAllButton')));
     headerActionsContent.appendChild(_makeLabeledBlock(_t('labelShowCloseAllButton'), closeAllContent));
 
-    tab.appendChild(_makeCard(_t('labelHeaderActions'), headerActionsContent));
+    tab.appendChild(_makeCard(_t('labelHeaderActions'), headerActionsContent, 'gs-card--feature'));
+
+    return tab;
+  }
+
+  // ── Tab: Advanced ──────────────────────────────────────────────────────
+  function _renderAdvancedTab() {
+    const tab = _makeTab('advanced');
+
+    tab.appendChild(_makeCard(_t('labelDebug'), () => {
+      const wrap = document.createDocumentFragment();
+      wrap.appendChild(_makeOptionGroup([
+        { label: _t('debugOn'),  value: true  },
+        { label: _t('debugOff'), value: false },
+      ], _settings?.debug ?? false, v => { _settings.debug = v; }));
+      wrap.appendChild(_makeHint(_t('hintDebug')));
+      return wrap;
+    }));
+
+    // Get version from manifest via runtime
+    const manifest = nativeAPI.runtime.getManifest();
+    const version = manifest.version || '—';
+    const author = manifest.author || '—';
+    const authorUrl = 'https://github.com/ffainy';
+    const homepage = manifest.homepage_url || '';
+    const releaseLink = homepage ? `${homepage.replace(/\/$/, '')}/releases/tag/v${version}` : '';
+
+    const card = document.createElement('div');
+    card.className = 'gs-card gs-card--about';
+    const content = document.createElement('div');
+    content.className = 'gs-card-content gs-settings-about-content';
+
+    const nameRow = document.createElement('div');
+    nameRow.className = 'gs-settings-about-header';
+
+    const logo = document.createElement('div');
+    logo.className = 'gs-settings-about-logo';
+    logo.innerHTML = BRAND_ICON_SVG;
+
+    const nameBlock = document.createElement('div');
+    nameBlock.className = 'gs-settings-about-name-block';
+
+    const extName = document.createElement('div');
+    extName.className = 'gs-settings-about-name';
+    extName.textContent = 'Glimpser';
+
+    const eyebrow = document.createElement('div');
+    eyebrow.className = 'gs-settings-about-kicker';
+    eyebrow.textContent = _t('tabAdvanced');
+
+    nameBlock.append(eyebrow, extName);
+    nameRow.append(logo, nameBlock);
+    content.appendChild(nameRow);
+
+    const desc = document.createElement('div');
+    desc.className = 'gs-settings-about-desc';
+    desc.textContent = _t('aboutDescText');
+    content.appendChild(desc);
+
+    [
+      { label: _t('aboutVersion'), value: `v${version}`, link: releaseLink },
+      { label: _t('aboutAuthor'), value: author, link: authorUrl },
+      { label: _t('aboutHomepage'), value: homepage, link: homepage },
+    ].forEach(({ label, value, link }) => {
+      const row = document.createElement('div');
+      row.className = 'gs-settings-about-row';
+
+      const lbl = document.createElement('span');
+      lbl.className = 'gs-settings-about-label';
+      lbl.textContent = label;
+
+      const val = link ? document.createElement('a') : document.createElement('span');
+      val.className = link ? 'gs-settings-about-value gs-settings-about-link' : 'gs-settings-about-value';
+      val.textContent = value;
+      if (link) {
+        val.href = link;
+        val.target = '_blank';
+        val.rel = 'noopener noreferrer';
+      }
+
+      row.append(lbl, val);
+      content.appendChild(row);
+    });
+
+    card.appendChild(content);
+    tab.appendChild(card);
 
     return tab;
   }
@@ -700,16 +710,16 @@
     return div;
   }
 
-  function _makeSummaryItem(label, value) {
+  function _makeMetaItem(label, value) {
     const item = document.createElement('div');
-    item.className = 'gs-settings-summary-item';
+    item.className = 'gs-settings-meta-item';
 
     const labelEl = document.createElement('div');
-    labelEl.className = 'gs-settings-summary-label';
+    labelEl.className = 'gs-settings-meta-label';
     labelEl.textContent = label;
 
     const valueEl = document.createElement('div');
-    valueEl.className = 'gs-settings-summary-value';
+    valueEl.className = 'gs-settings-meta-value';
     valueEl.textContent = value;
 
     item.append(labelEl, valueEl);

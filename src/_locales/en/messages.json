@@ -25,6 +25,8 @@
   "settingsSaved":        { "message": "Saved" },
   "settingsSaveFailed":   { "message": "Couldn't save" },
   "tabAppearance":        { "message": "Appearance" },
+  "tabWorkspace":         { "message": "Workspace" },
+  "tabAdvanced":          { "message": "Advanced" },
   "tabDropzone":          { "message": "Drop area" },
   "tabPreview":           { "message": "Preview" },
   "tabAbout":             { "message": "About" },
