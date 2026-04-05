@@ -286,6 +286,17 @@ function _viewportRect() {
   }
 }
 
+async function _loadCssText(nativeAPI, paths) {
+  const cssChunks = await Promise.all(
+    paths.map(async (path) => {
+      const url = nativeAPI.runtime.getURL(path)
+      return fetch(url).then((response) => response.text())
+    })
+  )
+
+  return cssChunks.join('\n\n')
+}
+
 function _normalizePreviewBounds(preview) {
   const viewport = _viewportRect()
   const maxWidth = Math.max(MIN_PREVIEW_WIDTH, Math.floor(viewport.width * MAX_PREVIEW_WIDTH_RATIO))
@@ -1238,13 +1249,15 @@ async function initGlimpser() {
 
   try {
     const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
-    const cssUrl = nativeAPI.runtime.getURL('styles.css')
-    const cssText = await fetch(cssUrl).then((response) => response.text())
+    const cssText = await _loadCssText(nativeAPI, [
+      'css/foundation.css',
+      'css/preview.css',
+    ])
     const styleEl = document.createElement('style')
     styleEl.textContent = cssText
     _shadowRoot.appendChild(styleEl)
   } catch (e) {
-    console.warn('[Glimpser] Failed to load styles.css into shadow root', e)
+    console.warn('[Glimpser] Failed to load preview CSS into shadow root', e)
   }
 
   _settings = await loadSettings()

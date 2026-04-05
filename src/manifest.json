@@ -42,7 +42,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["_locales/*", "styles.css"],
+      "resources": ["_locales/*", "css/*.css"],
       "matches": ["<all_urls>"]
     }
   ],

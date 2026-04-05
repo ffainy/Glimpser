@@ -19,11 +19,10 @@ const SOURCE_FILES = [
   'i18n.js',
   'background.js',
   'content.js',
-  'styles.css',
   'settings.html',
   'settings-panel.js',
 ]
-const SOURCE_DIRS = ['icons', '_locales']
+const SOURCE_DIRS = ['icons', '_locales', 'css']
 
 function stripBom(content) {
   return content.replace(/^\uFEFF/, '')

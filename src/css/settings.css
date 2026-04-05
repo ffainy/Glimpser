@@ -1,0 +1,1022 @@
+/* settings.css — Settings panel UI
+   Depends on foundation.css.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Shared settings tokens ──────────────────────────────────────────────── */
+:host,
+[data-dp-theme] {
+  --gs-settings-inset-highlight: inset 0 1px 0 var(--gs-settings-highlight);
+  --gs-settings-pill-border: rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-pill-bg: linear-gradient(135deg, rgb(var(--gs-settings-accent) / 0.12), rgb(var(--gs-settings-support) / 0.08));
+  --gs-settings-pill-text: rgb(var(--gs-settings-accent));
+  --gs-settings-icon-surface: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.16), rgb(var(--gs-settings-support) / 0.08));
+  --gs-settings-icon-surface-hover: rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-icon-surface-active: rgb(var(--gs-settings-accent) / 0.16);
+  --gs-settings-icon-border: rgb(var(--gs-settings-accent) / 0.2);
+  --gs-settings-icon-border-strong: rgb(var(--gs-settings-accent) / 0.22);
+  --gs-settings-icon-shadow: 0 22px 42px rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-hover-border-soft: rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-hover-border: rgb(var(--gs-settings-accent) / 0.18);
+  --gs-settings-active-border-soft: rgb(var(--gs-settings-accent) / 0.18);
+  --gs-settings-active-border: rgb(var(--gs-settings-accent) / 0.24);
+  --gs-settings-active-border-strong: rgb(var(--gs-settings-accent) / 0.28);
+  --gs-settings-accent-text: rgb(var(--gs-settings-accent));
+  --gs-settings-accent-text-strong: rgb(var(--gs-settings-accent-strong));
+  --gs-settings-option-bg: rgb(var(--c-white) / 0.1);
+  --gs-settings-option-bg-hover: rgb(var(--c-white) / 0.18);
+  --gs-settings-button-secondary-bg: rgb(var(--c-white) / 0.12);
+  --gs-settings-button-secondary-bg-hover: rgb(var(--c-white) / 0.2);
+  --gs-settings-white-highlight-soft: rgb(var(--c-white) / 0.08);
+  --gs-settings-white-highlight-medium: rgb(var(--c-white) / 0.16);
+  --gs-settings-panel-glow: radial-gradient(circle at top left, rgb(var(--gs-settings-accent) / 0.08), transparent 32%);
+  --gs-settings-panel-sheen: linear-gradient(180deg, rgb(var(--c-white) / 0.1), transparent 38%);
+  --gs-settings-header-glow: radial-gradient(circle at top left, var(--gs-settings-halo-a), transparent 34%);
+  --gs-settings-header-sheen: linear-gradient(180deg, var(--gs-settings-white-highlight-soft), transparent);
+  --gs-settings-card-glow: radial-gradient(circle at top right, var(--gs-settings-halo-a), transparent 30%);
+  --gs-settings-card-sheen: linear-gradient(180deg, var(--gs-settings-white-highlight-soft), transparent 34%);
+  --gs-settings-depth-soft: 0 10px 24px rgb(var(--c-black) / 0.05);
+  --gs-settings-depth-hover: 0 12px 24px rgb(var(--c-black) / 0.08);
+  --gs-settings-card-shadow: 0 18px 38px rgb(var(--c-black) / 0.08);
+  --gs-settings-card-shadow-hover: 0 24px 48px rgb(var(--c-black) / 0.12);
+  --gs-settings-accent-shadow: 0 14px 32px rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-accent-shadow-strong: 0 12px 24px rgb(var(--gs-settings-accent) / 0.16);
+  --gs-settings-primary-shadow: 0 16px 32px rgb(var(--gs-settings-accent) / 0.26);
+  --gs-settings-primary-shadow-hover: 0 18px 34px rgb(var(--gs-settings-accent) / 0.3);
+  --gs-settings-slider-track: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.42), rgb(var(--gs-settings-support) / 0.2));
+  --gs-settings-slider-thumb-bg: linear-gradient(135deg, rgb(var(--c-white)), rgb(var(--gs-settings-accent) / 0.98));
+  --gs-settings-slider-thumb-shadow: 0 0 0 4px rgb(var(--gs-settings-accent) / 0.16),
+    0 8px 18px rgb(var(--gs-settings-accent) / 0.22);
+  --gs-settings-slider-thumb-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.18),
+    0 12px 20px rgb(var(--gs-settings-support) / 0.24);
+}
+
+/* ── Settings overlay & shell ────────────────────────────────────────────── */
+
+.gs-settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--gs-z-settings);
+  background:
+    radial-gradient(circle at top left, var(--gs-settings-halo-a), transparent 30%),
+    radial-gradient(circle at bottom right, var(--gs-settings-halo-b), transparent 24%),
+    var(--gs-settings-overlay-fill);
+  backdrop-filter: blur(var(--gs-blur-md)) saturate(1.08);
+  -webkit-backdrop-filter: blur(var(--gs-blur-md)) saturate(1.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: var(--font);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-slow);
+}
+
+.gs-settings-overlay.visible { opacity: 1; pointer-events: all; }
+
+.gs-settings-shell {
+  position: relative;
+  display: flex;
+  width: min(1120px, calc(100vw - 48px));
+  min-height: min(760px, calc(100vh - 48px));
+  max-height: calc(100vh - 48px);
+  gap: 18px;
+  transform: scale(0.97) translateY(14px);
+  opacity: 0;
+  transition: transform var(--t-slow), opacity var(--t-base);
+}
+
+.gs-settings-overlay.visible .gs-settings-shell {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* ── Settings tabs ───────────────────────────────────────────────────────── */
+
+.gs-settings-sidebar {
+  width: 308px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.gs-settings-brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  border-radius: var(--r-3xl);
+  border: 1px solid var(--gs-settings-border);
+  background:
+    radial-gradient(circle at top right, var(--gs-settings-halo-a), transparent 32%),
+    linear-gradient(180deg, rgb(var(--c-white) / 0.16), transparent 46%),
+    var(--gs-settings-surface);
+  box-shadow: var(--gs-settings-shadow);
+  overflow: hidden;
+  color: var(--text);
+}
+
+.gs-settings-sidebar-glow {
+  position: absolute;
+  inset: auto -48px -72px auto;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: var(--gs-settings-halo-a);
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.gs-settings-brand-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  color: var(--gs-settings-pill-text);
+  border: 1px solid var(--gs-settings-icon-border);
+  background: var(--gs-settings-icon-surface);
+  box-shadow:
+    var(--gs-settings-icon-shadow),
+    inset 0 1px 0 rgb(var(--c-white) / 0.2);
+}
+
+.gs-settings-brand-badge svg {
+  width: 34px;
+  height: 34px;
+}
+
+.gs-settings-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.gs-settings-brand-eyebrow,
+.gs-settings-kicker {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--gs-settings-pill-border);
+  background: var(--gs-settings-pill-bg);
+  color: var(--gs-settings-pill-text);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.gs-settings-brand-title {
+  font-size: clamp(28px, 2.6vw, 40px);
+  font-weight: var(--fw-heavy);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: var(--text-strong);
+}
+
+.gs-settings-brand-hint,
+.gs-settings-subtitle {
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  color: var(--gs-settings-muted);
+  max-width: 42ch;
+}
+
+.gs-settings-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--r-3xl);
+  border: 1px solid var(--gs-settings-border);
+  background: var(--gs-settings-surface);
+  box-shadow: var(--gs-settings-shadow);
+}
+
+.gs-settings-tab {
+  appearance: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 70px;
+  padding: 14px;
+  border-radius: var(--r-xl);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  color: var(--gs-settings-tab-text);
+  text-align: left;
+  transition: background var(--t-fast), color var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+}
+
+.gs-settings-tab-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgb(var(--gs-settings-accent-strong) / 0.08);
+  color: inherit;
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
+}
+
+.gs-settings-tab svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.gs-settings-tab-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gs-settings-tab-label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.01em;
+  color: inherit;
+}
+
+.gs-settings-tab-hint {
+  display: block;
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+  color: var(--gs-settings-faint);
+}
+
+.gs-settings-tab:not(.active):hover {
+  background: var(--gs-settings-surface-strong);
+  border-color: var(--gs-settings-hover-border-soft);
+  color: var(--text);
+  transform: translateX(2px);
+}
+
+.gs-settings-tab:not(.active):hover .gs-settings-tab-icon {
+  background: var(--gs-settings-icon-surface-hover);
+  color: var(--gs-settings-accent-text);
+}
+
+.gs-settings-tab.active {
+  background: var(--gs-settings-surface-active);
+  border-color: var(--gs-settings-active-border-soft);
+  color: var(--gs-settings-accent-text-strong);
+  box-shadow:
+    var(--gs-settings-accent-shadow),
+    var(--gs-settings-inset-highlight);
+}
+
+.gs-settings-tab.active .gs-settings-tab-icon {
+  background: var(--gs-settings-icon-surface-active);
+  color: var(--gs-settings-accent-text-strong);
+  transform: translateY(-1px);
+}
+
+/* ── Settings panel ──────────────────────────────────────────────────────── */
+
+.gs-settings-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background:
+    var(--gs-settings-panel-glow),
+    var(--gs-settings-panel-sheen),
+    var(--gs-settings-surface);
+  backdrop-filter: blur(var(--gs-blur-2xl)) saturate(1.08);
+  -webkit-backdrop-filter: blur(var(--gs-blur-2xl)) saturate(1.08);
+  border: 1px solid var(--gs-settings-border);
+  border-radius: var(--r-4xl);
+  box-shadow: var(--gs-settings-shadow);
+  overflow: hidden;
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.gs-settings-header {
+  position: relative;
+  padding: 28px 28px 22px;
+  border-bottom: 1px solid var(--gs-settings-border);
+  background:
+    var(--gs-settings-header-glow),
+    var(--gs-settings-header-sheen);
+  flex-shrink: 0;
+}
+
+.gs-settings-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.gs-settings-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.gs-settings-title {
+  font-size: clamp(30px, 3vw, 42px);
+  font-weight: var(--fw-heavy);
+  letter-spacing: -0.05em;
+  line-height: 0.96;
+  color: var(--text-strong);
+}
+
+.gs-settings-theme-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: var(--r-pill);
+  color: var(--text-strong);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.gs-settings-theme-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--c-black) / 0.1);
+  background: var(--gs-settings-theme-swatch-bg);
+  box-shadow: 0 0 0 4px rgb(var(--c-white) / 0.3);
+}
+
+.gs-settings-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.gs-settings-summary-item {
+  min-height: 94px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--gs-settings-border);
+  background: var(--gs-settings-surface-strong);
+  box-shadow:
+    var(--gs-settings-inset-highlight),
+    var(--gs-settings-depth-soft);
+}
+
+.gs-settings-summary-label {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
+  line-height: 1.3;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gs-settings-faint);
+  margin-bottom: 12px;
+}
+
+.gs-settings-summary-value {
+  font-size: 22px;
+  font-weight: var(--fw-heavy);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-strong);
+}
+
+.gs-settings-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 28px 28px;
+}
+
+.gs-settings-scroll::-webkit-scrollbar { width: 4px; }
+.gs-settings-scroll::-webkit-scrollbar-track { background: transparent; }
+.gs-settings-scroll::-webkit-scrollbar-thumb {
+  background: var(--gs-settings-scrollbar);
+  border-radius: 10px;
+}
+.gs-settings-scroll::-webkit-scrollbar-thumb:hover { background: rgb(var(--gs-settings-accent)); }
+.gs-settings-scroll { scrollbar-width: thin; scrollbar-color: var(--gs-settings-scrollbar) transparent; }
+
+/* ── Settings sections ───────────────────────────────────────────────────── */
+
+.gs-settings-section { display: none; }
+
+@keyframes gs-tab-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.gs-settings-section.active {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 16px;
+  animation: gs-tab-in 0.2s var(--ease) both;
+}
+
+/* ── Shared cards ────────────────────────────────────────────────────────── */
+
+.gs-card {
+  width: calc(50% - 8px);
+  min-width: min(100%, 280px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background:
+    var(--gs-settings-card-glow),
+    var(--gs-settings-surface);
+  border: 1px solid var(--gs-settings-border);
+  border-radius: var(--r-2xl);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    var(--gs-settings-card-shadow),
+    var(--gs-settings-inset-highlight);
+  transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base), background var(--t-base);
+}
+
+.gs-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gs-settings-card-sheen);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.gs-card:hover {
+  background:
+    var(--gs-settings-card-glow),
+    var(--gs-settings-surface-strong);
+  border-color: var(--gs-settings-hover-border);
+  box-shadow:
+    var(--gs-settings-card-shadow-hover),
+    var(--gs-settings-inset-highlight);
+  transform: translateY(-2px);
+}
+
+.gs-card--feature,
+.gs-card--about {
+  width: 100%;
+}
+
+.gs-card-title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+  margin: 0;
+}
+
+.gs-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Shared field text ───────────────────────────────────────────────────── */
+
+.gs-field-label {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--text-label);
+  margin-bottom: 0;
+  line-height: 1.4;
+  letter-spacing: 0.18px;
+}
+
+.gs-field-hint {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-regular);
+  color: var(--gs-settings-faint);
+  margin-top: 0;
+  line-height: 1.5;
+}
+
+.gs-setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gs-setting-group + .gs-setting-group {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--gs-settings-border);
+}
+
+.gs-slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gs-option-hint-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gs-card-content > .gs-field-hint:first-child {
+  margin-top: -2px;
+}
+
+.gs-slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 20px;
+}
+
+.gs-value-chip {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  font-family: var(--font-mono);
+  color: var(--gs-settings-accent-text);
+  line-height: 1.4;
+  letter-spacing: 0.18px;
+}
+
+/* ── Shared option buttons ──────────────────────────────────────────────── */
+
+.gs-option-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+}
+
+.gs-option-btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  font-family: var(--font);
+  line-height: 1.35;
+  text-align: center;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--gs-settings-border);
+  background: var(--gs-settings-option-bg);
+  color: var(--text-dim);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background var(--t-fast), border-color var(--t-fast),
+              color var(--t-fast), transform var(--t-base), box-shadow var(--t-base);
+}
+
+.gs-option-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(105deg, transparent 40%, var(--gs-settings-white-highlight-medium) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0s;
+  pointer-events: none;
+}
+
+.gs-option-btn:hover {
+  background: var(--gs-settings-option-bg-hover);
+  border-color: var(--gs-settings-hover-border-soft);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: var(--gs-settings-depth-hover);
+}
+
+.gs-option-btn:hover::after { transform: translateX(100%); transition: transform 0.45s ease; }
+
+.gs-option-btn.active {
+  background: var(--gs-settings-surface-active);
+  border-color: var(--gs-settings-active-border);
+  color: var(--gs-settings-accent-text-strong);
+  box-shadow:
+    inset 0 0 0 1px var(--gs-settings-active-border-soft),
+    var(--gs-settings-accent-shadow-strong);
+}
+
+.gs-option-btn.active:hover {
+  background: linear-gradient(135deg, rgb(var(--gs-settings-accent) / 0.22), rgb(var(--gs-settings-support) / 0.14));
+  border-color: var(--gs-settings-active-border-strong);
+}
+
+/* ── Shared sliders ─────────────────────────────────────────────────────── */
+
+.gs-slider {
+  width: 100%;
+  height: 22px;
+  background: transparent;
+  outline: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.gs-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  background: var(--gs-settings-slider-track);
+  border-radius: var(--r-pill);
+}
+
+.gs-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gs-settings-slider-thumb-bg);
+  margin-top: -5px;
+  border: none;
+  box-shadow: var(--gs-settings-slider-thumb-shadow);
+  transition: box-shadow var(--t-fast), transform var(--t-fast);
+}
+
+.gs-slider:hover::-webkit-slider-thumb {
+  box-shadow: var(--gs-settings-slider-thumb-shadow-hover);
+  transform: scale(1.08);
+}
+
+.gs-slider::-moz-range-track {
+  height: 8px;
+  background: var(--gs-settings-slider-track);
+  border-radius: var(--r-pill);
+  border: none;
+}
+
+.gs-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gs-settings-slider-thumb-bg);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--gs-settings-slider-thumb-shadow);
+  transition: box-shadow var(--t-fast), transform var(--t-fast);
+}
+
+.gs-slider:hover::-moz-range-thumb {
+  box-shadow: var(--gs-settings-slider-thumb-shadow-hover);
+  transform: scale(1.08);
+}
+
+/* ── Footer & buttons ───────────────────────────────────────────────────── */
+
+.gs-settings-footer {
+  padding: 18px 28px 22px;
+  border-top: 1px solid var(--gs-settings-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  background: linear-gradient(to top, rgb(var(--gs-settings-accent) / 0.08), transparent);
+}
+
+.gs-settings-footer-start,
+.gs-settings-footer-end {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.gs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: var(--r-lg);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  font-family: var(--font);
+  cursor: pointer;
+  border: 1px solid var(--gs-settings-border);
+  white-space: nowrap;
+  transition: transform var(--t-base), box-shadow var(--t-base),
+              background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+
+.gs-btn:active { transform: scale(0.97); transition-duration: 0.08s; }
+
+.gs-btn-primary {
+  background: linear-gradient(135deg, rgb(var(--gs-settings-accent-strong)), rgb(var(--gs-settings-support)));
+  color: rgb(var(--c-white));
+  border-color: var(--gs-settings-active-border);
+  box-shadow: var(--gs-settings-primary-shadow);
+}
+
+.gs-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--gs-settings-primary-shadow-hover);
+}
+
+.gs-btn-secondary {
+  background: var(--gs-settings-button-secondary-bg);
+  color: var(--text-dim);
+  border-color: var(--gs-settings-border);
+}
+
+.gs-btn-secondary:hover {
+  background: var(--gs-settings-button-secondary-bg-hover);
+  border-color: rgb(var(--gs-settings-accent) / 0.16);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: var(--gs-settings-depth-hover);
+}
+
+.gs-btn-reset {
+  background: var(--gs-danger-bg);
+  color: var(--gs-danger-text-soft);
+  border-color: var(--gs-danger-border);
+}
+
+.gs-btn-reset:hover {
+  background: var(--gs-danger-bg-strong);
+  border-color: var(--gs-danger-border-strong);
+  color: var(--gs-danger-text-soft-strong);
+}
+
+/* ── Status & about ─────────────────────────────────────────────────────── */
+
+.gs-settings-status {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--gs-settings-accent-text);
+  line-height: 1.4;
+  margin-right: auto;
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+
+.gs-settings-status.visible { opacity: 1; }
+.gs-settings-status.error   { color: var(--gs-danger-text); }
+
+.gs-settings-about-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+}
+
+.gs-settings-about-content {
+  gap: 20px;
+}
+
+.gs-settings-about-name-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.gs-settings-about-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--r-xl);
+  background: var(--gs-settings-icon-surface);
+  border: 1px solid var(--gs-settings-icon-border-strong);
+  color: var(--gs-settings-accent-text);
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 1px 0 rgb(var(--c-white) / 0.16),
+    0 18px 34px rgb(var(--gs-settings-accent) / 0.16);
+}
+
+.gs-settings-brand,
+.gs-settings-tabs {
+  backdrop-filter: blur(var(--gs-blur-xl)) saturate(1.08);
+  -webkit-backdrop-filter: blur(var(--gs-blur-xl)) saturate(1.08);
+}
+
+.gs-settings-brand-eyebrow,
+.gs-settings-kicker,
+.gs-settings-theme-badge {
+  border: 1px solid var(--gs-settings-pill-border);
+  background: var(--gs-settings-pill-bg);
+}
+
+.gs-settings-brand-badge,
+.gs-settings-about-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gs-card {
+  backdrop-filter: blur(var(--gs-blur-lg)) saturate(1.08);
+  -webkit-backdrop-filter: blur(var(--gs-blur-lg)) saturate(1.08);
+}
+
+.gs-option-btn,
+.gs-btn {
+  backdrop-filter: blur(var(--gs-blur-md)) saturate(1.04);
+  -webkit-backdrop-filter: blur(var(--gs-blur-md)) saturate(1.04);
+}
+
+.gs-settings-about-logo svg {
+  width: 28px;
+  height: 28px;
+}
+
+.gs-settings-about-name {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: var(--fw-heavy);
+  color: var(--text-strong);
+  letter-spacing: -0.05em;
+  line-height: 0.94;
+}
+
+.gs-settings-about-desc {
+  font-size: 15px;
+  font-weight: var(--fw-regular);
+  color: var(--gs-settings-muted);
+  line-height: 1.75;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--gs-settings-border);
+}
+
+.gs-settings-about-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gs-settings-border);
+  font-size: var(--fs-sm);
+}
+
+.gs-settings-about-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.gs-settings-about-label {
+  color: var(--gs-settings-faint);
+  min-width: 40px;
+  flex-shrink: 0;
+  font-weight: var(--fw-semibold);
+  line-height: 1.45;
+}
+
+.gs-settings-about-value {
+  color: var(--gs-settings-accent-text);
+  word-break: break-all;
+  font-family: var(--font-mono);
+  font-weight: var(--fw-medium);
+  line-height: 1.45;
+  letter-spacing: 0.2px;
+}
+
+.gs-settings-about-link {
+  text-decoration: none;
+  transition: color var(--t-fast), opacity var(--t-fast), text-decoration-color var(--t-fast);
+}
+
+.gs-settings-about-link:hover {
+  color: rgb(var(--gs-settings-support-strong));
+  opacity: 0.92;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 960px) {
+  .gs-settings-overlay {
+    padding: 16px;
+  }
+
+  .gs-settings-shell {
+    width: min(100vw - 32px, 920px);
+    min-height: auto;
+    max-height: calc(100vh - 32px);
+    flex-direction: column;
+  }
+
+  .gs-settings-sidebar {
+    width: 100%;
+  }
+
+  .gs-settings-brand {
+    padding: 20px;
+  }
+
+  .gs-settings-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gs-settings-tab {
+    min-height: 64px;
+  }
+
+  .gs-settings-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gs-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .gs-settings-overlay {
+    padding: 12px;
+    align-items: stretch;
+  }
+
+  .gs-settings-shell {
+    width: 100%;
+    max-height: none;
+    height: 100%;
+    gap: 12px;
+  }
+
+  .gs-settings-brand {
+    gap: 14px;
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .gs-settings-brand-title,
+  .gs-settings-title {
+    font-size: 28px;
+  }
+
+  .gs-settings-tabs {
+    grid-template-columns: 1fr;
+    border-radius: 22px;
+  }
+
+  .gs-settings-header {
+    padding: 20px 18px 18px;
+  }
+
+  .gs-settings-header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gs-settings-theme-badge {
+    min-height: 38px;
+  }
+
+  .gs-settings-summary {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .gs-settings-summary-item {
+    min-height: 80px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .gs-settings-summary-value {
+    font-size: 18px;
+  }
+
+  .gs-settings-scroll {
+    padding: 18px;
+  }
+
+  .gs-settings-panel {
+    border-radius: 26px;
+  }
+
+  .gs-settings-footer {
+    padding: 16px 18px 20px;
+  }
+
+  .gs-settings-footer-start,
+  .gs-settings-footer-end {
+    width: 100%;
+  }
+
+  .gs-settings-footer-end {
+    justify-content: space-between;
+  }
+
+  .gs-btn {
+    flex: 1;
+  }
+}

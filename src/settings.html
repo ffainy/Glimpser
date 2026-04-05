@@ -12,9 +12,25 @@
       height: 100%;
     }
 
-    body[data-dp-theme="dark"]  { background: #111113; }
-    body[data-dp-theme="light"] { background: #e8e8ea; }
-    body { background: #111113; } /* default before theme loads */
+    body {
+      transition: background 0.25s ease;
+    }
+
+    body[data-dp-theme="dark"]  {
+      background:
+        radial-gradient(circle at top left, rgba(162, 116, 255, 0.18), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(255, 179, 71, 0.1), transparent 22%),
+        #09080d;
+    }
+
+    body[data-dp-theme="light"] {
+      background:
+        radial-gradient(circle at top left, rgba(88, 72, 107, 0.14), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(114, 79, 52, 0.12), transparent 20%),
+        #efeff1;
+    }
+
+    body { background: #09080d; } /* default before theme loads */
   </style>
 </head>
 <body>

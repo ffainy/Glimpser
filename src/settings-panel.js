@@ -73,19 +73,72 @@
     };
   }
 
+  function _getTabLabel(key) {
+    return _t('tab' + key.charAt(0).toUpperCase() + key.slice(1));
+  }
+
+  function _getActiveThemeLabel() {
+    return _settings?.theme === 'light' ? _t('themeLight') : _t('themeDark');
+  }
+
+  function _getTabDescription(key) {
+    switch (key) {
+      case 'appearance':
+        return `${_t('labelTheme')} · ${_t('labelLang')} · ${_t('labelCorners')}`;
+      case 'dropzone':
+        return `${_t('labelPos')} · ${_t('labelSize')}`;
+      case 'preview':
+        return `${_t('labelDefaultWindowSize')} · ${_t('labelMaxPreviewWindows')} · ${_t('labelHeaderActions')}`;
+      case 'about':
+        return _t('aboutDescText');
+      default:
+        return _t('aboutDescText');
+    }
+  }
+
+  function _getSummaryItems() {
+    return [
+      { label: _t('labelTheme'), value: _getActiveThemeLabel() },
+      { label: _t('labelLang'), value: _settings?.language === 'zh' ? '中文' : 'English' },
+      { label: _t('labelPos'), value: _t(`pos${(_settings?.dropZonePosition || 'bottom').charAt(0).toUpperCase()}${(_settings?.dropZonePosition || 'bottom').slice(1)}`) },
+      { label: _t('labelMaxPreviewWindows'), value: String(_settings?.maxPreviewWindows ?? DEFAULT_SETTINGS.maxPreviewWindows) },
+    ];
+  }
+
+  function _syncHeaderState(sectionKicker, subtitle) {
+    if (sectionKicker) {
+      sectionKicker.textContent = _getTabLabel(_activeTab);
+    }
+    if (subtitle) {
+      subtitle.textContent = _getTabDescription(_activeTab);
+    }
+  }
+
   function _cloneDefaultSettings() {
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   }
 
+  async function _loadCssText(paths) {
+    const cssChunks = await Promise.all(
+      paths.map(async (path) => {
+        const cssUrl = nativeAPI.runtime.getURL(path);
+        return fetch(cssUrl).then(r => r.text());
+      })
+    );
+
+    return cssChunks.join('\n\n');
+  }
+
   // ── Build Shadow DOM ───────────────────────────────────────────────────
   async function _buildPanel() {
-    // Load CSS — works in both content script context and extension pages
     let cssText = '';
     try {
-      const cssUrl = nativeAPI.runtime.getURL('styles.css');
-      cssText = await fetch(cssUrl).then(r => r.text());
+      cssText = await _loadCssText([
+        'css/foundation.css',
+        'css/settings.css',
+      ]);
     } catch (e) {
-      console.warn('[Glimpser] Failed to load styles.css', e);
+      console.warn('[Glimpser] Failed to load settings CSS', e);
     }
 
     _host = document.createElement('div');
@@ -169,15 +222,53 @@
     const shell = document.createElement('div');
     shell.className = 'gs-settings-shell';
 
-    // Tab nav
+    const sidebar = document.createElement('aside');
+    sidebar.className = 'gs-settings-sidebar';
+
+    const sidebarGlow = document.createElement('div');
+    sidebarGlow.className = 'gs-settings-sidebar-glow';
+
+    const brand = document.createElement('div');
+    brand.className = 'gs-settings-brand';
+
+    const brandBadge = document.createElement('div');
+    brandBadge.className = 'gs-settings-brand-badge';
+    brandBadge.innerHTML = BRAND_ICON_SVG;
+
+    const brandText = document.createElement('div');
+    brandText.className = 'gs-settings-brand-copy';
+
+    const brandEyebrow = document.createElement('div');
+    brandEyebrow.className = 'gs-settings-brand-eyebrow';
+    brandEyebrow.textContent = 'GLIMPSER';
+
+    const brandTitle = document.createElement('div');
+    brandTitle.className = 'gs-settings-brand-title';
+    brandTitle.textContent = _t('settingsTitle');
+
+    const brandHint = document.createElement('div');
+    brandHint.className = 'gs-settings-brand-hint';
+    brandHint.textContent = _t('aboutDescText');
+
+    brandText.append(brandEyebrow, brandTitle, brandHint);
+    brand.append(sidebarGlow, brandBadge, brandText);
+
     const tabNav = document.createElement('nav');
     tabNav.className = 'gs-settings-tabs';
+    tabNav.setAttribute('aria-label', _t('settingsTitle'));
 
     TABS.forEach(tab => {
-      const btn = document.createElement('div');
+      const btn = document.createElement('button');
       btn.className = 'gs-settings-tab' + (_activeTab === tab.key ? ' active' : '');
       btn.dataset.tab = tab.key;
-      btn.innerHTML = tab.svg + `<span class="gs-settings-tab-label">${_t('tab' + tab.key.charAt(0).toUpperCase() + tab.key.slice(1))}</span>`;
+      btn.type = 'button';
+      btn.innerHTML = `
+        <span class="gs-settings-tab-icon">${tab.svg}</span>
+        <span class="gs-settings-tab-copy">
+          <span class="gs-settings-tab-label">${_getTabLabel(tab.key)}</span>
+          <span class="gs-settings-tab-hint">${_getTabDescription(tab.key)}</span>
+        </span>
+      `;
       btn.addEventListener('click', () => {
         _activeTab = tab.key;
         _shadow.querySelectorAll('.gs-settings-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab.key));
@@ -186,17 +277,54 @@
           c.classList.remove('active');
           if (isActive) { void c.offsetWidth; c.classList.add('active'); }
         });
+        _syncHeaderState(sectionKicker, subtitle);
       });
       tabNav.appendChild(btn);
     });
+    sidebar.append(brand, tabNav);
 
-    // Panel
     const panel = document.createElement('div');
     panel.className = 'gs-settings-panel';
+
+    const header = document.createElement('div');
+    header.className = 'gs-settings-header';
+
+    const headerTop = document.createElement('div');
+    headerTop.className = 'gs-settings-header-top';
+
+    const titleGroup = document.createElement('div');
+    titleGroup.className = 'gs-settings-title-group';
+
+    const sectionKicker = document.createElement('div');
+    sectionKicker.className = 'gs-settings-kicker';
+    sectionKicker.textContent = _getTabLabel(_activeTab);
 
     const title = document.createElement('div');
     title.className = 'gs-settings-title';
     title.textContent = _t('settingsTitle');
+
+    const subtitle = document.createElement('div');
+    subtitle.className = 'gs-settings-subtitle';
+    subtitle.textContent = _getTabDescription(_activeTab);
+
+    titleGroup.append(sectionKicker, title, subtitle);
+
+    const themeBadge = document.createElement('div');
+    themeBadge.className = 'gs-settings-theme-badge';
+    themeBadge.innerHTML = `
+      <span class="gs-settings-theme-swatch" data-theme="${_settings?.theme || 'dark'}"></span>
+      <span>${_getActiveThemeLabel()}</span>
+    `;
+
+    headerTop.append(titleGroup, themeBadge);
+
+    const summaryGrid = document.createElement('div');
+    summaryGrid.className = 'gs-settings-summary';
+    _getSummaryItems().forEach(({ label, value }) => {
+      summaryGrid.appendChild(_makeSummaryItem(label, value));
+    });
+
+    header.append(headerTop, summaryGrid);
 
     const scroll = document.createElement('div');
     scroll.className = 'gs-settings-scroll';
@@ -245,8 +373,8 @@
     footerStart.append(resetBtn);
     footerEnd.append(status, closeBtn, saveBtn);
     footer.append(footerStart, footerEnd);
-    panel.append(title, scroll, footer);
-    shell.append(tabNav, panel);
+    panel.append(header, scroll, footer);
+    shell.append(sidebar, panel);
     overlay.appendChild(shell);
     _shadow.appendChild(overlay);
 
@@ -372,17 +500,17 @@
     const posContent = document.createDocumentFragment();
     posContent.appendChild(posGroup);
     posContent.appendChild(posHintEl);
-    tab.appendChild(_makeCard(_t('labelPos'), posContent));
+    tab.appendChild(_makeCard(_t('labelPos'), posContent, 'gs-card--feature'));
 
     const sizeContent = document.createDocumentFragment();
     sizeContent.appendChild(_makeSliderRow(
-      'labelW', 100, 1200,
+      _t('labelW'), 100, 1200,
       _settings?.dropZoneCustomSize?.width ?? 300,
       v => { _settings.dropZoneCustomSize.width = v; },
       'px'
     ));
     sizeContent.appendChild(_makeSliderRow(
-      'labelH', 60, 400,
+      _t('labelH'), 60, 400,
       _settings?.dropZoneCustomSize?.height ?? 150,
       v => { _settings.dropZoneCustomSize.height = v; },
       'px'
@@ -409,7 +537,7 @@
     const releaseLink = homepage ? `${homepage.replace(/\/$/, '')}/releases/tag/v${version}` : '';
 
     const card = document.createElement('div');
-    card.className = 'gs-card';
+    card.className = 'gs-card gs-card--about';
     const content = document.createElement('div');
     content.className = 'gs-card-content gs-settings-about-content';
 
@@ -572,9 +700,25 @@
     return div;
   }
 
-  function _makeCard(titleText, content) {
+  function _makeSummaryItem(label, value) {
+    const item = document.createElement('div');
+    item.className = 'gs-settings-summary-item';
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'gs-settings-summary-label';
+    labelEl.textContent = label;
+
+    const valueEl = document.createElement('div');
+    valueEl.className = 'gs-settings-summary-value';
+    valueEl.textContent = value;
+
+    item.append(labelEl, valueEl);
+    return item;
+  }
+
+  function _makeCard(titleText, content, className = '') {
     const card = document.createElement('div');
-    card.className = 'gs-card';
+    card.className = `gs-card${className ? ` ${className}` : ''}`;
     const t = document.createElement('div');
     t.className = 'gs-card-title';
     t.textContent = titleText;
