@@ -50,11 +50,7 @@
     0 8px 18px rgb(var(--gs-settings-accent) / 0.22);
   --gs-settings-slider-thumb-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.18),
     0 12px 20px rgb(var(--gs-settings-support) / 0.24);
-  --gs-settings-brand-stop-a: rgb(var(--gs-settings-accent-strong));
-  --gs-settings-brand-stop-b: rgb(var(--gs-settings-accent));
-  --gs-settings-brand-stop-c: rgb(var(--gs-settings-support-strong));
-  --gs-settings-brand-stop-d: rgb(var(--gs-settings-support-strong));
-  --gs-settings-title-gradient: linear-gradient(135deg, rgb(var(--gs-settings-accent-strong)), rgb(var(--gs-settings-accent)) 52%, rgb(var(--gs-settings-support-strong)));
+  --gs-settings-title-gradient: linear-gradient(135deg, rgb(var(--gs-settings-accent)), rgb(var(--gs-settings-accent)) 52%, rgb(var(--gs-settings-support-strong)));
   --gs-settings-title-shadow: 0 1px 0 rgb(255 255 255 / 0.28);
   --gs-settings-title-underline: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.22), rgb(var(--gs-settings-support) / 0.16));
   --gs-settings-meta-card-border: rgb(var(--gs-settings-accent) / 0.08);
@@ -99,11 +95,7 @@
   --gs-settings-slider-thumb-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.22), 0 12px 22px rgb(var(--gs-settings-accent) / 0.32), 0 0 24px rgb(var(--gs-settings-support) / 0.14);
   --gs-settings-display-glow: 0 0 12px rgb(var(--gs-settings-accent) / 0.12);
   --gs-settings-display-glow-strong: 0 0 18px rgb(var(--gs-settings-accent) / 0.18), 0 0 30px rgb(var(--gs-settings-support) / 0.08);
-  --gs-settings-brand-stop-a: rgb(var(--gs-settings-accent-strong));
-  --gs-settings-brand-stop-b: rgb(224 200 255);
-  --gs-settings-brand-stop-c: rgb(var(--gs-settings-support));
-  --gs-settings-brand-stop-d: rgb(255 204 145);
-  --gs-settings-title-gradient: linear-gradient(135deg, rgb(248 243 255), rgb(var(--gs-settings-accent-strong)) 52%, rgb(var(--gs-settings-support-strong)));
+  --gs-settings-title-gradient: linear-gradient(135deg, rgb(248 243 255), rgb(var(--gs-settings-accent)) 52%, rgb(var(--gs-settings-support-strong)));
   --gs-settings-title-shadow: 0 0 12px rgb(var(--gs-settings-accent) / 0.14), 0 0 20px rgb(var(--gs-settings-support) / 0.06);
   --gs-settings-title-underline: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.26), rgb(var(--gs-settings-support) / 0.18));
   --gs-settings-meta-card-border: rgb(var(--gs-settings-accent) / 0.04);
@@ -144,10 +136,6 @@
   --gs-settings-accent-shadow-strong: 0 14px 28px rgb(var(--gs-settings-accent) / 0.1);
   --gs-settings-primary-shadow: 0 14px 28px rgb(var(--gs-settings-accent) / 0.14);
   --gs-settings-primary-shadow-hover: 0 18px 32px rgb(var(--gs-settings-accent) / 0.18);
-  --gs-settings-brand-stop-a: rgb(var(--gs-settings-accent-strong));
-  --gs-settings-brand-stop-b: rgb(var(--gs-settings-accent));
-  --gs-settings-brand-stop-c: rgb(126 87 35);
-  --gs-settings-brand-stop-d: rgb(126 87 35);
   --gs-settings-title-gradient: linear-gradient(135deg, rgb(36 31 44), rgb(var(--gs-settings-accent)) 56%, rgb(126 87 35));
   --gs-settings-title-shadow: 0 1px 0 rgb(255 255 255 / 0.44);
   --gs-settings-title-underline: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.16), rgb(var(--gs-settings-support) / 0.12));
@@ -321,7 +309,7 @@
   color: rgb(var(--gs-settings-support-strong));
   font-family: var(--gs-font-family-mono);
   font-size: var(--gs-font-size-xs);
-  font-weight: var(--gs-font-weight-medium);
+  font-weight: var(--gs-font-weight-bold);
   font-variant-numeric: tabular-nums;
   line-height: 1.4;
   letter-spacing: 0.1px;
@@ -343,28 +331,19 @@
 
 .gs-settings-brand-title {
   width: min(100%, 600px);
-  line-height: 0;
-}
-
-.gs-settings-brand-wordmark-svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.gs-settings-brand-wordmark-text {
+  display: inline-block;
   font-family: var(--gs-font-family-serif);
-  font-size: 98px;
-  font-weight: 800;
+  font-size: calc(var(--gs-font-size-lg) * 2);
+  font-weight: var(--gs-font-weight-heavy);
   letter-spacing: -0.02em;
-  text-rendering: geometricPrecision;
+  line-height: 1;
+  background: var(--gs-settings-title-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: var(--gs-settings-title-shadow);
 }
-
-.gs-settings-brand-stop-a { stop-color: var(--gs-settings-brand-stop-a); }
-.gs-settings-brand-stop-b { stop-color: var(--gs-settings-brand-stop-b); }
-.gs-settings-brand-stop-c { stop-color: var(--gs-settings-brand-stop-c); }
-.gs-settings-brand-stop-d { stop-color: var(--gs-settings-brand-stop-d); }
 
 .gs-settings-brand-hint {
   font-family: var(--gs-font-family);
@@ -430,8 +409,8 @@
 }
 
 .gs-settings-tab-label {
-  font-size: var(--gs-font-size-sm);
-  font-weight: var(--gs-font-weight-semibold);
+  font-size: var(--gs-font-size-md);
+  font-weight: var(--gs-font-weight-bold);
   letter-spacing: 0.01em;
   color: inherit;
 }
@@ -439,6 +418,7 @@
 .gs-settings-tab-hint {
   display: block;
   font-size: var(--gs-font-size-xs);
+  font-weight: var(--gs-font-weight-regular);
   line-height: 1.45;
   color: var(--gs-settings-faint);
 }
@@ -521,9 +501,9 @@
   display: inline-block;
   font-family: var(--gs-font-family-serif);
   font-size: clamp(24px, 2.2vw, 32px);
-  font-weight: 800;
+  font-weight: var(--gs-font-weight-regular);
   letter-spacing: -0.02em;
-  line-height: 0.98;
+  line-height: 1;
   padding-bottom: 8px;
   background-image: var(--gs-settings-title-gradient);
   background-clip: text;
@@ -608,7 +588,7 @@
   border: 1px solid rgb(var(--gs-settings-support) / 0.08);
   background: rgb(var(--gs-settings-support) / 0.04);
   font-size: var(--gs-font-size-xs);
-  font-weight: var(--gs-font-weight-medium);
+  font-weight: var(--gs-font-weight-bold);
   font-family: var(--gs-font-family-mono);
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -782,7 +762,7 @@
   border: 1px solid rgb(var(--gs-settings-accent) / 0.08);
   background: rgb(var(--gs-settings-accent) / 0.028);
   font-size: var(--gs-font-size-xs);
-  font-weight: var(--gs-font-weight-medium);
+  font-weight: var(--gs-font-weight-bold);
   font-family: var(--gs-font-family-mono);
   font-variant-numeric: tabular-nums;
   color: var(--gs-settings-accent-text);
@@ -1096,9 +1076,9 @@
 }
 
 .gs-settings-about-name {
-  font-family: var(--gs-font-family-serif);
+  font-family: var(--gs-font-family);
   font-size: clamp(32px, 4vw, 52px);
-  font-weight: 800;
+  font-weight: var(--gs-font-weight-heavy);
   color: var(--text-strong);
   letter-spacing: -0.02em;
   line-height: 0.92;
@@ -1143,7 +1123,7 @@
   color: var(--gs-settings-accent-text);
   word-break: break-all;
   font-family: var(--gs-font-family-mono);
-  font-weight: var(--gs-font-weight-medium);
+  font-weight: var(--gs-font-weight-bold);
   font-variant-numeric: tabular-nums;
   line-height: 1.45;
   letter-spacing: 0.2px;

@@ -824,7 +824,7 @@
   white-space: nowrap;
   font-family: var(--gs-font-family-mono);
   font-size: var(--gs-font-size-2xs);
-  font-weight: 500;
+  font-weight: var(--gs-font-weight-bold);
   font-variant-numeric: tabular-nums;
   color: var(--gs-preview-urltext);
   text-align: left;
@@ -918,7 +918,7 @@
   color: var(--gs-toast-text);
   font-family: var(--gs-font-family-mono);
   font-size: var(--gs-font-size-2xs);
-  font-weight: 700;
+  font-weight: var(--gs-font-weight-bold);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   white-space: nowrap;

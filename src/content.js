@@ -41,7 +41,7 @@ const FRAME_DRAG_END_MESSAGE = 'gs:frame-drag-end'
 const FRAME_FOCUS_MESSAGE = 'gs:frame-focus'
 const FRAME_ESCAPE_MESSAGE = 'gs:frame-escape'
 const DROP_AREA_SHOW_DELAY_MS = 100
-const GOOGLE_FONTS_STYLESHEET = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Spectral:wght@600;700;800&display=swap'
+const GOOGLE_FONTS_STYLESHEET = 'https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Nunito+Sans:wght@400;500;600;700;800&family=Young+Serif&display=swap'
 
 const ICON_REFRESH = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/></svg>`
 const ICON_OPEN_CURRENT = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H4m12 0l-4 4m4-4l-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/></svg>`

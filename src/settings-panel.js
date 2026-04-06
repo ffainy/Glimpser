@@ -17,7 +17,7 @@
 
   const nativeAPI = typeof browser !== 'undefined' ? browser : chrome;
   const HOST_ID   = 'gs-settings-host';
-  const GOOGLE_FONTS_STYLESHEET = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Spectral:wght@600;700;800&display=swap';
+  const GOOGLE_FONTS_STYLESHEET = 'https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Nunito+Sans:wght@400;500;600;700;800&family=Young+Serif&display=swap';
   const BRAND_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0C4.492 2.746-.885 11.312.502 19.963C.502 19.963 4.989 24 12 24s11.496-4.037 11.496-4.037C24.882 11.312 19.508 2.746 12 0m0 1.846s2.032.726 3.945 2.488c.073.067.13.163.129.277c-.001.168-.128.287-.301.287a.5.5 0 0 1-.137-.027a6.5 6.5 0 0 0-2.316-.4a6.63 6.63 0 0 0-3.914 1.273l-.002.002a7.98 7.98 0 0 1 6.808.768C20.48 9.11 22.597 14.179 21.902 19c0 0-1.646 1.396-4.129 2.172a.37.37 0 0 1-.303-.026c-.144-.084-.185-.255-.1-.404a.5.5 0 0 1 .094-.103a6.6 6.6 0 0 0 1.504-1.809a6.63 6.63 0 0 0 .856-4.027l-.002-.002a7.95 7.95 0 0 1-3.838 5.383c-4.42 2.552-9.99 1.882-13.885-1.184c0 0-.388-2.124.182-4.662a.37.37 0 0 1 .176-.25c.145-.084.31-.033.396.117a.5.5 0 0 1 .045.13c.126.762.405 1.5.814 2.208a6.64 6.64 0 0 0 3.059 2.756a8 8 0 0 1-1.672-2.033a7.93 7.93 0 0 1-1.066-4.205C4.128 8.047 7.464 3.659 12 1.846m0 7.623c-2.726 0-5.117.93-6.483 2.332c-.064.32-.1.65-.1.984c0 3.146 2.947 5.695 6.583 5.695c3.635 0 6.584-2.549 6.584-5.695c0-.334-.038-.664-.102-.984C17.116 10.4 14.724 9.469 12 9.469m0 .693a3.12 3.12 0 0 1 0 6.238a3.118 3.118 0 0 1-2.872-4.336a1.3 1.3 0 1 0 1.657-1.656A3.1 3.1 0 0 1 12 10.162"/></svg>`;
 
   // ── Tab definitions ────────────────────────────────────────────────────
@@ -55,7 +55,6 @@
   let _activeTab = 'appearance';
   let _settings = null;
   let _scrollLockState = null;
-  let _brandWordmarkId = 0;
 
   function _t(key) {
     return typeof t === 'function' ? t(key) : key;
@@ -162,80 +161,6 @@
 
   function _cloneDefaultSettings() {
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
-  }
-
-  function _createBrandWordmarkSvg() {
-    const ns = 'http://www.w3.org/2000/svg';
-    const wordmarkId = ++_brandWordmarkId;
-    const gradientId = `gs-brand-wordmark-gradient-${wordmarkId}`;
-    const filterId = `gs-brand-wordmark-glow-${wordmarkId}`;
-
-    const svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('class', 'gs-settings-brand-wordmark-svg');
-    svg.setAttribute('viewBox', '0 0 432 96');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.setAttribute('focusable', 'false');
-    svg.setAttribute('preserveAspectRatio', 'xMinYMid meet');
-
-    const defs = document.createElementNS(ns, 'defs');
-
-    const gradient = document.createElementNS(ns, 'linearGradient');
-    gradient.setAttribute('id', gradientId);
-    gradient.setAttribute('x1', '0%');
-    gradient.setAttribute('y1', '0%');
-    gradient.setAttribute('x2', '100%');
-    gradient.setAttribute('y2', '0%');
-
-    [
-      ['0%', 'gs-settings-brand-stop-a'],
-      ['42%', 'gs-settings-brand-stop-b'],
-      ['78%', 'gs-settings-brand-stop-c'],
-      ['100%', 'gs-settings-brand-stop-d'],
-    ].forEach(([offset, className]) => {
-      const stop = document.createElementNS(ns, 'stop');
-      stop.setAttribute('offset', offset);
-      stop.setAttribute('class', className);
-      gradient.appendChild(stop);
-    });
-
-    const filter = document.createElementNS(ns, 'filter');
-    filter.setAttribute('id', filterId);
-    filter.setAttribute('x', '-20%');
-    filter.setAttribute('y', '-30%');
-    filter.setAttribute('width', '140%');
-    filter.setAttribute('height', '180%');
-
-    const blur = document.createElementNS(ns, 'feGaussianBlur');
-    blur.setAttribute('in', 'SourceGraphic');
-    blur.setAttribute('stdDeviation', '2.8');
-    blur.setAttribute('result', 'blur');
-
-    const matrix = document.createElementNS(ns, 'feColorMatrix');
-    matrix.setAttribute('in', 'blur');
-    matrix.setAttribute('type', 'matrix');
-    matrix.setAttribute('values', '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.28 0');
-    matrix.setAttribute('result', 'glow');
-
-    const merge = document.createElementNS(ns, 'feMerge');
-    const glowNode = document.createElementNS(ns, 'feMergeNode');
-    glowNode.setAttribute('in', 'glow');
-    const sourceNode = document.createElementNS(ns, 'feMergeNode');
-    sourceNode.setAttribute('in', 'SourceGraphic');
-    merge.append(glowNode, sourceNode);
-
-    filter.append(blur, matrix, merge);
-    defs.append(gradient, filter);
-
-    const text = document.createElementNS(ns, 'text');
-    text.setAttribute('class', 'gs-settings-brand-wordmark-text');
-    text.setAttribute('x', '0');
-    text.setAttribute('y', '72');
-    text.setAttribute('fill', `url(#${gradientId})`);
-    text.setAttribute('filter', `url(#${filterId})`);
-    text.textContent = 'Glimpser';
-
-    svg.append(defs, text);
-    return svg;
   }
 
   async function _appendStylesheets(shadowRoot, paths) {
@@ -370,7 +295,7 @@
 
     const brandTitle = document.createElement('div');
     brandTitle.className = 'gs-settings-brand-title';
-    brandTitle.appendChild(_createBrandWordmarkSvg());
+    brandTitle.textContent = 'Glimpser';
 
     brandNameBlock.appendChild(brandTitle);
     brandTop.append(brandBadge, brandNameBlock);

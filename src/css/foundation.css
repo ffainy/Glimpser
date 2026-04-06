@@ -34,9 +34,9 @@ textarea {
   --gs-danger-rgb: 239 68 68;
 
   /* Typography */
-  --gs-font-family-sans:    "Manrope", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --gs-font-family-serif:   "Spectral", "Times New Roman", "Microsoft YaHei", serif;
-  --gs-font-family-mono:    "IBM Plex Mono", "Cascadia Code", "Microsoft YaHei", ui-monospace, monospace;
+  --gs-font-family-sans:    "Nunito Sans", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --gs-font-family-serif:   "Young Serif", "Times New Roman", "Microsoft YaHei", serif;
+  --gs-font-family-mono:    "Courier Prime", "Cascadia Code", "Microsoft YaHei", ui-monospace, monospace;
   --gs-font-family:         var(--gs-font-family-sans);
   --gs-font-weight-regular: 400;
   --gs-font-weight-medium:  500;
