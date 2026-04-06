@@ -17,6 +17,8 @@ const DEFAULT_SETTINGS = {
   debug: false,
 }
 
+const DROP_ZONE_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg>'
+
 const state = {
   draggedLink: null,
 }
@@ -38,6 +40,7 @@ const FRAME_DRAG_MESSAGE = 'gs:frame-drag-link'
 const FRAME_DRAG_END_MESSAGE = 'gs:frame-drag-end'
 const FRAME_FOCUS_MESSAGE = 'gs:frame-focus'
 const FRAME_ESCAPE_MESSAGE = 'gs:frame-escape'
+const DROP_AREA_SHOW_DELAY_MS = 100
 
 const ICON_REFRESH = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/></svg>`
 const ICON_OPEN_CURRENT = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H4m12 0l-4 4m4-4l-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/></svg>`
@@ -982,6 +985,21 @@ function applyContentCorners(corners) {
   }
 }
 
+function _buildDropHintInner({ iconClass, title, copyClass = '', kicker = '' }) {
+  const kickerMarkup = kicker ? `<div class="gs-drop-kicker">${kicker}</div>` : ''
+  const copyClasses = ['gs-drop-copy', copyClass].filter(Boolean).join(' ')
+
+  return `
+    <div class="gs-drop-icon-shell ${iconClass}">
+      ${DROP_ZONE_ICON_SVG}
+    </div>
+    <div class="${copyClasses}">
+      ${kickerMarkup}
+      <div class="gs-drop-title">${title}</div>
+    </div>
+  `
+}
+
 function _createDropZoneElement(position, customSize) {
   const width = clamp((customSize && customSize.width) || 300, 100, 1200)
   const height = clamp((customSize && customSize.height) || 150, 60, 400)
@@ -992,8 +1010,31 @@ function _createDropZoneElement(position, customSize) {
   zone.setAttribute('data-dp-theme', _currentTheme)
   zone.style.width = `${width}px`
   zone.style.height = `${height}px`
-  zone.innerHTML = `<span class="gs-drop-hint">${t('dropHintZone')}</span>`
+  zone.innerHTML = `
+    <div class="gs-drop-surface gs-drop-surface--slot">
+      <div class="gs-drop-slot-pill">
+        ${_buildDropHintInner({
+          iconClass: 'gs-drop-icon-shell--slot',
+          title: t('dropHintZone'),
+        })}
+      </div>
+    </div>
+  `
   return zone
+}
+
+function _setFullscreenOverlayActive(isActive) {
+  const overlay = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
+  if (overlay) {
+    overlay.classList.toggle('active', isActive)
+    overlay.setAttribute('data-dp-theme', _currentTheme)
+  }
+
+  document.body.classList.toggle('gs-dropzone-fullscreen-active', isActive)
+
+  if (!isActive) {
+    state.draggedLink = null
+  }
 }
 
 function _bindDropZoneEvents(dropZone) {
@@ -1005,14 +1046,14 @@ function _bindDropZoneEvents(dropZone) {
     state.draggedLink = url
     setTimeout(() => {
       dropZone.classList.add('active')
-    }, 100)
+    }, DROP_AREA_SHOW_DELAY_MS)
   }
 
   const onDragEnd = () => {
     setTimeout(() => {
       dropZone.classList.remove('active', 'hovered')
       state.draggedLink = null
-    }, 100)
+    }, DROP_AREA_SHOW_DELAY_MS)
   }
 
   document.addEventListener('dragstart', onDragStart)
@@ -1118,12 +1159,7 @@ function _getPreviewByFrameWindow(frameWindow) {
 }
 
 function _hideFullscreenOverlay() {
-  const overlay = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
-  if (overlay) {
-    overlay.classList.remove('active')
-  }
-  document.body.classList.remove('gs-dropzone-fullscreen-active')
-  state.draggedLink = null
+  _setFullscreenOverlayActive(false)
 }
 
 function _ensureFullscreenOverlay() {
@@ -1136,7 +1172,18 @@ function _ensureFullscreenOverlay() {
   overlay = document.createElement('div')
   overlay.id = 'gs-dropzone-overlay'
   overlay.setAttribute('data-dp-theme', _currentTheme)
-  overlay.innerHTML = `<span class="gs-drop-hint">${t('dropHintFullscreen')}</span>`
+  overlay.innerHTML = `
+    <div class="gs-drop-overlay-stage">
+      <div class="gs-drop-surface gs-drop-surface--overlay">
+        ${_buildDropHintInner({
+          iconClass: 'gs-drop-icon-shell--overlay',
+          title: t('dropHintFullscreen'),
+          copyClass: 'gs-drop-copy--overlay',
+          kicker: 'Glimpser',
+        })}
+      </div>
+    </div>
+  `
   _shadowRoot.appendChild(overlay)
   return overlay
 }
@@ -1149,16 +1196,15 @@ function _bindFullscreenDragEvents() {
     }
     state.draggedLink = url
     setTimeout(() => {
-      const overlay = _ensureFullscreenOverlay()
-      overlay.classList.add('active')
-      document.body.classList.add('gs-dropzone-fullscreen-active')
-    }, 100)
+      _ensureFullscreenOverlay()
+      _setFullscreenOverlayActive(true)
+    }, DROP_AREA_SHOW_DELAY_MS)
   }
 
   const onDragEnd = () => {
     setTimeout(() => {
       _hideFullscreenOverlay()
-    }, 100)
+    }, DROP_AREA_SHOW_DELAY_MS)
   }
 
   const onOverlayDragOver = (event) => {
@@ -1198,6 +1244,7 @@ function _bindFullscreenDragEvents() {
 
 function reinitDropZone() {
   _removeDragHandlers()
+  _setFullscreenOverlayActive(false)
 
   const oldZone = _shadowRoot.getElementById('gs-dropzone')
   if (oldZone) {

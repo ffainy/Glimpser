@@ -5,15 +5,54 @@
 /* ── Shared preview tokens ───────────────────────────────────────────────── */
 :host,
 [data-dp-theme] {
-  --zone-text: rgb(var(--gs-accent-rgb));
-  --zone-hover-bg: rgb(var(--gs-accent-rgb) / 0.92);
-  --zone-hover-bd: rgb(var(--gs-accent-rgb));
-  --zone-hover-tx: rgb(0 0 0 / 0.85);
-
-  --gs-drop-overlay-bg: rgb(0 0 0 / 0.42);
-  --gs-drop-overlay-pill-bg: rgb(24 24 28 / 0.58);
-  --gs-drop-overlay-pill-border: rgb(255 255 255 / 0.08);
-  --gs-drop-overlay-pill-shadow: 0 18px 44px rgb(0 0 0 / 0.28);
+  --gs-drop-slot-kicker: rgb(var(--gs-accent-rgb));
+  --gs-drop-title-color: var(--text-strong);
+  --gs-drop-copy-color: var(--text);
+  --gs-drop-icon-color: rgb(var(--gs-accent-rgb));
+  --gs-drop-icon-bg: rgb(255 255 255 / 0.08);
+  --gs-drop-icon-border: rgb(var(--gs-accent-rgb) / 0.16);
+  --gs-drop-slot-bg:
+    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.05), transparent 26%),
+    rgb(255 255 255 / 0.04);
+  --gs-drop-slot-border: rgb(var(--gs-accent-rgb) / 0.14);
+  --gs-drop-slot-shadow: 0 16px 30px rgb(0 0 0 / 0.12);
+  --gs-drop-slot-hover-bg:
+    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.08), transparent 28%),
+    rgb(255 255 255 / 0.06);
+  --gs-drop-slot-hover-border: rgb(var(--gs-accent-rgb) / 0.26);
+  --gs-drop-slot-hover-shadow: 0 18px 34px rgb(0 0 0 / 0.18);
+  --gs-drop-slot-pill-bg: rgb(255 255 255 / 0.12);
+  --gs-drop-slot-pill-border: rgb(var(--gs-accent-rgb) / 0.12);
+  --gs-drop-slot-pill-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14);
+  --gs-drop-slot-pill-hover-bg: rgb(255 255 255 / 0.14);
+  --gs-drop-slot-pill-hover-border: rgb(var(--gs-accent-rgb) / 0.22);
+  --gs-drop-slot-pill-hover-shadow:
+    0 14px 28px rgb(0 0 0 / 0.12),
+    0 0 0 1px rgb(255 255 255 / 0.05) inset;
+  --gs-drop-slot-glow:
+    radial-gradient(circle at 50% 50%, rgb(var(--gs-accent-rgb) / 0.18), transparent 62%);
+  --gs-drop-slot-sheen:
+    linear-gradient(120deg, transparent 18%, rgb(255 255 255 / 0.18) 50%, transparent 82%);
+  --gs-drop-slot-sheen-blend: screen;
+  --gs-drop-slot-sheen-opacity: 0.72;
+  --gs-drop-icon-hover-bg: linear-gradient(180deg, rgb(255 255 255 / 0.16), var(--gs-drop-icon-bg));
+  --gs-drop-icon-hover-shadow:
+    0 10px 20px rgb(0 0 0 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.22);
+  --gs-drop-title-hover-shadow: 0 6px 18px rgb(var(--gs-accent-rgb) / 0.18);
+  --gs-drop-overlay-bg:
+    radial-gradient(circle at top left, rgb(var(--gs-accent-rgb) / 0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.1), transparent 22%),
+    rgb(0 0 0 / 0.42);
+  --gs-drop-overlay-panel-bg: rgb(255 255 255 / 0.06);
+  --gs-drop-overlay-panel-border: rgb(var(--gs-accent-rgb) / 0.12);
+  --gs-drop-overlay-panel-shadow: 0 24px 58px rgb(0 0 0 / 0.24);
+  --gs-drop-overlay-ring: radial-gradient(circle, rgb(var(--gs-accent-rgb) / 0.16), transparent 66%);
+  --gs-drop-overlay-panel-glow:
+    radial-gradient(circle at 20% 18%, rgb(var(--gs-accent-rgb) / 0.16), transparent 42%),
+    radial-gradient(circle at 82% 84%, rgb(var(--gs-support-rgb) / 0.12), transparent 46%);
+  --gs-drop-overlay-panel-sheen:
+    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.16), transparent 58%);
 
   --gs-preview-action-danger-bg: var(--gs-danger-bg-strong);
   --gs-preview-action-bulk-bg: var(--gs-warning-bg);
@@ -23,8 +62,53 @@
 /* ── Dropzone tokens scoped from theme ───────────────────────────────────── */
 :host([data-dp-theme="dark"]),
 [data-dp-theme="dark"] {
-  --zone-bg:       rgb(17 15 24 / 0.74);
-  --zone-border:   rgb(235 228 246 / 0.16);
+  --gs-drop-slot-bg:
+    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.08), transparent 28%),
+    rgb(16 15 21 / 0.84);
+  --gs-drop-slot-border: rgb(235 228 246 / 0.14);
+  --gs-drop-slot-shadow: 0 18px 36px rgb(3 2 7 / 0.28), 0 0 20px rgb(var(--gs-accent-rgb) / 0.06);
+  --gs-drop-slot-hover-bg:
+    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.12), transparent 30%),
+    rgb(18 16 24 / 0.88);
+  --gs-drop-slot-hover-border: rgb(var(--gs-accent-rgb) / 0.28);
+  --gs-drop-slot-hover-shadow: 0 22px 42px rgb(3 2 7 / 0.34), 0 0 24px rgb(var(--gs-accent-rgb) / 0.14);
+  --gs-drop-slot-pill-bg: rgb(255 255 255 / 0.055);
+  --gs-drop-slot-pill-border: rgb(235 228 246 / 0.08);
+  --gs-drop-slot-pill-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+  --gs-drop-slot-pill-hover-bg: rgb(255 255 255 / 0.08);
+  --gs-drop-slot-pill-hover-border: rgb(var(--gs-accent-rgb) / 0.24);
+  --gs-drop-slot-pill-hover-shadow:
+    0 18px 34px rgb(3 2 7 / 0.26),
+    0 0 0 1px rgb(var(--gs-accent-rgb) / 0.08) inset;
+  --gs-drop-title-color: rgb(248 243 255 / 0.94);
+  --gs-drop-copy-color: rgb(225 218 238 / 0.72);
+  --gs-drop-icon-color: rgb(var(--gs-accent-strong-rgb));
+  --gs-drop-icon-bg: rgb(var(--gs-accent-rgb) / 0.08);
+  --gs-drop-icon-border: rgb(var(--gs-accent-rgb) / 0.14);
+  --gs-drop-slot-glow:
+    radial-gradient(circle at 50% 50%, rgb(var(--gs-accent-rgb) / 0.28), transparent 62%);
+  --gs-drop-slot-sheen:
+    linear-gradient(120deg, transparent 16%, rgb(255 255 255 / 0.16) 50%, transparent 84%);
+  --gs-drop-slot-sheen-blend: screen;
+  --gs-drop-slot-sheen-opacity: 0.72;
+  --gs-drop-icon-hover-bg: linear-gradient(180deg, rgb(255 255 255 / 0.16), var(--gs-drop-icon-bg));
+  --gs-drop-icon-hover-shadow:
+    0 10px 20px rgb(0 0 0 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.22);
+  --gs-drop-title-hover-shadow: 0 6px 18px rgb(var(--gs-accent-rgb) / 0.18);
+  --gs-drop-overlay-bg:
+    radial-gradient(circle at top left, rgb(var(--gs-accent-rgb) / 0.18), transparent 28%),
+    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.14), transparent 24%),
+    rgb(6 5 12 / 0.52);
+  --gs-drop-overlay-panel-bg: rgb(24 21 34 / 0.64);
+  --gs-drop-overlay-panel-border: rgb(235 228 246 / 0.12);
+  --gs-drop-overlay-panel-shadow: 0 28px 64px rgb(3 2 7 / 0.38), 0 0 38px rgb(var(--gs-accent-rgb) / 0.12);
+  --gs-drop-overlay-ring: radial-gradient(circle, rgb(var(--gs-accent-rgb) / 0.24), transparent 66%);
+  --gs-drop-overlay-panel-glow:
+    radial-gradient(circle at 22% 18%, rgb(var(--gs-accent-rgb) / 0.22), transparent 42%),
+    radial-gradient(circle at 80% 82%, rgb(var(--gs-support-rgb) / 0.14), transparent 48%);
+  --gs-drop-overlay-panel-sheen:
+    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.12), transparent 56%);
 
   --gs-preview-window-bg: linear-gradient(to bottom, rgb(21 18 30 / 0.92), rgb(15 13 23 / 0.88));
   --gs-preview-window-border: rgb(235 229 245 / 0.1);
@@ -85,8 +169,60 @@
 
 :host([data-dp-theme="light"]),
 [data-dp-theme="light"] {
-  --zone-bg:       rgb(32 29 37 / 0.58);
-  --zone-border:   rgb(68 61 80 / 0.18);
+  --gs-drop-slot-bg:
+    radial-gradient(circle at 82% 100%, rgb(var(--gs-support-rgb) / 0.08), transparent 30%),
+    radial-gradient(circle at 18% 0%, rgb(var(--gs-accent-rgb) / 0.05), transparent 34%),
+    rgb(255 255 255 / 0.82);
+  --gs-drop-slot-border: rgb(68 61 80 / 0.1);
+  --gs-drop-slot-shadow: 0 14px 24px rgb(44 37 48 / 0.08);
+  --gs-drop-slot-hover-bg:
+    radial-gradient(circle at 82% 100%, rgb(var(--gs-support-rgb) / 0.15), transparent 34%),
+    radial-gradient(circle at 18% 0%, rgb(var(--gs-accent-rgb) / 0.11), transparent 40%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(248 244 239 / 0.9));
+  --gs-drop-slot-hover-border: rgb(var(--gs-support-rgb) / 0.24);
+  --gs-drop-slot-hover-shadow:
+    0 18px 34px rgb(44 37 48 / 0.12),
+    0 0 0 1px rgb(var(--gs-support-rgb) / 0.07);
+  --gs-drop-slot-pill-bg: rgb(255 255 255 / 0.58);
+  --gs-drop-slot-pill-border: rgb(68 61 80 / 0.06);
+  --gs-drop-slot-pill-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5);
+  --gs-drop-slot-pill-hover-bg: rgb(255 255 255 / 0.68);
+  --gs-drop-slot-pill-hover-border: rgb(var(--gs-support-rgb) / 0.12);
+  --gs-drop-slot-pill-hover-shadow:
+    0 12px 24px rgb(44 37 48 / 0.1),
+    0 0 0 1px rgb(255 255 255 / 0.35) inset;
+  --gs-drop-title-color: rgb(34 29 45 / 0.9);
+  --gs-drop-copy-color: rgb(74 69 82 / 0.66);
+  --gs-drop-icon-color: rgb(var(--gs-accent-strong-rgb));
+  --gs-drop-icon-bg: rgb(255 255 255 / 0.42);
+  --gs-drop-icon-border: rgb(68 61 80 / 0.08);
+  --gs-drop-slot-glow:
+    radial-gradient(circle at 24% 30%, rgb(var(--gs-accent-rgb) / 0.16), transparent 48%),
+    radial-gradient(circle at 78% 76%, rgb(var(--gs-support-rgb) / 0.2), transparent 54%);
+  --gs-drop-slot-sheen:
+    linear-gradient(118deg, transparent 14%, rgb(255 255 255 / 0.6) 42%, rgb(255 245 232 / 0.42) 54%, transparent 78%);
+  --gs-drop-slot-sheen-blend: soft-light;
+  --gs-drop-slot-sheen-opacity: 0.92;
+  --gs-drop-icon-hover-bg:
+    linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(var(--gs-support-rgb) / 0.1));
+  --gs-drop-icon-hover-shadow:
+    0 10px 18px rgb(44 37 48 / 0.12),
+    0 0 0 1px rgb(var(--gs-support-rgb) / 0.08),
+    inset 0 1px 0 rgb(255 255 255 / 0.78);
+  --gs-drop-title-hover-shadow: 0 8px 18px rgb(var(--gs-support-rgb) / 0.16);
+  --gs-drop-overlay-bg:
+    radial-gradient(circle at top left, rgb(var(--gs-accent-rgb) / 0.08), transparent 30%),
+    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.06), transparent 24%),
+    rgb(242 240 237 / 0.44);
+  --gs-drop-overlay-panel-bg: rgb(255 252 248 / 0.82);
+  --gs-drop-overlay-panel-border: rgb(68 61 80 / 0.1);
+  --gs-drop-overlay-panel-shadow: 0 20px 42px rgb(44 37 48 / 0.12);
+  --gs-drop-overlay-ring: radial-gradient(circle, rgb(var(--gs-accent-rgb) / 0.12), transparent 68%);
+  --gs-drop-overlay-panel-glow:
+    radial-gradient(circle at 22% 18%, rgb(var(--gs-accent-rgb) / 0.11), transparent 40%),
+    radial-gradient(circle at 82% 84%, rgb(var(--gs-support-rgb) / 0.14), transparent 44%);
+  --gs-drop-overlay-panel-sheen:
+    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.52), transparent 58%);
 
   --gs-preview-window-bg: linear-gradient(to bottom, rgb(255 255 255 / 0.88), rgb(248 246 242 / 0.82));
   --gs-preview-window-border: rgb(52 47 60 / 0.12);
@@ -151,39 +287,39 @@
   transform: translateX(-50%);
   z-index: var(--gs-z-backdrop);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
   overflow: hidden;
-  background: var(--zone-bg);
-  backdrop-filter: blur(var(--gs-blur-dropzone)) saturate(1.4);
-  -webkit-backdrop-filter: blur(var(--gs-blur-dropzone)) saturate(1.4);
-  border: 1.5px solid var(--zone-border);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
   border-radius: var(--gs-radius-lg);
-  box-shadow: var(--shadow-zone);
+  box-shadow: none;
   font-family: var(--gs-font-family);
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--gs-motion-base), background var(--gs-motion-fast), border-color var(--gs-motion-fast);
+  transition: opacity var(--gs-motion-base), transform var(--gs-motion-base);
 }
 
 #gs-dropzone[data-position="bottom"] { bottom: 16px; }
 #gs-dropzone[data-position="top"]    { top: 16px; }
 #gs-dropzone.active { opacity: 1; pointer-events: all; }
 
-#gs-dropzone.hovered {
-  background: var(--zone-hover-bg);
-  border-color: var(--zone-hover-bd);
-}
-
-#gs-dropzone .gs-drop-hint {
-  color: var(--zone-text);
-  font-size: var(--gs-font-size-base);
-  text-align: center;
-  padding: 0 12px;
+#gs-dropzone .gs-drop-surface--slot {
   width: 100%;
+  height: 100%;
 }
 
-#gs-dropzone.hovered .gs-drop-hint { color: var(--zone-hover-tx); }
+#gs-dropzone.hovered {
+  transform: translateX(-50%) translateY(-3px) scale(1.018);
+}
+
+#gs-dropzone.hovered .gs-drop-surface--slot {
+  background: var(--gs-drop-slot-hover-bg);
+  border-color: var(--gs-drop-slot-hover-border);
+  box-shadow: var(--gs-drop-slot-hover-shadow);
+}
 
 /* ── Fullscreen Drop Overlay ─────────────────────────────────────────────── */
 
@@ -205,25 +341,276 @@
 
 #gs-dropzone-overlay.active { opacity: 1; pointer-events: all; }
 
-#gs-dropzone-overlay .gs-drop-hint {
-  color: var(--gs-accent);
-  font-size: var(--gs-font-size-lg);
-  padding: 18px 28px;
-  border-radius: var(--gs-radius-pill);
-  background: var(--gs-drop-overlay-pill-bg);
-  border: 1px solid var(--gs-drop-overlay-pill-border);
-  box-shadow: var(--gs-drop-overlay-pill-shadow);
-  letter-spacing: 0.03em;
+#gs-dropzone-overlay .gs-drop-overlay-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(540px, calc(100vw - 48px));
+  min-height: 260px;
+  transform: scale(0.985) translateY(6px);
+  transition: transform 0.32s var(--gs-ease-standard), opacity 0.24s ease;
+}
+
+#gs-dropzone-overlay .gs-drop-overlay-stage::before {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: min(440px, 86vw);
+  height: min(440px, 86vw);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--gs-drop-overlay-ring);
+  filter: blur(22px);
+  opacity: 0.96;
+  pointer-events: none;
+}
+
+#gs-dropzone-overlay.active .gs-drop-overlay-stage {
+  transform: scale(1) translateY(0);
 }
 
 /* ── Shared hint ─────────────────────────────────────────────────────────── */
 
-.gs-drop-hint {
+.gs-drop-surface {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  border: 1px solid var(--gs-drop-slot-border);
+  background: var(--gs-drop-slot-bg);
+  box-shadow: var(--gs-drop-slot-shadow);
+  color: var(--gs-drop-copy-color);
+}
+
+.gs-drop-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.gs-drop-surface--slot {
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: inherit;
+  backdrop-filter: blur(calc(var(--gs-blur-dropzone) * 0.9)) saturate(1.2);
+  -webkit-backdrop-filter: blur(calc(var(--gs-blur-dropzone) * 0.9)) saturate(1.2);
+  overflow: hidden;
+  transition:
+    background 0.32s var(--gs-ease-standard),
+    border-color 0.28s var(--gs-ease-standard),
+    box-shadow 0.32s var(--gs-ease-standard),
+    transform 0.32s var(--gs-ease-standard);
+}
+
+.gs-drop-surface--slot::before,
+.gs-drop-surface--slot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  transition:
+    opacity 0.32s var(--gs-ease-standard),
+    transform 0.42s var(--gs-ease-standard);
+}
+
+.gs-drop-surface--slot::before {
+  background: var(--gs-drop-slot-glow);
+  opacity: 0.26;
+  transform: scale(0.94);
+  filter: blur(12px);
+}
+
+.gs-drop-surface--slot::after {
+  inset: -1px;
+  background: var(--gs-drop-slot-sheen);
+  opacity: 0;
+  transform: translateX(-26%);
+  mix-blend-mode: var(--gs-drop-slot-sheen-blend);
+}
+
+.gs-drop-surface--overlay {
+  z-index: 1;
+  flex-direction: column;
+  text-align: center;
+  gap: 18px;
+  padding: 28px 32px;
+  border-radius: var(--gs-radius-3xl);
+  border-color: var(--gs-drop-overlay-panel-border);
+  background: var(--gs-drop-overlay-panel-bg);
+  box-shadow: var(--gs-drop-overlay-panel-shadow);
+  backdrop-filter: blur(var(--gs-blur-panel)) saturate(1.08);
+  -webkit-backdrop-filter: blur(var(--gs-blur-panel)) saturate(1.08);
+  overflow: hidden;
+}
+
+.gs-drop-surface--overlay::before {
+  background: var(--gs-drop-overlay-panel-glow);
+  opacity: 0.92;
+}
+
+.gs-drop-surface--overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: var(--gs-drop-overlay-panel-sheen);
+  opacity: 0.9;
+}
+
+.gs-drop-icon-shell {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  border: 1px solid var(--gs-drop-icon-border);
+  background: var(--gs-drop-icon-bg);
+  color: var(--gs-drop-icon-color);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+
+.gs-drop-icon-shell--slot {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  transition:
+    transform 0.32s var(--gs-ease-standard),
+    border-color 0.28s var(--gs-ease-standard),
+    background 0.28s var(--gs-ease-standard),
+    box-shadow 0.32s var(--gs-ease-standard);
+}
+
+.gs-drop-icon-shell--slot svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.32s var(--gs-ease-standard);
+}
+
+.gs-drop-icon-shell--overlay {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+}
+
+.gs-drop-icon-shell svg {
+  display: block;
+}
+
+.gs-drop-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gs-drop-copy--overlay {
+  align-items: center;
+  gap: 8px;
+}
+
+.gs-drop-kicker {
   font-family: var(--gs-font-family);
-  font-weight: 500;
+  font-size: var(--gs-font-size-2xs);
+  font-weight: var(--gs-font-weight-bold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gs-drop-slot-kicker);
+  opacity: 0.72;
+}
+
+.gs-drop-title {
+  font-family: var(--gs-font-family);
+  font-size: var(--gs-font-size-md);
+  font-weight: var(--gs-font-weight-semibold);
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: var(--gs-drop-title-color);
   pointer-events: none;
   user-select: none;
-  letter-spacing: 0.02em;
+  transition:
+    transform 0.32s var(--gs-ease-standard),
+    color 0.28s var(--gs-ease-standard),
+    text-shadow 0.32s var(--gs-ease-standard);
+}
+
+.gs-drop-surface--slot .gs-drop-title {
+  font-size: var(--gs-font-size-sm);
+  letter-spacing: 0.01em;
+}
+
+.gs-drop-slot-pill {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(100%, 320px);
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: var(--gs-radius-pill);
+  border: 1px solid var(--gs-drop-slot-pill-border);
+  background: var(--gs-drop-slot-pill-bg);
+  box-shadow: var(--gs-drop-slot-pill-shadow);
+  transition:
+    transform 0.32s var(--gs-ease-standard),
+    background 0.28s var(--gs-ease-standard),
+    border-color 0.28s var(--gs-ease-standard),
+    box-shadow 0.32s var(--gs-ease-standard);
+}
+
+#gs-dropzone.hovered .gs-drop-slot-pill {
+  background: var(--gs-drop-slot-pill-hover-bg);
+  border-color: var(--gs-drop-slot-pill-hover-border);
+  box-shadow: var(--gs-drop-slot-pill-hover-shadow);
+  transform: translateY(-1px) scale(1.01);
+  animation: gs-drop-slot-hover-float 1.8s ease-in-out infinite;
+}
+
+#gs-dropzone.hovered .gs-drop-surface--slot::before {
+  opacity: 0.72;
+  transform: scale(1.06);
+}
+
+#gs-dropzone.hovered .gs-drop-surface--slot::after {
+  opacity: var(--gs-drop-slot-sheen-opacity);
+  transform: translateX(18%);
+}
+
+#gs-dropzone.hovered .gs-drop-icon-shell--slot {
+  transform: translateY(-1px) scale(1.08);
+  background: var(--gs-drop-icon-hover-bg);
+  box-shadow: var(--gs-drop-icon-hover-shadow);
+}
+
+#gs-dropzone.hovered .gs-drop-icon-shell--slot svg {
+  transform: translateY(-0.5px) scale(1.04);
+}
+
+#gs-dropzone.hovered .gs-drop-title {
+  transform: translateY(-0.5px);
+  text-shadow: var(--gs-drop-title-hover-shadow);
+}
+
+@keyframes gs-drop-slot-hover-float {
+  0%, 100% {
+    transform: translateY(-1px) scale(1.01);
+  }
+
+  50% {
+    transform: translateY(-3px) scale(1.018);
+  }
 }
 
 /* ── Preview windows ─────────────────────────────────────────────────────── */
