@@ -41,6 +41,7 @@ const FRAME_DRAG_END_MESSAGE = 'gs:frame-drag-end'
 const FRAME_FOCUS_MESSAGE = 'gs:frame-focus'
 const FRAME_ESCAPE_MESSAGE = 'gs:frame-escape'
 const DROP_AREA_SHOW_DELAY_MS = 100
+const GOOGLE_FONTS_STYLESHEET = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Spectral:wght@600;700;800&display=swap'
 
 const ICON_REFRESH = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/></svg>`
 const ICON_OPEN_CURRENT = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H4m12 0l-4 4m4-4l-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/></svg>`
@@ -290,14 +291,32 @@ function _viewportRect() {
 }
 
 async function _loadCssText(nativeAPI, paths) {
-  const cssChunks = await Promise.all(
-    paths.map(async (path) => {
-      const url = nativeAPI.runtime.getURL(path)
-      return fetch(url).then((response) => response.text())
-    })
+  await Promise.all(
+    paths.map((path) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = nativeAPI.runtime.getURL(path)
+      link.addEventListener('load', resolve, { once: true })
+      link.addEventListener('error', () => reject(new Error(`Failed to load stylesheet: ${path}`)), { once: true })
+      _shadowRoot.appendChild(link)
+    }))
   )
+}
 
-  return cssChunks.join('\n\n')
+async function _ensureDocumentStylesheet(href) {
+  const existing = document.head.querySelector(`link[rel="stylesheet"][href="${href}"]`)
+  if (existing) {
+    return
+  }
+
+  await new Promise((resolve, reject) => {
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = href
+    link.addEventListener('load', resolve, { once: true })
+    link.addEventListener('error', () => reject(new Error(`Failed to load stylesheet: ${href}`)), { once: true })
+    document.head.appendChild(link)
+  })
 }
 
 function _normalizePreviewBounds(preview) {
@@ -1296,13 +1315,11 @@ async function initGlimpser() {
 
   try {
     const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
-    const cssText = await _loadCssText(nativeAPI, [
+    await _ensureDocumentStylesheet(GOOGLE_FONTS_STYLESHEET)
+    await _loadCssText(nativeAPI, [
       'css/foundation.css',
       'css/preview.css',
     ])
-    const styleEl = document.createElement('style')
-    styleEl.textContent = cssText
-    _shadowRoot.appendChild(styleEl)
   } catch (e) {
     console.warn('[Glimpser] Failed to load preview CSS into shadow root', e)
   }

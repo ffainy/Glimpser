@@ -17,6 +17,7 @@
 
   const nativeAPI = typeof browser !== 'undefined' ? browser : chrome;
   const HOST_ID   = 'gs-settings-host';
+  const GOOGLE_FONTS_STYLESHEET = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Spectral:wght@600;700;800&display=swap';
   const BRAND_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0C4.492 2.746-.885 11.312.502 19.963C.502 19.963 4.989 24 12 24s11.496-4.037 11.496-4.037C24.882 11.312 19.508 2.746 12 0m0 1.846s2.032.726 3.945 2.488c.073.067.13.163.129.277c-.001.168-.128.287-.301.287a.5.5 0 0 1-.137-.027a6.5 6.5 0 0 0-2.316-.4a6.63 6.63 0 0 0-3.914 1.273l-.002.002a7.98 7.98 0 0 1 6.808.768C20.48 9.11 22.597 14.179 21.902 19c0 0-1.646 1.396-4.129 2.172a.37.37 0 0 1-.303-.026c-.144-.084-.185-.255-.1-.404a.5.5 0 0 1 .094-.103a6.6 6.6 0 0 0 1.504-1.809a6.63 6.63 0 0 0 .856-4.027l-.002-.002a7.95 7.95 0 0 1-3.838 5.383c-4.42 2.552-9.99 1.882-13.885-1.184c0 0-.388-2.124.182-4.662a.37.37 0 0 1 .176-.25c.145-.084.31-.033.396.117a.5.5 0 0 1 .045.13c.126.762.405 1.5.814 2.208a6.64 6.64 0 0 0 3.059 2.756a8 8 0 0 1-1.672-2.033a7.93 7.93 0 0 1-1.066-4.205C4.128 8.047 7.464 3.659 12 1.846m0 7.623c-2.726 0-5.117.93-6.483 2.332c-.064.32-.1.65-.1.984c0 3.146 2.947 5.695 6.583 5.695c3.635 0 6.584-2.549 6.584-5.695c0-.334-.038-.664-.102-.984C17.116 10.4 14.724 9.469 12 9.469m0 .693a3.12 3.12 0 0 1 0 6.238a3.118 3.118 0 0 1-2.872-4.336a1.3 1.3 0 1 0 1.657-1.656A3.1 3.1 0 0 1 12 10.162"/></svg>`;
 
   // ── Tab definitions ────────────────────────────────────────────────────
@@ -50,6 +51,7 @@
   // ── Panel singleton ────────────────────────────────────────────────────
   let _host = null;
   let _shadow = null;
+  let _fontsLink = null;
   let _activeTab = 'appearance';
   let _settings = null;
   let _scrollLockState = null;
@@ -236,29 +238,39 @@
     return svg;
   }
 
-  async function _loadCssText(paths) {
-    const cssChunks = await Promise.all(
-      paths.map(async (path) => {
-        const cssUrl = nativeAPI.runtime.getURL(path);
-        return fetch(cssUrl).then(r => r.text());
-      })
+  async function _appendStylesheets(shadowRoot, paths) {
+    await Promise.all(
+      paths.map((path) => new Promise((resolve, reject) => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = nativeAPI.runtime.getURL(path);
+        link.addEventListener('load', resolve, { once: true });
+        link.addEventListener('error', () => reject(new Error(`Failed to load stylesheet: ${path}`)), { once: true });
+        shadowRoot.appendChild(link);
+      }))
     );
+  }
 
-    return cssChunks.join('\n\n');
+  async function _ensureDocumentStylesheet(href) {
+    const existing = document.head.querySelector(`link[rel="stylesheet"][href="${href}"]`);
+    if (existing) {
+      _fontsLink = existing;
+      return;
+    }
+
+    await new Promise((resolve, reject) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      link.addEventListener('load', resolve, { once: true });
+      link.addEventListener('error', () => reject(new Error(`Failed to load stylesheet: ${href}`)), { once: true });
+      document.head.appendChild(link);
+      _fontsLink = link;
+    });
   }
 
   // ── Build Shadow DOM ───────────────────────────────────────────────────
   async function _buildPanel() {
-    let cssText = '';
-    try {
-      cssText = await _loadCssText([
-        'css/foundation.css',
-        'css/settings.css',
-      ]);
-    } catch (e) {
-      console.warn('[Glimpser] Failed to load settings CSS', e);
-    }
-
     _host = document.createElement('div');
     _host.id = HOST_ID;
     _host.style.position = 'fixed';
@@ -269,9 +281,15 @@
 
     _shadow = _host.attachShadow({ mode: 'open' });
 
-    const style = document.createElement('style');
-    style.textContent = cssText;
-    _shadow.appendChild(style);
+    try {
+      await _ensureDocumentStylesheet(GOOGLE_FONTS_STYLESHEET);
+      await _appendStylesheets(_shadow, [
+        'css/foundation.css',
+        'css/settings.css',
+      ]);
+    } catch (e) {
+      console.warn('[Glimpser] Failed to load settings CSS', e);
+    }
 
     _render();
   }
@@ -317,10 +335,10 @@
 
   // ── Render ─────────────────────────────────────────────────────────────
   function _render() {
-    // Remove old content except style
-    const style = _shadow.querySelector('style');
+    // Remove old content except linked stylesheets
+    const styles = Array.from(_shadow.querySelectorAll('link[rel="stylesheet"]'));
     _shadow.innerHTML = '';
-    _shadow.appendChild(style);
+    styles.forEach((style) => _shadow.appendChild(style));
 
     const theme = _settings?.theme || 'dark';
     _syncThemeState(theme);
