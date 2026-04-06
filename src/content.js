@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS = {
   closePreviewOnOpenNewTab: true,
   showCloseOthersButton: true,
   showCloseAllButton: true,
+  blacklistDomains: [],
   language: null,
   theme: null,
   corners: 'rounded',
@@ -89,6 +90,71 @@ function validateURL(url) {
   return false
 }
 
+function _normalizeDomainInput(value) {
+  const trimmed = String(value || '').trim().toLowerCase().replace(/\.+$/, '')
+  if (!trimmed) {
+    return ''
+  }
+
+  const normalizeHostname = (hostname) => {
+    const normalized = String(hostname || '').trim().toLowerCase().replace(/\.+$/, '')
+    if (!normalized) {
+      return ''
+    }
+
+    const labels = normalized.split('.')
+    if (labels.some((label) => !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(label))) {
+      return ''
+    }
+
+    return normalized
+  }
+
+  if (!trimmed.includes('/') && !trimmed.includes(':')) {
+    return normalizeHostname(trimmed)
+  }
+
+  const candidates = /^[a-z][a-z\d+.-]*:\/\//i.test(trimmed)
+    ? [trimmed]
+    : [`https://${trimmed}`]
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = new URL(candidate)
+      return normalizeHostname(parsed.hostname)
+    } catch (e) {}
+  }
+
+  return ''
+}
+
+function _normalizeBlacklistDomains(domains) {
+  const unique = []
+  for (const domain of Array.isArray(domains) ? domains : []) {
+    const normalized = _normalizeDomainInput(domain)
+    if (normalized && !unique.includes(normalized)) {
+      unique.push(normalized)
+    }
+  }
+  return unique
+}
+
+function _getCurrentPageDomain() {
+  if (!/^https?:$/i.test(window.location.protocol)) {
+    return ''
+  }
+  return _normalizeDomainInput(window.location.hostname)
+}
+
+function _getBlacklistDomains(settings = _settings || DEFAULT_SETTINGS) {
+  return _normalizeBlacklistDomains(settings?.blacklistDomains)
+}
+
+function _isPreviewBlockedOnThisPage(settings = _settings || DEFAULT_SETTINGS) {
+  const currentDomain = _getCurrentPageDomain()
+  return !!currentDomain && _getBlacklistDomains(settings).includes(currentDomain)
+}
+
 function detectDraggedLink(event) {
   if (!event || !event.target) {
     return null
@@ -114,7 +180,9 @@ function detectDraggedLink(event) {
 async function loadSettings() {
   try {
     const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
-    return await nativeAPI.storage.sync.get(DEFAULT_SETTINGS)
+    const settings = await nativeAPI.storage.sync.get(DEFAULT_SETTINGS)
+    settings.blacklistDomains = _normalizeBlacklistDomains(settings.blacklistDomains)
+    return settings
   } catch (e) {
     return DEFAULT_SETTINGS
   }
@@ -877,6 +945,10 @@ function closeAllPreviews(exceptId = null) {
 }
 
 function openPreview(url) {
+  if (_isPreviewBlockedOnThisPage()) {
+    return null
+  }
+
   if (!validateURL(url)) {
     console.warn(t('warnInvalidUrl'))
     return null
@@ -1058,6 +1130,9 @@ function _setFullscreenOverlayActive(isActive) {
 
 function _bindDropZoneEvents(dropZone) {
   const onDragStart = (event) => {
+    if (_isPreviewBlockedOnThisPage()) {
+      return
+    }
     const url = detectDraggedLink(event)
     if (!url) {
       return
@@ -1100,6 +1175,10 @@ function _bindDropZoneEvents(dropZone) {
   })
 
   dropZone.addEventListener('drop', (event) => {
+    if (_isPreviewBlockedOnThisPage()) {
+      state.draggedLink = null
+      return
+    }
     event.preventDefault()
     event.stopPropagation()
     dropZone.classList.remove('active', 'hovered')
@@ -1125,6 +1204,8 @@ function _bindFrameDragBridge() {
       return
     }
 
+    // Let the top document decide whether preview is blocked so allowed pages
+    // with third-party iframes keep working as expected.
     try {
       window.top.postMessage({ type: FRAME_DRAG_MESSAGE, url }, '*')
     } catch (e) {
@@ -1209,6 +1290,9 @@ function _ensureFullscreenOverlay() {
 
 function _bindFullscreenDragEvents() {
   const onDragStart = (event) => {
+    if (_isPreviewBlockedOnThisPage()) {
+      return
+    }
     const url = detectDraggedLink(event)
     if (!url) {
       return
@@ -1227,6 +1311,9 @@ function _bindFullscreenDragEvents() {
   }
 
   const onOverlayDragOver = (event) => {
+    if (_isPreviewBlockedOnThisPage()) {
+      return
+    }
     if (state.draggedLink) {
       event.preventDefault()
       event.stopPropagation()
@@ -1237,6 +1324,10 @@ function _bindFullscreenDragEvents() {
   }
 
   const onOverlayDrop = (event) => {
+    if (_isPreviewBlockedOnThisPage()) {
+      state.draggedLink = null
+      return
+    }
     if (!state.draggedLink) {
       return
     }
@@ -1277,6 +1368,10 @@ function reinitDropZone() {
 
   state.draggedLink = null
 
+  if (_isPreviewBlockedOnThisPage()) {
+    return
+  }
+
   const position = _settings.dropZonePosition || 'bottom'
   if (position === 'fullscreen') {
     _bindFullscreenDragEvents()
@@ -1289,6 +1384,7 @@ function reinitDropZone() {
 
 async function initGlimpser() {
   if (window !== top) {
+    _settings = await loadSettings()
     _bindFrameDragBridge()
     return
   }
@@ -1356,7 +1452,7 @@ if (typeof exports === 'undefined') {
       return
     }
 
-    if (event.data?.type === FRAME_DRAG_MESSAGE && validateURL(event.data.url)) {
+    if (event.data?.type === FRAME_DRAG_MESSAGE && !_isPreviewBlockedOnThisPage() && validateURL(event.data.url)) {
       state.draggedLink = event.data.url
       const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
       const fullscreen = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
@@ -1411,6 +1507,11 @@ if (typeof exports === 'undefined') {
     }
 
     _settings = { ...(_settings || DEFAULT_SETTINGS), ...newSettings }
+    _settings.blacklistDomains = _normalizeBlacklistDomains(_settings.blacklistDomains)
+
+    if (window !== top) {
+      return
+    }
 
     if (newSettings.maxPreviewWindows) {
       _enforcePreviewWindowLimit()

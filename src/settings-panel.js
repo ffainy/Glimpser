@@ -30,6 +30,10 @@
       key: 'workspace',
       svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-5l-3 3v-3H6a2 2 0 0 1-2-2zm4 3h8m-8-3h8"/></svg>',
     },
+    {
+      key: 'blacklist',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.5 11.5L11 13l4-3.5M12 20a16.4 16.4 0 0 1-5.092-5.804A16.7 16.7 0 0 1 5 6.666L12 4l7 2.667a16.7 16.7 0 0 1-1.908 7.529A16.4 16.4 0 0 1 12 20"/></svg>',
+    },
   ];
 
   const DEFAULT_SETTINGS = {
@@ -41,6 +45,7 @@
     closePreviewOnOpenNewTab: true,
     showCloseOthersButton: true,
     showCloseAllButton: true,
+    blacklistDomains:   [],
     language:           null,
     theme:              null,
     corners:            'rounded',
@@ -55,6 +60,10 @@
   let _activeTab = 'appearance';
   let _settings = null;
   let _scrollLockState = null;
+  let _blacklistDraft = '';
+  let _blacklistEditingIndex = -1;
+  let _blacklistEditDraft = '';
+  let _blacklistNotice = null;
 
   function _t(key) {
     return typeof t === 'function' ? t(key) : key;
@@ -98,9 +107,139 @@
         return `${_t('labelTheme')} · ${_t('labelLang')} · ${_t('labelCorners')}`;
       case 'workspace':
         return `${_t('labelPos')} · ${_t('labelDefaultWindowSize')} · ${_t('labelHeaderActions')}`;
+      case 'blacklist':
+        return `${_t('labelBlacklistDomains')} · ${_t('hintBlacklistExactMatchShort')}`;
       default:
         return _t('aboutDescText');
     }
+  }
+
+  function _normalizeDomainInput(value) {
+    const trimmed = String(value || '').trim().toLowerCase().replace(/\.+$/, '');
+    if (!trimmed) {
+      return '';
+    }
+
+    const normalizeHostname = (hostname) => {
+      const normalized = String(hostname || '').trim().toLowerCase().replace(/\.+$/, '');
+      if (!normalized) {
+        return '';
+      }
+
+      const labels = normalized.split('.');
+      if (labels.some(label => !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(label))) {
+        return '';
+      }
+
+      return normalized;
+    };
+
+    if (!trimmed.includes('/') && !trimmed.includes(':')) {
+      return normalizeHostname(trimmed);
+    }
+
+    const candidates = /^[a-z][a-z\d+.-]*:\/\//i.test(trimmed)
+      ? [trimmed]
+      : [`https://${trimmed}`];
+
+    for (const candidate of candidates) {
+      try {
+        const parsed = new URL(candidate);
+        return normalizeHostname(parsed.hostname);
+      } catch (e) {}
+    }
+
+    return '';
+  }
+
+  function _normalizeBlacklistDomains(domains) {
+    const unique = [];
+    (Array.isArray(domains) ? domains : []).forEach((domain) => {
+      const normalized = _normalizeDomainInput(domain);
+      if (normalized && !unique.includes(normalized)) {
+        unique.push(normalized);
+      }
+    });
+    return unique;
+  }
+
+  function _getCurrentPageDomain() {
+    if (!/^https?:$/i.test(window.location.protocol)) {
+      return '';
+    }
+    return _normalizeDomainInput(window.location.hostname);
+  }
+
+  function _isCurrentPageBlacklisted() {
+    const currentDomain = _getCurrentPageDomain();
+    return !!currentDomain && _getBlacklistDomains().includes(currentDomain);
+  }
+
+  function _getBlacklistDomains() {
+    const normalized = _normalizeBlacklistDomains(_settings?.blacklistDomains);
+    if (_settings && JSON.stringify(normalized) !== JSON.stringify(_settings.blacklistDomains || [])) {
+      _settings.blacklistDomains = normalized;
+    }
+    return normalized;
+  }
+
+  function _setBlacklistNotice(key, tone = 'info') {
+    _blacklistNotice = key ? { key, tone } : null;
+  }
+
+  function _resetBlacklistEditor() {
+    _blacklistDraft = '';
+    _blacklistEditingIndex = -1;
+    _blacklistEditDraft = '';
+  }
+
+  function _addBlacklistDomain(rawValue, successKey = 'blacklistDomainAdded') {
+    const domain = _normalizeDomainInput(rawValue);
+    if (!domain) {
+      _setBlacklistNotice('blacklistInvalidDomain', 'error');
+      return false;
+    }
+
+    const domains = _getBlacklistDomains();
+    if (domains.includes(domain)) {
+      _setBlacklistNotice('blacklistDuplicateDomain', 'error');
+      return false;
+    }
+
+    _settings.blacklistDomains = [...domains, domain];
+    _blacklistDraft = '';
+    _setBlacklistNotice(successKey, 'success');
+    return true;
+  }
+
+  function _updateBlacklistDomain(index, rawValue) {
+    const domain = _normalizeDomainInput(rawValue);
+    if (!domain) {
+      _setBlacklistNotice('blacklistInvalidDomain', 'error');
+      return false;
+    }
+
+    const domains = _getBlacklistDomains();
+    if (domains.some((existing, existingIndex) => existing === domain && existingIndex !== index)) {
+      _setBlacklistNotice('blacklistDuplicateDomain', 'error');
+      return false;
+    }
+
+    _settings.blacklistDomains = domains.map((existing, existingIndex) => existingIndex === index ? domain : existing);
+    _blacklistEditingIndex = -1;
+    _blacklistEditDraft = '';
+    _setBlacklistNotice('blacklistDomainUpdated', 'success');
+    return true;
+  }
+
+  function _removeBlacklistDomain(index) {
+    const domains = _getBlacklistDomains();
+    _settings.blacklistDomains = domains.filter((_, existingIndex) => existingIndex !== index);
+    if (_blacklistEditingIndex === index) {
+      _blacklistEditingIndex = -1;
+      _blacklistEditDraft = '';
+    }
+    _setBlacklistNotice('blacklistDomainRemoved', 'success');
   }
 
   function _getHeaderMetaItems() {
@@ -117,6 +256,18 @@
           { label: _t('labelDefaultWindowSize'), value: `${_settings?.defaultWindowScale?.width ?? DEFAULT_SETTINGS.defaultWindowScale.width}% × ${_settings?.defaultWindowScale?.height ?? DEFAULT_SETTINGS.defaultWindowScale.height}%` },
           { label: _t('labelMaxPreviewWindows'), value: String(_settings?.maxPreviewWindows ?? DEFAULT_SETTINGS.maxPreviewWindows) },
         ];
+      case 'blacklist': {
+        const currentDomain = _getCurrentPageDomain();
+        return [
+          { label: _t('labelBlacklistCount'), value: String(_getBlacklistDomains().length) },
+          { label: _t('labelCurrentDomain'), value: currentDomain || _t('blacklistCurrentDomainUnavailable') },
+          {
+            label: _t('labelCurrentSiteStatus'),
+            value: currentDomain ? _t(_isCurrentPageBlacklisted() ? 'blacklistCurrentSiteBlocked' : 'blacklistCurrentSiteAllowed') : '—',
+            tone: currentDomain && _isCurrentPageBlacklisted() ? 'danger' : '',
+          },
+        ];
+      }
       default:
         return [];
     }
@@ -128,8 +279,8 @@
     }
     if (metaRow) {
       metaRow.innerHTML = '';
-      _getHeaderMetaItems().forEach(({ label, value }) => {
-        metaRow.appendChild(_makeMetaItem(label, value));
+      _getHeaderMetaItems().forEach(({ label, value, tone }) => {
+        metaRow.appendChild(_makeMetaItem(label, value, tone));
       });
     }
   }
@@ -402,8 +553,8 @@
 
     const metaRow = document.createElement('div');
     metaRow.className = 'gs-settings-meta';
-    _getHeaderMetaItems().forEach(({ label, value }) => {
-      metaRow.appendChild(_makeMetaItem(label, value));
+    _getHeaderMetaItems().forEach(({ label, value, tone }) => {
+      metaRow.appendChild(_makeMetaItem(label, value, tone));
     });
 
     header.append(headerTop, metaRow);
@@ -413,6 +564,7 @@
 
     scroll.appendChild(_renderAppearanceTab());
     scroll.appendChild(_renderWorkspaceTab());
+    scroll.appendChild(_renderBlacklistTab());
 
     // Footer
     const footer = document.createElement('div');
@@ -432,6 +584,8 @@
     resetBtn.textContent = _t('btnReset');
     resetBtn.addEventListener('click', () => {
       _settings = _cloneDefaultSettings();
+      _resetBlacklistEditor();
+      _setBlacklistNotice(null);
       _settings.theme = _host?.getAttribute('data-dp-theme') || _settings.theme || 'dark';
       _render();
     });
@@ -677,6 +831,220 @@
     return tab;
   }
 
+  function _renderBlacklistTab() {
+    const tab = _makeTab('blacklist');
+    const currentDomain = _getCurrentPageDomain();
+    const domains = _getBlacklistDomains();
+    const currentDomainBlocked = !!currentDomain && domains.includes(currentDomain);
+    const manualDraftEmpty = !String(_blacklistDraft || '').trim();
+
+    const quickActions = document.createDocumentFragment();
+
+    const currentDomainBlock = document.createElement('div');
+    currentDomainBlock.className = 'gs-setting-group';
+
+    const currentDomainLabel = document.createElement('div');
+    currentDomainLabel.className = 'gs-field-label';
+    currentDomainLabel.textContent = _t('labelCurrentDomain');
+
+    const currentDomainRow = document.createElement('div');
+    currentDomainRow.className = 'gs-blacklist-input-row';
+
+    const currentDomainValue = document.createElement('div');
+    currentDomainValue.className = 'gs-blacklist-domain-chip';
+    currentDomainValue.textContent = currentDomain || _t('blacklistCurrentDomainUnavailable');
+
+    const addCurrentButton = document.createElement('button');
+    addCurrentButton.className = 'gs-btn gs-btn-secondary gs-btn-small';
+    addCurrentButton.type = 'button';
+    addCurrentButton.textContent = _t('btnAddCurrentDomain');
+    addCurrentButton.disabled = !currentDomain || currentDomainBlocked;
+    addCurrentButton.addEventListener('click', () => {
+      _addBlacklistDomain(currentDomain, 'blacklistCurrentDomainAdded');
+      _render();
+    });
+
+    currentDomainRow.append(currentDomainValue, addCurrentButton);
+    currentDomainBlock.append(currentDomainLabel, currentDomainRow, _makeHint(currentDomain ? _t('hintBlacklistCurrentDomain') : _t('blacklistCurrentDomainUnavailable')));
+    quickActions.appendChild(currentDomainBlock);
+
+    const manualBlock = document.createElement('div');
+    manualBlock.className = 'gs-setting-group';
+
+    const manualLabel = document.createElement('div');
+    manualLabel.className = 'gs-field-label';
+    manualLabel.textContent = _t('labelBlacklistDomains');
+
+    const manualRow = document.createElement('div');
+    manualRow.className = 'gs-blacklist-input-row';
+
+    const manualInput = document.createElement('input');
+    manualInput.className = 'gs-text-input';
+    manualInput.type = 'text';
+    manualInput.inputMode = 'url';
+    manualInput.autocomplete = 'off';
+    manualInput.autocapitalize = 'none';
+    manualInput.spellcheck = false;
+    manualInput.placeholder = _t('placeholderBlacklistDomain');
+    manualInput.value = _blacklistDraft;
+    manualInput.addEventListener('input', () => {
+      _blacklistDraft = manualInput.value;
+      addButton.disabled = !String(manualInput.value || '').trim();
+      _setBlacklistNotice(null);
+    });
+    manualInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        _addBlacklistDomain(_blacklistDraft);
+        _render();
+      }
+    });
+
+    const addButton = document.createElement('button');
+    addButton.className = 'gs-btn gs-btn-primary gs-btn-small';
+    addButton.type = 'button';
+    addButton.textContent = _t('btnAddDomain');
+    addButton.disabled = manualDraftEmpty;
+    addButton.addEventListener('click', () => {
+      _addBlacklistDomain(_blacklistDraft);
+      _render();
+    });
+
+    manualRow.append(manualInput, addButton);
+    manualBlock.append(manualLabel, manualRow, _makeHint(_t('hintBlacklistExactMatch')));
+    quickActions.appendChild(manualBlock);
+
+    if (_blacklistNotice) {
+      const notice = document.createElement('div');
+      notice.className = `gs-blacklist-notice is-${_blacklistNotice.tone}`;
+      notice.textContent = _t(_blacklistNotice.key);
+      quickActions.appendChild(notice);
+    }
+
+    tab.appendChild(_makeCard(_t('labelBlacklistControls'), quickActions, 'gs-card--feature'));
+
+    tab.appendChild(_makeCard(_t('labelBlacklistDomains'), () => {
+      const fragment = document.createDocumentFragment();
+      const list = document.createElement('div');
+      list.className = 'gs-blacklist-list';
+
+      if (!domains.length) {
+        const empty = document.createElement('div');
+        empty.className = 'gs-blacklist-empty';
+        empty.textContent = _t('blacklistListEmpty');
+        list.appendChild(empty);
+      }
+
+      domains.forEach((domain, index) => {
+        const row = document.createElement('div');
+        row.className = 'gs-blacklist-row';
+        const isEditing = _blacklistEditingIndex === index;
+        const editDraftEmpty = !String(_blacklistEditDraft || '').trim();
+        let saveButton = null;
+
+        const main = document.createElement('div');
+        main.className = 'gs-blacklist-row-main';
+
+        if (isEditing) {
+          const editInput = document.createElement('input');
+          editInput.className = 'gs-text-input';
+          editInput.type = 'text';
+          editInput.inputMode = 'url';
+          editInput.autocomplete = 'off';
+          editInput.autocapitalize = 'none';
+          editInput.spellcheck = false;
+          editInput.value = _blacklistEditDraft;
+          editInput.addEventListener('input', () => {
+            _blacklistEditDraft = editInput.value;
+            if (saveButton) {
+              saveButton.disabled = !String(editInput.value || '').trim();
+            }
+            _setBlacklistNotice(null);
+          });
+          editInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              _updateBlacklistDomain(index, _blacklistEditDraft);
+              _render();
+            }
+          });
+          main.appendChild(editInput);
+        } else {
+          const domainText = document.createElement('div');
+          domainText.className = 'gs-blacklist-domain';
+          domainText.textContent = domain;
+          main.appendChild(domainText);
+
+          if (currentDomain && currentDomain === domain) {
+            const badge = document.createElement('div');
+            badge.className = 'gs-blacklist-domain-tag';
+            badge.textContent = _t('blacklistCurrentSiteBadge');
+            main.appendChild(badge);
+          }
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'gs-blacklist-actions';
+
+        if (isEditing) {
+          saveButton = document.createElement('button');
+          saveButton.className = 'gs-btn gs-btn-primary gs-btn-small';
+          saveButton.type = 'button';
+          saveButton.textContent = _t('btnSave');
+          saveButton.disabled = editDraftEmpty;
+          saveButton.addEventListener('click', () => {
+            _updateBlacklistDomain(index, _blacklistEditDraft);
+            _render();
+          });
+
+          const cancelButton = document.createElement('button');
+          cancelButton.className = 'gs-btn gs-btn-secondary gs-btn-small';
+          cancelButton.type = 'button';
+          cancelButton.textContent = _t('btnCancel');
+          cancelButton.addEventListener('click', () => {
+            _blacklistEditingIndex = -1;
+            _blacklistEditDraft = '';
+            _setBlacklistNotice(null);
+            _render();
+          });
+
+          actions.append(saveButton, cancelButton);
+        } else {
+          const editButton = document.createElement('button');
+          editButton.className = 'gs-btn gs-btn-secondary gs-btn-small';
+          editButton.type = 'button';
+          editButton.textContent = _t('btnEdit');
+          editButton.addEventListener('click', () => {
+            _blacklistEditingIndex = index;
+            _blacklistEditDraft = domain;
+            _setBlacklistNotice(null);
+            _render();
+          });
+
+          const deleteButton = document.createElement('button');
+          deleteButton.className = 'gs-btn gs-btn-secondary gs-btn-small gs-btn-danger-soft';
+          deleteButton.type = 'button';
+          deleteButton.textContent = _t('btnDelete');
+          deleteButton.addEventListener('click', () => {
+            _removeBlacklistDomain(index);
+            _render();
+          });
+
+          actions.append(editButton, deleteButton);
+        }
+
+        row.append(main, actions);
+        list.appendChild(row);
+      });
+
+      fragment.append(list);
+      fragment.appendChild(_makeHint(_t('hintBlacklistList')));
+      return fragment;
+    }, 'gs-card--feature'));
+
+    return tab;
+  }
+
   // ── Helpers ────────────────────────────────────────────────────────────
   function _makeTab(key) {
     const div = document.createElement('div');
@@ -685,7 +1053,7 @@
     return div;
   }
 
-  function _makeMetaItem(label, value) {
+  function _makeMetaItem(label, value, tone = '') {
     const item = document.createElement('div');
     item.className = 'gs-settings-meta-item';
 
@@ -694,7 +1062,7 @@
     labelEl.textContent = label;
 
     const valueEl = document.createElement('div');
-    valueEl.className = 'gs-settings-meta-value';
+    valueEl.className = `gs-settings-meta-value${tone ? ` is-${tone}` : ''}`;
     valueEl.textContent = value;
 
     item.append(labelEl, valueEl);
@@ -825,6 +1193,7 @@
   async function _save(statusEl) {
     try {
       delete _settings.controlBarSide;
+      _settings.blacklistDomains = _normalizeBlacklistDomains(_settings.blacklistDomains);
       await nativeAPI.storage.sync.set(_settings);
       statusEl.textContent = _t('saved');
       statusEl.className = 'gs-settings-status visible';
@@ -851,9 +1220,13 @@
     // Load fresh settings
     try {
       _settings = await nativeAPI.storage.sync.get(DEFAULT_SETTINGS);
+      _settings.blacklistDomains = _normalizeBlacklistDomains(_settings.blacklistDomains);
     } catch (e) {
       _settings = _cloneDefaultSettings();
     }
+
+    _resetBlacklistEditor();
+    _setBlacklistNotice(null);
 
     await applyLangPref(_settings?.language);
 

@@ -42,6 +42,15 @@
   --gs-settings-accent-shadow-strong: 0 12px 24px rgb(var(--gs-settings-accent) / 0.16);
   --gs-settings-primary-shadow: 0 16px 32px rgb(var(--gs-settings-accent) / 0.26);
   --gs-settings-primary-shadow-hover: 0 18px 34px rgb(var(--gs-settings-accent) / 0.3);
+  --gs-settings-primary-bg-start: 136 121 160;
+  --gs-settings-primary-bg-end: 170 140 102;
+  --gs-settings-primary-border: rgb(120 100 150 / 0.2);
+  --gs-settings-primary-text: 255 255 255;
+  --gs-settings-primary-text-shadow: 0 1px 1px rgb(0 0 0 / 0.12);
+  --gs-settings-primary-shadow: 0 14px 28px rgb(104 88 128 / 0.16), 0 0 16px rgb(146 118 86 / 0.05);
+  --gs-settings-primary-shadow-hover: 0 16px 30px rgb(104 88 128 / 0.2), 0 0 18px rgb(146 118 86 / 0.08);
+  --gs-settings-primary-glow-hover: 0 0 0 1px rgb(255 255 255 / 0.05);
+  --gs-settings-inline-action-width: 12.5rem;
   --gs-settings-slider-track: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.42), rgb(var(--gs-settings-support) / 0.2));
   --gs-settings-slider-thumb-bg: linear-gradient(135deg, rgb(255 255 255), rgb(var(--gs-settings-accent) / 0.98));
   --gs-settings-display-glow: 0 1px 0 rgb(255 255 255 / 0.24);
@@ -92,6 +101,13 @@
   --gs-settings-accent-shadow-strong: 0 0 0 1px rgb(var(--gs-settings-accent) / 0.16), 0 18px 34px rgb(var(--gs-settings-accent) / 0.22), 0 0 28px rgb(var(--gs-settings-support) / 0.12);
   --gs-settings-primary-shadow: 0 18px 36px rgb(var(--gs-settings-accent) / 0.28), 0 0 24px rgb(var(--gs-settings-support) / 0.12);
   --gs-settings-primary-shadow-hover: 0 22px 42px rgb(var(--gs-settings-accent) / 0.34), 0 0 32px rgb(var(--gs-settings-support) / 0.16);
+  --gs-settings-primary-bg-start: 90 77 112;
+  --gs-settings-primary-bg-end: 116 92 62;
+  --gs-settings-primary-border: rgb(145 123 178 / 0.18);
+  --gs-settings-primary-text-shadow: 0 1px 1px rgb(0 0 0 / 0.2);
+  --gs-settings-primary-shadow: 0 16px 30px rgb(66 54 84 / 0.2), 0 0 16px rgb(108 84 56 / 0.06);
+  --gs-settings-primary-shadow-hover: 0 18px 34px rgb(66 54 84 / 0.24), 0 0 20px rgb(108 84 56 / 0.1);
+  --gs-settings-primary-glow-hover: 0 0 18px rgb(98 82 124 / 0.16), 0 0 24px rgb(122 96 66 / 0.1);
   --gs-settings-slider-thumb-shadow: 0 0 0 4px rgb(var(--gs-settings-accent) / 0.18), 0 10px 20px rgb(var(--gs-settings-accent) / 0.28), 0 0 18px rgb(var(--gs-settings-support) / 0.1);
   --gs-settings-slider-thumb-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.22), 0 12px 22px rgb(var(--gs-settings-accent) / 0.32), 0 0 24px rgb(var(--gs-settings-support) / 0.14);
   --gs-settings-display-glow: 0 0 12px rgb(var(--gs-settings-accent) / 0.12);
@@ -136,8 +152,13 @@
   --gs-settings-card-shadow-hover: 0 18px 34px rgb(44 37 48 / 0.1);
   --gs-settings-accent-shadow: 0 12px 24px rgb(var(--gs-settings-accent) / 0.08);
   --gs-settings-accent-shadow-strong: 0 14px 28px rgb(var(--gs-settings-accent) / 0.1);
-  --gs-settings-primary-shadow: 0 14px 28px rgb(var(--gs-settings-accent) / 0.14);
-  --gs-settings-primary-shadow-hover: 0 18px 32px rgb(var(--gs-settings-accent) / 0.18);
+  --gs-settings-primary-bg-start: 96 82 122;
+  --gs-settings-primary-bg-end: 124 93 68;
+  --gs-settings-primary-border: rgb(108 91 138 / 0.18);
+  --gs-settings-primary-text-shadow: 0 1px 1px rgb(0 0 0 / 0.1);
+  --gs-settings-primary-shadow: 0 12px 24px rgb(92 77 116 / 0.12), 0 0 14px rgb(120 90 64 / 0.04);
+  --gs-settings-primary-shadow-hover: 0 14px 28px rgb(92 77 116 / 0.16), 0 0 18px rgb(120 90 64 / 0.08);
+  --gs-settings-primary-glow-hover: 0 0 14px rgb(92 77 116 / 0.1), 0 0 18px rgb(120 90 64 / 0.05);
   --gs-settings-brand-gradient: linear-gradient(135deg, rgb(28 24 34), rgb(var(--gs-settings-accent-strong)) 44%, rgb(126 87 35));
   --gs-settings-title-gradient: linear-gradient(135deg, rgb(36 31 44), rgb(var(--gs-settings-accent)) 56%, rgb(126 87 35));
   --gs-settings-title-shadow: 0 1px 0 rgb(255 255 255 / 0.44);
@@ -774,6 +795,168 @@
   white-space: nowrap;
 }
 
+.gs-text-input {
+  width: 100%;
+  min-width: 0;
+  padding: 11px 14px;
+  border-radius: var(--gs-radius-lg);
+  border: 1px solid var(--gs-settings-border);
+  background: var(--gs-settings-option-bg);
+  color: var(--text);
+  font-family: var(--gs-font-family);
+  font-size: var(--gs-font-size-sm);
+  font-weight: var(--gs-font-weight-medium);
+  line-height: 1.4;
+  transition: border-color var(--gs-motion-fast), background var(--gs-motion-fast), box-shadow var(--gs-motion-fast), color var(--gs-motion-fast);
+}
+
+.gs-text-input::placeholder {
+  color: var(--gs-settings-faint);
+}
+
+.gs-text-input:hover {
+  background: var(--gs-settings-option-bg-hover);
+  border-color: var(--gs-settings-hover-border-soft);
+}
+
+.gs-text-input:focus {
+  outline: none;
+  border-color: var(--gs-settings-active-border);
+  box-shadow: 0 0 0 3px rgb(var(--gs-settings-accent) / 0.14);
+}
+
+.gs-blacklist-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gs-blacklist-input-row > .gs-btn {
+  flex: 0 0 var(--gs-settings-inline-action-width);
+  inline-size: var(--gs-settings-inline-action-width);
+}
+
+.gs-blacklist-domain-chip {
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--gs-radius-lg);
+  border: 1px solid rgb(var(--gs-settings-accent) / 0.08);
+  background: rgb(var(--gs-settings-accent) / 0.04);
+  color: var(--text-strong);
+  font-family: var(--gs-font-family-mono);
+  font-size: var(--gs-font-size-sm);
+  font-weight: var(--gs-font-weight-bold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gs-blacklist-notice {
+  padding: 11px 14px;
+  border-radius: var(--gs-radius-lg);
+  border: 1px solid rgb(var(--gs-settings-accent) / 0.12);
+  background: rgb(var(--gs-settings-accent) / 0.05);
+  color: var(--gs-settings-accent-text);
+  font-family: var(--gs-font-family);
+  font-size: var(--gs-font-size-xs);
+  font-weight: var(--gs-font-weight-medium);
+  line-height: 1.5;
+}
+
+.gs-blacklist-notice.is-error {
+  border-color: var(--gs-danger-border);
+  background: var(--gs-danger-bg);
+  color: var(--gs-danger-text-soft);
+}
+
+.gs-blacklist-notice.is-success {
+  border-color: rgb(var(--gs-settings-support) / 0.18);
+  background: rgb(var(--gs-settings-support) / 0.08);
+  color: rgb(var(--gs-settings-support-strong));
+}
+
+.gs-settings-meta-value.is-danger {
+  border-color: var(--gs-danger-border);
+  background: var(--gs-danger-bg);
+  color: var(--gs-danger-text-soft);
+}
+
+.gs-blacklist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gs-blacklist-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border-radius: var(--gs-radius-xl);
+  border: 1px solid var(--gs-settings-border);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.05), transparent), rgb(var(--gs-settings-accent) / 0.025);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+.gs-blacklist-row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gs-blacklist-domain {
+  min-width: 0;
+  color: var(--text-strong);
+  font-family: var(--gs-font-family-mono);
+  font-size: var(--gs-font-size-sm);
+  font-weight: var(--gs-font-weight-bold);
+  overflow-wrap: anywhere;
+}
+
+.gs-blacklist-domain-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: var(--gs-radius-pill);
+  border: 1px solid var(--gs-settings-pill-border);
+  background: var(--gs-settings-pill-bg);
+  color: var(--gs-settings-pill-text);
+  font-family: var(--gs-font-family);
+  font-size: var(--gs-font-size-2xs);
+  font-weight: var(--gs-font-weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.gs-blacklist-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.gs-blacklist-empty {
+  padding: 18px;
+  border-radius: var(--gs-radius-xl);
+  border: 1px dashed rgb(var(--gs-settings-accent) / 0.18);
+  color: var(--gs-settings-faint);
+  font-family: var(--gs-font-family);
+  font-size: var(--gs-font-size-sm);
+  font-weight: var(--gs-font-weight-regular);
+  line-height: 1.6;
+  text-align: center;
+}
+
 /* ── Shared option buttons ──────────────────────────────────────────────── */
 
 .gs-option-group {
@@ -941,16 +1124,30 @@
 
 .gs-btn:active { transform: scale(0.97); transition-duration: 0.08s; }
 
+.gs-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.gs-btn-small {
+  min-height: 38px;
+  padding: 8px 14px;
+  font-size: var(--gs-font-size-xs);
+}
+
 .gs-btn-primary {
-  background: linear-gradient(135deg, rgb(var(--gs-settings-accent-strong)), rgb(var(--gs-settings-support)));
-  color: rgb(255 255 255);
-  border-color: var(--gs-settings-active-border);
+  background: linear-gradient(135deg, rgb(var(--gs-settings-primary-bg-start)), rgb(var(--gs-settings-primary-bg-end)));
+  color: rgb(var(--gs-settings-primary-text));
+  border-color: var(--gs-settings-primary-border);
   box-shadow: var(--gs-settings-primary-shadow);
+  text-shadow: var(--gs-settings-primary-text-shadow);
 }
 
 .gs-btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: var(--gs-settings-primary-shadow-hover);
+  box-shadow: var(--gs-settings-primary-shadow-hover), var(--gs-settings-primary-glow-hover);
 }
 
 .gs-btn-secondary {
@@ -974,6 +1171,18 @@
 }
 
 .gs-btn-reset:hover {
+  background: var(--gs-danger-bg-strong);
+  border-color: var(--gs-danger-border-strong);
+  color: var(--gs-danger-text-soft-strong);
+}
+
+.gs-btn-danger-soft {
+  background: var(--gs-danger-bg);
+  color: var(--gs-danger-text-soft);
+  border-color: var(--gs-danger-border);
+}
+
+.gs-btn-danger-soft:hover {
   background: var(--gs-danger-bg-strong);
   border-color: var(--gs-danger-border-strong);
   color: var(--gs-danger-text-soft-strong);
@@ -1177,6 +1386,25 @@
 
   .gs-card {
     width: 100%;
+  }
+
+  .gs-blacklist-input-row,
+  .gs-blacklist-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gs-blacklist-input-row > .gs-btn {
+    flex: 1 1 auto;
+    inline-size: auto;
+  }
+
+  .gs-blacklist-actions {
+    justify-content: flex-start;
+  }
+
+  .gs-blacklist-actions .gs-btn {
+    flex: 1 1 0;
   }
 }
 
