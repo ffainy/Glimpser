@@ -50,6 +50,7 @@
     0 8px 18px rgb(var(--gs-settings-accent) / 0.22);
   --gs-settings-slider-thumb-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.18),
     0 12px 20px rgb(var(--gs-settings-support) / 0.24);
+  --gs-settings-brand-gradient: linear-gradient(135deg, rgb(var(--gs-settings-accent-strong)), rgb(var(--gs-settings-accent)) 42%, rgb(var(--gs-settings-support-strong)));
   --gs-settings-title-gradient: linear-gradient(135deg, rgb(var(--gs-settings-accent)), rgb(var(--gs-settings-accent)) 52%, rgb(var(--gs-settings-support-strong)));
   --gs-settings-title-shadow: 0 1px 0 rgb(255 255 255 / 0.28);
   --gs-settings-title-underline: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.22), rgb(var(--gs-settings-support) / 0.16));
@@ -95,6 +96,7 @@
   --gs-settings-slider-thumb-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.22), 0 12px 22px rgb(var(--gs-settings-accent) / 0.32), 0 0 24px rgb(var(--gs-settings-support) / 0.14);
   --gs-settings-display-glow: 0 0 12px rgb(var(--gs-settings-accent) / 0.12);
   --gs-settings-display-glow-strong: 0 0 18px rgb(var(--gs-settings-accent) / 0.18), 0 0 30px rgb(var(--gs-settings-support) / 0.08);
+  --gs-settings-brand-gradient: linear-gradient(135deg, rgb(255 249 255), rgb(224 200 255) 38%, rgb(255 204 145) 82%);
   --gs-settings-title-gradient: linear-gradient(135deg, rgb(248 243 255), rgb(var(--gs-settings-accent)) 52%, rgb(var(--gs-settings-support-strong)));
   --gs-settings-title-shadow: 0 0 12px rgb(var(--gs-settings-accent) / 0.14), 0 0 20px rgb(var(--gs-settings-support) / 0.06);
   --gs-settings-title-underline: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.26), rgb(var(--gs-settings-support) / 0.18));
@@ -136,6 +138,7 @@
   --gs-settings-accent-shadow-strong: 0 14px 28px rgb(var(--gs-settings-accent) / 0.1);
   --gs-settings-primary-shadow: 0 14px 28px rgb(var(--gs-settings-accent) / 0.14);
   --gs-settings-primary-shadow-hover: 0 18px 32px rgb(var(--gs-settings-accent) / 0.18);
+  --gs-settings-brand-gradient: linear-gradient(135deg, rgb(28 24 34), rgb(var(--gs-settings-accent-strong)) 44%, rgb(126 87 35));
   --gs-settings-title-gradient: linear-gradient(135deg, rgb(36 31 44), rgb(var(--gs-settings-accent)) 56%, rgb(126 87 35));
   --gs-settings-title-shadow: 0 1px 0 rgb(255 255 255 / 0.44);
   --gs-settings-title-underline: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.16), rgb(var(--gs-settings-support) / 0.12));
@@ -337,7 +340,7 @@
   font-weight: var(--gs-font-weight-heavy);
   letter-spacing: -0.02em;
   line-height: 1;
-  background: var(--gs-settings-title-gradient);
+  background: var(--gs-settings-brand-gradient);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
