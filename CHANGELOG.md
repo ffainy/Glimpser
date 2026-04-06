@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - settings: align language selection with active locale
 - settings: refine panel layout and stabilize ci
 
-
 ## [0.0.3] - 2026-04-02
 
 ### Fixed
