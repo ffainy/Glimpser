@@ -133,6 +133,31 @@
     }
   }
 
+  function _syncThemeState(theme, themeBadge = null, metaRow = null) {
+    if (_host) {
+      _host.setAttribute('data-dp-theme', theme);
+    }
+
+    if (_shadow?.host) {
+      _shadow.host.setAttribute('data-dp-theme', theme);
+    }
+
+    if (document.documentElement.dataset.dpStandalone) {
+      document.body.setAttribute('data-dp-theme', theme);
+    }
+
+    if (themeBadge) {
+      themeBadge.innerHTML = `
+        <span class="gs-settings-theme-swatch" data-theme="${theme}"></span>
+        <span>${_getActiveThemeLabel()}</span>
+      `;
+    }
+
+    if (metaRow) {
+      _syncHeaderState(null, metaRow);
+    }
+  }
+
   function _cloneDefaultSettings() {
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   }
@@ -298,16 +323,7 @@
     _shadow.appendChild(style);
 
     const theme = _settings?.theme || 'dark';
-    _host.setAttribute('data-dp-theme', theme);
-
-    // Apply theme to shadow host
-    const shadowHost = _shadow.host;
-    shadowHost.setAttribute('data-dp-theme', theme);
-
-    // In standalone mode, sync body background
-    if (document.documentElement.dataset.dpStandalone) {
-      document.body.setAttribute('data-dp-theme', theme);
-    }
+    _syncThemeState(theme);
 
     const overlay = document.createElement('div');
     overlay.className = 'gs-settings-overlay';
@@ -536,10 +552,7 @@
       { label: _t('themeLight'), value: 'light', hint: _t('hintThemeLight') },
     ], _settings?.theme || 'dark', v => {
       _settings.theme = v;
-      _shadow.host.setAttribute('data-dp-theme', v);
-      if (document.documentElement.dataset.dpStandalone) {
-        document.body.setAttribute('data-dp-theme', v);
-      }
+      _syncThemeState(v, _shadow?.querySelector('.gs-settings-theme-badge'), _shadow?.querySelector('.gs-settings-meta'));
     })));
 
     // Corners
