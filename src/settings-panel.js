@@ -74,6 +74,23 @@
     return _settings?.theme === 'light' ? _t('themeLight') : _t('themeDark');
   }
 
+  function _detectPreferredLanguage() {
+    const nav = (navigator.language || navigator.userLanguage || '').toLowerCase();
+    return nav.startsWith('zh') ? 'zh' : 'en';
+  }
+
+  function _getSelectedLanguageValue() {
+    return (_settings?.language === 'zh' || _settings?.language === 'zh_CN')
+      ? 'zh'
+      : (_settings?.language === 'en')
+        ? 'en'
+        : _detectPreferredLanguage();
+  }
+
+  function _getSelectedLanguageLabel() {
+    return _getSelectedLanguageValue() === 'zh' ? '中文' : 'English';
+  }
+
   function _getTabDescription(key) {
     switch (key) {
       case 'appearance':
@@ -90,7 +107,7 @@
       case 'appearance':
         return [
           { label: _t('labelTheme'), value: _getActiveThemeLabel() },
-          { label: _t('labelLang'), value: _settings?.language === 'zh' ? '中文' : 'English' },
+          { label: _t('labelLang'), value: _getSelectedLanguageLabel() },
           { label: _t('labelCorners'), value: _settings?.corners === 'square' ? _t('cornersSquare') : _t('cornersRounded') },
         ];
       case 'workspace':
@@ -504,7 +521,7 @@
     tab.appendChild(_makeCard(_t('labelLang'), _makeOptionGroup([
       { label: 'English', value: 'en' },
       { label: '中文',    value: 'zh' },
-    ], _settings?.language === 'zh' ? 'zh' : 'en', v => {
+    ], _getSelectedLanguageValue(), v => {
       _settings.language = v;
       applyLangPref(v).then(() => {
         _render();
