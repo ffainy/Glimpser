@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - 'CHANGELOG.md'
+      - '.github/release-notes.md'
   pull_request:
 
 concurrency:

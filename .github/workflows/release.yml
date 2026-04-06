@@ -38,8 +38,11 @@ jobs:
           npm test
           node scripts/build.js ${{ steps.version.outputs.VERSION }}
 
-      - name: Generate changelog and release notes
-        run: node scripts/update-changelog.mjs --tag ${{ github.ref_name }}
+      - name: Refresh Unreleased changelog for tag
+        run: node scripts/update-changelog.mjs --mode unreleased
+
+      - name: Generate release changelog and notes
+        run: node scripts/update-changelog.mjs --mode release --tag ${{ github.ref_name }}
 
       - name: Commit changelog to default branch
         env:
@@ -48,13 +51,11 @@ jobs:
           cp CHANGELOG.md /tmp/CHANGELOG.md
           cp package.json /tmp/package.json
           cp package-lock.json /tmp/package-lock.json
-          cp .github/release-notes.md /tmp/release-notes.md
           git fetch origin "$DEFAULT_BRANCH"
           git switch -C "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"
           cp /tmp/CHANGELOG.md CHANGELOG.md
           cp /tmp/package.json package.json
           cp /tmp/package-lock.json package-lock.json
-          cp /tmp/release-notes.md .github/release-notes.md
 
           if git diff --quiet -- CHANGELOG.md package.json package-lock.json; then
             echo "No release metadata changes to commit"
