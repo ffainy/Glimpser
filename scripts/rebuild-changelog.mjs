@@ -53,7 +53,6 @@ function renderChangelogDocument(unreleasedContent, releaseSections, preservedSe
   const sections = [...releaseSections, ...preservedSections]
   if (sections.length) {
     lines.push('')
-    lines.push('')
     lines.push(sections.join('\n\n'))
   }
 
