@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - preview: support multiple simultaneous preview windows
 
 ### Fixed
+- changelog: align rebuild output with unreleased updates
 - ui: load shared fonts from document head
 - settings: keep theme badge in sync with theme changes
 - settings: align language selection with active locale
