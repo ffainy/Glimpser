@@ -2,6 +2,25 @@
    Shared by preview and settings UI.
    ─────────────────────────────────────────────────────────────────────────── */
 
+/* Token usage guide
+   1. Change theme values in this file first. foundation.css is the source of
+      truth for dark/light visual language.
+   2. Prefer semantic tokens over raw rgb()/gradients in component files.
+      settings.css and preview.css should mostly map or consume tokens.
+   3. Reuse before adding. If a new UI need matches an existing role such as
+      surface, border, foreground, shadow, glow, sheen, or state, extend usage
+      of the current token instead of minting a near-duplicate.
+   4. Add new tokens at the narrowest useful layer:
+      primitive -> theme -> semantic UI -> component alias.
+      Skip component-local aliases unless the styling is truly unique.
+   5. Keep naming role-first and readable. Prefer names like
+      surface / border / foreground / shadow / glow / hover / active over
+      size-only or effect-only labels.
+   6. When introducing a token, place it in the matching section and keep the
+      dark/light blocks structurally aligned so diffs stay easy to review.
+   7. Hardcoded colors are acceptable only for one-off decorative details with
+      no reuse value, no theme significance, and no semantic role. */
+
 /* ── 1. Shadow DOM reset ─────────────────────────────────────────────────── */
 /* Must come first — resets inherited page styles before we define our own.   */
 :host {
@@ -38,27 +57,190 @@ textarea {
   --gs-font-family-serif:   "Young Serif", "Times New Roman", "Microsoft YaHei", serif;
   --gs-font-family-mono:    "Courier Prime", "Cascadia Code", "Microsoft YaHei", ui-monospace, monospace;
   --gs-font-family:         var(--gs-font-family-sans);
-  --gs-font-weight-regular: 400;
-  --gs-font-weight-medium:  500;
-  --gs-font-weight-semibold: 600;
-  --gs-font-weight-bold:    700;
-  --gs-font-weight-heavy:   800;
-  --gs-font-size-base:      14px;
-  --gs-font-size-2xs:       calc(var(--gs-font-size-base) - 3px);   /* 11px */
-  --gs-font-size-xs:        calc(var(--gs-font-size-base) - 2px);   /* 12px */
-  --gs-font-size-sm:        calc(var(--gs-font-size-base) - 1px);   /* 13px */
-  --gs-font-size-md:        calc(var(--gs-font-size-base) + 2px);   /* 16px */
-  --gs-font-size-lg:        calc(var(--gs-font-size-base) + 4px);   /* 18px */
+  /* Font weight scale
+     Use semantic tokens instead of raw weight names.
+     body: default paragraph and neutral interface copy.
+     body-strong: emphasized body copy and medium-strength control text.
+     label: field labels and compact structural labels.
+     action: buttons, option buttons, and interactive headings.
+     title: standard UI titles and highlighted short headings.
+     display: large hero / showcase titles.
+     code: monospace values that need emphasis and readability.
+     code-strong: stronger monospace/status values such as chips and toasts. */
+  --gs-font-weight-raw-regular:    400;
+  --gs-font-weight-raw-medium:     500;
+  --gs-font-weight-raw-semibold:   600;
+  --gs-font-weight-raw-bold:       700;
+  --gs-font-weight-raw-heavy:      800;
+  --gs-font-weight-body:           var(--gs-font-weight-raw-regular);
+  --gs-font-weight-body-strong:    var(--gs-font-weight-raw-medium);
+  --gs-font-weight-label:          var(--gs-font-weight-raw-semibold);
+  --gs-font-weight-action:         var(--gs-font-weight-raw-semibold);
+  --gs-font-weight-title:          var(--gs-font-weight-raw-bold);
+  --gs-font-weight-display:        var(--gs-font-weight-raw-regular);
+  --gs-font-weight-code:           var(--gs-font-weight-raw-bold);
+  --gs-font-weight-code-strong:    var(--gs-font-weight-raw-bold);
+  /* Font size scale
+     Use semantic tokens instead of size aliases.
+     caption: tiny mono/meta text such as tooltips, url text, and toast text.
+     kicker: uppercase micro labels such as pills, chips, and section kickers.
+     label: field labels and compact supporting labels.
+     hint: secondary helper copy shown under fields and controls.
+     meta: compact numeric/status values, badges, and inline metadata.
+     body: default UI reading size for controls, cards, and short paragraphs.
+     control: inputs and interactive text inside form controls.
+     button: default button and option button text.
+     button-compact: smaller button variants.
+     card-title: compact card headings.
+     reading: longer descriptive paragraphs that need better readability.
+     tab-label: primary navigational labels and prominent short headings.
+     panel-title: main settings panel heading.
+     brand-title: sidebar product name / brand heading.
+     display: large showcase titles such as the About name block.
+     title-mobile: mobile override for large display titles. */
+  --gs-font-size-base:             14px;
+  --gs-font-size-caption:          calc(var(--gs-font-size-base) - 3px);   /* 11px */
+  --gs-font-size-kicker:           var(--gs-font-size-caption);
+  --gs-font-size-label:            calc(var(--gs-font-size-base) - 2px);   /* 12px */
+  --gs-font-size-hint:             var(--gs-font-size-label);
+  --gs-font-size-meta:             var(--gs-font-size-label);
+  --gs-font-size-body:             calc(var(--gs-font-size-base) - 1px);   /* 13px */
+  --gs-font-size-control:          var(--gs-font-size-body);
+  --gs-font-size-button:           var(--gs-font-size-body);
+  --gs-font-size-button-compact:   var(--gs-font-size-label);
+  --gs-font-size-card-title:       var(--gs-font-size-body);
+  --gs-font-size-reading:          calc(var(--gs-font-size-base) + 1px);   /* 15px */
+  --gs-font-size-tab-label:        calc(var(--gs-font-size-base) + 2px);   /* 16px */
+  --gs-font-size-panel-title:      clamp(24px, 2.2vw, 32px);
+  --gs-font-size-brand-title:      clamp(28px, 2vw, 34px);
+  --gs-font-size-display:          clamp(32px, 4vw, 54px);
+  --gs-font-size-title-mobile:     28px;
+  /* Line height scale
+     Use semantic tokens instead of raw numeric values.
+     tight: compact single-line UI text, chips, and dense metadata.
+     title: tighter display and heading text.
+     label: short labels, kickers, and compact headings.
+     control: form controls and short interactive text.
+     body: default UI copy and short descriptive text.
+     relaxed: helper copy and readable supporting paragraphs.
+     reading: long-form descriptive paragraphs that need the most breathing room.
+     display: extra-tight hero / showcase titles. */
+  --gs-line-height-tight:          1;
+  --gs-line-height-title:          1.2;
+  --gs-line-height-label:          1.35;
+  --gs-line-height-control:        1.4;
+  --gs-line-height-body:           1.45;
+  --gs-line-height-relaxed:        1.5;
+  --gs-line-height-reading:        1.6;
+  --gs-line-height-display:        0.92;
+  /* Letter spacing scale
+     Use semantic tokens instead of raw tracking values.
+     display: large brand/showcase titles with the tightest tracking.
+     title: standard major headings and display-adjacent titles.
+     body: default interface copy, tab labels, and readable short headings.
+     kicker: uppercase section labels and card overlines.
+     kicker-wide: extra-spaced micro labels such as metadata chips and dropzone kickers.
+     label: field labels and compact structural UI labels.
+     code: monospace values that need slightly opened spacing.
+     code-compact: dense numeric chips and inline values.
+     value: highlighted detail values and prominent metadata.
+     toast: transient status text that benefits from a touch of extra spacing. */
+  --gs-letter-spacing-display:      -0.03em;
+  --gs-letter-spacing-title:        -0.02em;
+  --gs-letter-spacing-body:         0.01em;
+  --gs-letter-spacing-kicker:       0.12em;
+  --gs-letter-spacing-kicker-wide:  0.14em;
+  --gs-letter-spacing-label:        0.18px;
+  --gs-letter-spacing-code:         0.08px;
+  --gs-letter-spacing-code-compact: 0.04px;
+  --gs-letter-spacing-value:        0.2px;
+  --gs-letter-spacing-toast:        0.02em;
+  /* Spacing scale
+     Use shared spacing tokens instead of repeating raw gap/padding values.
+     hairline: tiniest alignment nudges and dense inner spacing.
+     micro: compact icon/text gaps.
+     micro-tight: ultra-compact stacked text spacing.
+     tight: dense control groups and chip padding.
+     compact: default small component spacing.
+     divider: compact divider offset and separated control groups.
+     base: standard inline gaps and compact card padding.
+     comfortable: relaxed control spacing and mobile padding.
+     roomy: card/grid spacing and medium insets.
+     section: section-level spacing inside grouped content.
+     group: stronger separation between related groups.
+     card: standard card padding.
+     panel: primary panel padding.
+     page: outer shell spacing and large section insets.
+     hero: largest showcase padding. */
+  --gs-space-hairline:              2px;
+  --gs-space-micro:                 4px;
+  --gs-space-micro-tight:           3px;
+  --gs-space-tight:                 6px;
+  --gs-space-compact:               8px;
+  --gs-space-divider:               9px;
+  --gs-space-base:                  10px;
+  --gs-space-comfortable:           12px;
+  --gs-space-roomy:                 14px;
+  --gs-space-section:               16px;
+  --gs-space-group:                 18px;
+  --gs-space-card:                  20px;
+  --gs-space-panel:                 24px;
+  --gs-space-page:                  28px;
+  --gs-space-hero:                  32px;
 
-  /* Shape */
-  --gs-radius-sm:      8px;
-  --gs-radius-md:      12px;
-  --gs-radius-lg:      16px;
-  --gs-radius-xl:      20px;
-  --gs-radius-2xl:     24px;
-  --gs-radius-3xl:     28px;
-  --gs-radius-4xl:     32px;
-  --gs-radius-pill:    999px;
+  /* Radius scale
+     Keep the size tokens as shape primitives, and prefer semantic aliases in components.
+     control: inputs, buttons, and inline controls.
+     action: compact icon buttons and tiny action surfaces.
+     badge: tooltips, tiny badges, and compact icon chips.
+     icon: compact icon badges and tab icons.
+     icon-large: showcase icon shells and larger hero icon surfaces.
+     card: standard cards and grouped rows.
+     surface: large sidebar surfaces and grouped containers.
+     panel: primary shell/panel containers.
+     chip: pills, chips, and rounded badges.
+     round: circular swatches, handles, and avatars.
+     scrollbar: compact scrollbar thumbs.
+     surface-mobile / tabs-mobile / panel-mobile: small-screen shell adjustments. */
+  --gs-radius-sm:             8px;
+  --gs-radius-md:             12px;
+  --gs-radius-lg:             16px;
+  --gs-radius-xl:             20px;
+  --gs-radius-2xl:            24px;
+  --gs-radius-3xl:            28px;
+  --gs-radius-4xl:            32px;
+  --gs-radius-pill:           999px;
+  --gs-radius-action:         6px;
+  --gs-radius-badge:          10px;
+  --gs-radius-control:        var(--gs-radius-lg);
+  --gs-radius-icon:           14px;
+  --gs-radius-icon-large:     18px;
+  --gs-radius-card:           var(--gs-radius-xl);
+  --gs-radius-card-large:     var(--gs-radius-2xl);
+  --gs-radius-surface:        var(--gs-radius-3xl);
+  --gs-radius-panel:          var(--gs-radius-4xl);
+  --gs-radius-chip:           var(--gs-radius-pill);
+  --gs-radius-round:          50%;
+  --gs-radius-scrollbar:      10px;
+  --gs-radius-surface-mobile: 24px;
+  --gs-radius-tabs-mobile:    22px;
+  --gs-radius-panel-mobile:   26px;
+  /* Shadow scale
+     Use shared neutral shadows for repeated highlights and elevations.
+     inset-highlight-soft/medium/strong: glossy top-edge highlights on surfaces.
+     inset-highlight-contrast: brighter inset highlight for light glossy controls.
+     ring-swatch: soft outer ring around circular swatches.
+     elevation-float: neutral elevated surface shadow for compact floating panels.
+     filter-float: drop-shadow filter for centered floating indicators. */
+  --gs-shadow-inset-highlight-soft:     inset 0 1px 0 rgb(255 255 255 / 0.08);
+  --gs-shadow-inset-highlight-medium:   inset 0 1px 0 rgb(255 255 255 / 0.1);
+  --gs-shadow-inset-highlight-strong:   inset 0 1px 0 rgb(255 255 255 / 0.18);
+  --gs-shadow-inset-highlight-glossy:   inset 0 1px 0 rgb(255 255 255 / 0.2);
+  --gs-shadow-inset-highlight-contrast: inset 0 1px 0 rgb(255 255 255 / 0.22);
+  --gs-shadow-inset-highlight-bright:   inset 0 1px 0 rgb(255 255 255 / 0.78);
+  --gs-shadow-ring-swatch:              0 0 0 4px rgb(255 255 255 / 0.3);
+  --gs-shadow-elevation-float:          0 18px 38px rgb(0 0 0 / 0.12);
+  --gs-shadow-filter-float:             drop-shadow(0 8px 24px rgb(0 0 0 / 0.14));
 
   /* Easing */
   --gs-ease-standard:  cubic-bezier(0.23, 1, 0.32, 1);
@@ -84,7 +266,17 @@ textarea {
 }
 
 /* ── 3. Theme tokens ─────────────────────────────────────────────────────── */
-/* Semantic tokens derived from primitives. Only these change between themes. */
+/* Semantic tokens derived from primitives. Only these change between themes.
+   Naming conventions:
+   surface: filled planes, gradients, and material backgrounds.
+   border: edge colors for surfaces, controls, and dividers.
+   foreground: readable text/icon colors that sit on top of a surface.
+   shadow: box-shadow style depth or inset emphasis.
+   glow: soft luminous emphasis, usually accent-tinted and decorative.
+   sheen: glossy top-light overlays used to suggest glass or polish.
+   highlight: subtle bright accents used for thin inner edges or top-light cues.
+   ring: circular or focus-outline emphasis around interactive or floating elements.
+   active / hover / inactive / pressed: interaction-state variants of the same role. */
 
 :host([data-dp-theme="dark"]),
 [data-dp-theme="dark"] {
@@ -93,12 +285,12 @@ textarea {
   --gs-support-rgb:        255 179 89;
   --gs-support-strong-rgb: 255 196 128;
 
-  /* Surfaces */
+  /* Core surfaces */
   --gs-overlay-bg:       rgb(3 2 7 / 0.7);
   --gs-surface-card:     rgb(20 18 28 / 0.9);
   --gs-preview-surface:  #120f1c;
 
-  /* Text */
+  /* Core text */
   --text:        rgb(237 234 244 / 0.9);
   --text-dim:    rgb(223 217 235 / 0.56);
   --text-strong: rgb(250 247 255 / 0.96);
@@ -106,7 +298,7 @@ textarea {
   --text-muted:  rgb(210 201 223 / 0.54);
   --text-faint:  rgb(188 179 205 / 0.42);
 
-  /* Accent */
+  /* Core accents */
   --gs-accent: rgb(var(--gs-accent-rgb));
 
   /* Shared state */
@@ -124,25 +316,223 @@ textarea {
   --error-border: var(--gs-danger-border-strong);
   --error-text: var(--gs-danger-text-soft);
 
-  /* Settings palette */
+  /* Preview theme
+     Match the settings grouping so preview surfaces, foregrounds, and
+     interaction states can be audited with the same mental model. */
+  /* Preview accents */
+  --gs-preview-accent: var(--gs-accent-rgb);
+  --gs-preview-accent-strong: var(--gs-accent-strong-rgb);
+  --gs-preview-support: var(--gs-support-rgb);
+  --gs-preview-support-strong: var(--gs-support-strong-rgb);
+  /* Preview surfaces */
+  /* Preview window chrome */
+  --gs-preview-window-surface-bg: linear-gradient(to bottom, rgb(21 18 30 / 0.92), rgb(15 13 23 / 0.88));
+  --gs-preview-window-surface-border: rgb(235 229 245 / 0.1);
+  --gs-preview-window-surface-border-active: rgb(var(--gs-accent-rgb) / 0.3);
+  --gs-preview-window-surface-shadow:
+    0 18px 42px rgb(3 2 7 / 0.46),
+    0 6px 18px rgb(3 2 7 / 0.2);
+  --gs-preview-window-surface-shadow-active:
+    0 34px 92px rgb(3 2 7 / 0.7),
+    0 0 38px rgb(var(--gs-preview-accent) / 0.16),
+    0 0 20px rgb(var(--gs-preview-support) / 0.08);
+  --gs-preview-header-surface: rgb(24 23 30 / 0.58);
+  --gs-preview-header-surface-active: rgb(28 26 34 / 0.66);
+  --gs-preview-header-surface-inactive: rgb(20 19 25 / 0.5);
+  --gs-preview-urlbar-surface: rgb(30 28 36 / 0.64);
+  --gs-preview-urlbar-surface-active: rgb(34 31 40 / 0.72);
+  --gs-preview-urlbar-surface-inactive: rgb(24 22 29 / 0.54);
+  --gs-preview-header-elevation-shadow: 0 10px 24px rgb(0 0 0 / 0.06);
+  /* Preview dropzone surfaces */
+  --gs-preview-drop-icon-surface: rgb(var(--gs-preview-accent) / 0.08);
+  --gs-preview-drop-icon-border: rgb(var(--gs-preview-accent) / 0.14);
+  --gs-preview-drop-surface-bg:
+    radial-gradient(circle at bottom right, rgb(var(--gs-preview-support) / 0.08), transparent 28%),
+    rgb(16 15 21 / 0.84);
+  --gs-preview-drop-surface-border: rgb(235 228 246 / 0.14);
+  --gs-preview-drop-surface-shadow:
+    0 18px 36px rgb(3 2 7 / 0.28),
+    0 0 20px rgb(var(--gs-preview-accent) / 0.06);
+  --gs-preview-drop-surface-bg-hover:
+    radial-gradient(circle at bottom right, rgb(var(--gs-preview-support) / 0.12), transparent 30%),
+    rgb(18 16 24 / 0.88);
+  --gs-preview-drop-surface-border-hover: rgb(var(--gs-preview-accent) / 0.28);
+  --gs-preview-drop-surface-shadow-hover:
+    0 22px 42px rgb(3 2 7 / 0.34),
+    0 0 24px rgb(var(--gs-preview-accent) / 0.14);
+  --gs-preview-drop-slot-pill-bg: rgb(255 255 255 / 0.055);
+  --gs-preview-drop-slot-pill-border: rgb(235 228 246 / 0.08);
+  --gs-preview-drop-slot-pill-hover-bg: rgb(255 255 255 / 0.08);
+  --gs-preview-drop-slot-pill-hover-border: rgb(var(--gs-preview-accent) / 0.24);
+  --gs-preview-drop-pill-shadow: var(--gs-shadow-inset-highlight-soft);
+  --gs-preview-drop-pill-shadow-hover:
+    0 18px 34px rgb(3 2 7 / 0.26),
+    0 0 0 1px rgb(var(--gs-preview-accent) / 0.08) inset;
+  --gs-preview-drop-kicker: rgb(var(--gs-preview-accent));
+  --gs-preview-drop-slot-glow:
+    radial-gradient(circle at 50% 50%, rgb(var(--gs-preview-accent) / 0.28), transparent 62%);
+  --gs-preview-drop-slot-sheen:
+    linear-gradient(120deg, transparent 16%, rgb(255 255 255 / 0.16) 50%, transparent 84%);
+  --gs-preview-drop-slot-sheen-blend: screen;
+  --gs-preview-drop-slot-sheen-opacity: 0.72;
+  --gs-preview-drop-title-foreground: rgb(248 243 255 / 0.94);
+  --gs-preview-drop-copy-foreground: rgb(225 218 238 / 0.72);
+  --gs-preview-drop-icon-foreground: rgb(var(--gs-preview-accent-strong));
+  --gs-preview-drop-icon-surface-hover: linear-gradient(180deg, rgb(255 255 255 / 0.16), var(--gs-preview-drop-icon-surface));
+  --gs-preview-drop-icon-surface-shadow-hover:
+    0 10px 20px rgb(0 0 0 / 0.12),
+    var(--gs-shadow-inset-highlight-contrast);
+  --gs-preview-drop-title-glow-hover: 0 6px 18px rgb(var(--gs-preview-accent) / 0.18);
+  /* Preview drop overlay surfaces */
+  --gs-preview-drop-overlay-bg:
+    radial-gradient(circle at top left, rgb(var(--gs-preview-accent) / 0.18), transparent 28%),
+    radial-gradient(circle at bottom right, rgb(var(--gs-preview-support) / 0.14), transparent 24%),
+    rgb(6 5 12 / 0.52);
+  --gs-preview-drop-overlay-surface-bg: rgb(24 21 34 / 0.64);
+  --gs-preview-drop-overlay-surface-border: rgb(235 228 246 / 0.12);
+  --gs-preview-drop-overlay-surface-shadow:
+    0 28px 64px rgb(3 2 7 / 0.38),
+    0 0 38px rgb(var(--gs-preview-accent) / 0.12);
+  --gs-preview-drop-overlay-ring: radial-gradient(circle, rgb(var(--gs-preview-accent) / 0.24), transparent 66%);
+  --gs-preview-drop-overlay-panel-glow:
+    radial-gradient(circle at 22% 18%, rgb(var(--gs-preview-accent) / 0.22), transparent 42%),
+    radial-gradient(circle at 80% 82%, rgb(var(--gs-preview-support) / 0.14), transparent 48%);
+  --gs-preview-drop-overlay-panel-sheen:
+    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.12), transparent 56%);
+  /* Preview floating feedback surfaces */
+  --gs-preview-tooltip-surface-bg: rgb(22 19 31 / 0.94);
+  --gs-preview-tooltip-surface-shadow:
+    0 20px 40px rgb(3 2 7 / 0.4),
+    0 0 20px rgb(var(--gs-preview-accent) / 0.08);
+  --gs-preview-toast-surface-bg: rgb(26 21 38 / 0.96);
+  --gs-preview-toast-surface-shadow:
+    0 18px 38px rgb(3 2 7 / 0.4),
+    0 0 18px rgb(var(--gs-preview-accent) / 0.14),
+    0 0 0 1px rgb(255 255 255 / 0.05) inset;
+  /* Preview foregrounds */
+  /* Preview text roles */
+  --gs-preview-text: var(--text);
+  --gs-preview-text-strong: var(--text-strong);
+  --gs-preview-text-dim: var(--text-dim);
+  --gs-preview-text-label: var(--text-label);
+  --gs-preview-group-divider: rgb(235 229 245 / 0.12);
+  --gs-preview-brand-foreground: rgb(235 229 245 / 0.3);
+  --gs-preview-brand-foreground-active: rgb(var(--gs-preview-accent));
+  --gs-preview-header-border: rgb(235 229 245 / 0.08);
+  --gs-preview-header-border-active: rgb(235 229 245 / 0.12);
+  --gs-preview-header-border-inactive: rgb(235 229 245 / 0.05);
+  --gs-preview-header-highlight: rgb(255 255 255 / 0.03);
+  --gs-preview-urlbar-border: rgb(235 229 245 / 0.08);
+  --gs-preview-urlbar-border-active: rgb(235 229 245 / 0.12);
+  --gs-preview-urlbar-border-inactive: rgb(235 229 245 / 0.05);
+  --gs-preview-urlbar-highlight: rgb(255 255 255 / 0.03);
+  --gs-preview-urlbar-highlight-active: rgb(255 255 255 / 0.04);
+  --gs-preview-url-foreground: var(--gs-preview-text);
+  --gs-preview-url-foreground-active: var(--gs-preview-text-strong);
+  --gs-preview-url-foreground-inactive: var(--gs-preview-text-dim);
+  /* Preview brand and action foregrounds */
+  --gs-preview-brand-glow:
+    drop-shadow(0 0 0.6px rgb(235 229 245 / 0.28))
+    drop-shadow(0 0 2px rgb(var(--gs-preview-accent) / 0.08));
+  --gs-preview-brand-glow-active:
+    drop-shadow(0 0 0.9px rgb(var(--gs-preview-accent) / 0.34))
+    drop-shadow(0 0 10px rgb(var(--gs-preview-accent) / 0.32));
+  --gs-preview-action-foreground: rgb(238 232 247 / 0.78);
+  --gs-preview-action-foreground-inactive: rgb(206 197 220 / 0.4);
+  --gs-preview-action-foreground-hover: rgb(var(--gs-preview-accent-strong) / 0.98);
+  --gs-preview-action-surface-hover: linear-gradient(135deg, rgb(var(--gs-preview-accent) / 0.18), rgb(var(--gs-preview-support) / 0.1));
+  --gs-preview-action-glow:
+    drop-shadow(0 0 0.55px rgb(235 229 245 / 0.22))
+    drop-shadow(0 0 2px rgb(var(--gs-preview-accent) / 0.06));
+  --gs-preview-action-glow-inactive: drop-shadow(0 0 0.45px rgb(235 229 245 / 0.12));
+  --gs-preview-action-glow-hover:
+    drop-shadow(0 0 0.9px rgb(var(--gs-preview-accent) / 0.28))
+    drop-shadow(0 0 8px rgb(var(--gs-preview-accent) / 0.2));
+  --gs-preview-tooltip-surface-border: rgb(235 229 245 / 0.1);
+  --gs-preview-tooltip-foreground: var(--gs-preview-text-strong);
+  --gs-preview-toast-surface-border: rgb(var(--gs-preview-accent) / 0.3);
+  --gs-preview-toast-foreground: rgb(var(--gs-preview-accent-strong) / 0.98);
+  --gs-preview-resize-handle-foreground: rgb(235 229 245 / 0.34);
+  --gs-preview-resize-handle-foreground-active: rgb(var(--gs-preview-accent) / 0.66);
+  /* Preview interaction state */
+  /* Preview semantic states */
+  --gs-preview-action-ring-hover: 0 0 0 1px rgb(var(--gs-preview-accent) / 0.18) inset;
+  --gs-preview-action-surface-pressed: rgb(255 255 255 / 0.14);
+  --gs-preview-body-overlay: linear-gradient(to bottom, rgb(0 0 0 / 0.02), rgb(0 0 0 / 0.06));
+  --gs-preview-danger-surface: var(--gs-danger-bg-strong);
+  --gs-preview-danger-foreground: var(--gs-danger-text-soft-strong);
+  --gs-preview-warning-surface: var(--gs-warning-bg);
+  --gs-preview-warning-foreground: var(--gs-warning-text);
+
+  /* Settings theme
+     Organize settings tokens by role so panel-level surfaces, foregrounds,
+     and atmospheric effects stay easy to scan and evolve together. */
+  /* Settings accents */
   --gs-settings-accent: var(--gs-accent-rgb);
   --gs-settings-accent-strong: var(--gs-accent-strong-rgb);
   --gs-settings-support: var(--gs-support-rgb);
   --gs-settings-support-strong: var(--gs-support-strong-rgb);
-  --gs-settings-border: rgb(230 225 239 / 0.12);
+  /* Settings surfaces */
+  /* Settings foundation surfaces */
+  --gs-settings-surface-border: rgb(230 225 239 / 0.12);
   --gs-settings-surface: linear-gradient(180deg, rgb(255 255 255 / 0.08), rgb(205 193 255 / 0.03) 44%, rgb(255 255 255 / 0.025));
   --gs-settings-surface-strong: linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(214 199 255 / 0.045) 44%, rgb(255 255 255 / 0.035));
   --gs-settings-surface-active: linear-gradient(135deg, rgb(var(--gs-accent-rgb) / 0.22), rgb(var(--gs-support-rgb) / 0.14));
-  --gs-settings-highlight: rgb(255 255 255 / 0.11);
+  --gs-settings-theme-swatch-surface: linear-gradient(135deg, rgb(var(--gs-accent-strong-rgb)), rgb(var(--gs-accent-rgb) / 0.9));
+  /* Settings component surfaces */
+  --gs-settings-badge-border: rgb(var(--gs-settings-accent) / 0.16);
+  --gs-settings-badge-surface: linear-gradient(135deg, rgb(var(--gs-settings-accent) / 0.14), rgb(var(--gs-settings-support) / 0.1));
+  --gs-settings-icon-surface: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.2), rgb(var(--gs-settings-support) / 0.12));
+  --gs-settings-icon-surface-hover: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.24), rgb(var(--gs-settings-support) / 0.14));
+  --gs-settings-icon-surface-active: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.3), rgb(var(--gs-settings-support) / 0.18));
+  --gs-settings-icon-surface-border: rgb(var(--gs-settings-accent) / 0.24);
+  --gs-settings-icon-surface-border-strong: rgb(var(--gs-settings-accent) / 0.26);
+  --gs-settings-control-surface: rgb(255 255 255 / 0.08);
+  --gs-settings-control-surface-hover: rgb(255 255 255 / 0.12);
+  --gs-settings-secondary-action-surface: rgb(255 255 255 / 0.08);
+  --gs-settings-secondary-action-surface-hover: rgb(255 255 255 / 0.12);
+  /* Settings atmospheric effects */
+  /* Settings shell atmosphere */
+  --gs-settings-surface-highlight: rgb(255 255 255 / 0.11);
   --gs-settings-shadow: 0 30px 90px rgb(4 3 10 / 0.62), 0 0 36px rgb(var(--gs-accent-rgb) / 0.08);
   --gs-settings-overlay-fill: rgb(8 7 14 / 0.66);
   --gs-settings-halo-a: rgb(var(--gs-accent-rgb) / 0.22);
   --gs-settings-halo-b: rgb(var(--gs-support-rgb) / 0.16);
+  /* Settings elevations and emphasis */
+  --gs-settings-panel-glow: radial-gradient(circle at top left, rgb(var(--gs-settings-accent) / 0.16), transparent 30%);
+  --gs-settings-panel-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 38%);
+  --gs-settings-card-glow: radial-gradient(circle at top right, rgb(var(--gs-settings-accent) / 0.14), transparent 30%);
+  --gs-settings-depth-soft: 0 12px 28px rgb(4 3 10 / 0.28);
+  --gs-settings-depth-hover: 0 16px 32px rgb(4 3 10 / 0.34);
+  --gs-settings-card-surface-shadow: 0 22px 46px rgb(4 3 10 / 0.34), 0 0 24px rgb(var(--gs-settings-accent) / 0.07);
+  --gs-settings-card-surface-shadow-hover: 0 28px 58px rgb(4 3 10 / 0.42), 0 0 28px rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-accent-emphasis-shadow: 0 0 0 1px rgb(var(--gs-settings-accent) / 0.12), 0 18px 34px rgb(var(--gs-settings-accent) / 0.18), 0 0 24px rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-accent-emphasis-shadow-strong: 0 0 0 1px rgb(var(--gs-settings-accent) / 0.16), 0 18px 34px rgb(var(--gs-settings-accent) / 0.22), 0 0 28px rgb(var(--gs-settings-support) / 0.12);
+  --gs-settings-primary-action-surface-start: 90 77 112;
+  --gs-settings-primary-action-surface-end: 116 92 62;
+  --gs-settings-primary-action-border: rgb(145 123 178 / 0.18);
+  --gs-settings-primary-action-foreground-shadow: 0 1px 1px rgb(0 0 0 / 0.2);
+  --gs-settings-primary-action-shadow: 0 16px 30px rgb(66 54 84 / 0.2), 0 0 16px rgb(108 84 56 / 0.06);
+  --gs-settings-primary-action-shadow-hover: 0 18px 34px rgb(66 54 84 / 0.24), 0 0 20px rgb(108 84 56 / 0.1);
+  --gs-settings-primary-action-glow-hover: 0 0 18px rgb(98 82 124 / 0.16), 0 0 24px rgb(122 96 66 / 0.1);
+  --gs-settings-slider-thumb-focus-shadow: 0 0 0 4px rgb(var(--gs-settings-accent) / 0.18), 0 10px 20px rgb(var(--gs-settings-accent) / 0.28), 0 0 18px rgb(var(--gs-settings-support) / 0.1);
+  --gs-settings-slider-thumb-focus-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.22), 0 12px 22px rgb(var(--gs-settings-accent) / 0.32), 0 0 24px rgb(var(--gs-settings-support) / 0.14);
+  --gs-settings-display-text-glow: 0 0 12px rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-display-text-glow-strong: 0 0 18px rgb(var(--gs-settings-accent) / 0.18), 0 0 30px rgb(var(--gs-settings-support) / 0.08);
+  --gs-settings-title-gradient: linear-gradient(135deg, rgb(248 243 255), rgb(var(--gs-settings-accent)) 52%, rgb(var(--gs-settings-support-strong)));
+  --gs-settings-title-text-glow: 0 0 12px rgb(var(--gs-settings-accent) / 0.14), 0 0 20px rgb(var(--gs-settings-support) / 0.06);
+  --gs-settings-title-underline: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.26), rgb(var(--gs-settings-support) / 0.18));
+  /* Settings foregrounds */
+  /* Settings text and interaction foregrounds */
   --gs-settings-scrollbar: rgb(var(--gs-accent-rgb) / 0.34);
-  --gs-settings-tab-text: rgb(235 229 245 / 0.78);
+  --gs-settings-tab-foreground: rgb(235 229 245 / 0.78);
   --gs-settings-muted: rgb(215 206 229 / 0.62);
   --gs-settings-faint: rgb(190 180 207 / 0.44);
-  --gs-settings-theme-swatch-bg: linear-gradient(135deg, rgb(var(--gs-accent-strong-rgb)), rgb(var(--gs-accent-rgb) / 0.9));
+  --gs-settings-control-border-hover-soft: rgb(var(--gs-settings-accent) / 0.16);
+  --gs-settings-control-border-hover: rgb(var(--gs-settings-accent) / 0.22);
+  --gs-settings-control-border-active-soft: rgb(var(--gs-settings-accent) / 0.24);
+  --gs-settings-control-border-active: rgb(var(--gs-settings-accent) / 0.3);
+  --gs-settings-control-border-active-strong: rgb(var(--gs-settings-accent) / 0.36);
 }
 
 :host([data-dp-theme="light"]),
@@ -152,12 +542,12 @@ textarea {
   --gs-support-rgb:        114 90 72;
   --gs-support-strong-rgb: 86 67 54;
 
-  /* Surfaces */
+  /* Core surfaces */
   --gs-overlay-bg:       rgb(27 23 31 / 0.24);
   --gs-surface-card:     rgb(255 255 255 / 0.88);
   --gs-preview-surface:  #f4f2ef;
 
-  /* Text */
+  /* Core text */
   --text:        rgb(44 40 49 / 0.88);
   --text-dim:    rgb(61 57 66 / 0.58);
   --text-strong: rgb(28 24 34 / 0.92);
@@ -165,7 +555,7 @@ textarea {
   --text-muted:  rgb(80 75 88 / 0.58);
   --text-faint:  rgb(98 92 104 / 0.42);
 
-  /* Accent */
+  /* Core accents */
   --gs-accent: rgb(var(--gs-accent-rgb));
 
   /* Shared state */
@@ -183,23 +573,206 @@ textarea {
   --error-border: var(--gs-danger-border-strong);
   --error-text: var(--gs-danger-text);
 
-  /* Settings palette */
+  /* Preview theme
+     Keep the same role grouping as dark mode so preview diffs stay easy to review. */
+  /* Preview accents */
+  --gs-preview-accent: var(--gs-accent-rgb);
+  --gs-preview-accent-strong: var(--gs-accent-strong-rgb);
+  --gs-preview-support: var(--gs-support-rgb);
+  --gs-preview-support-strong: var(--gs-support-strong-rgb);
+  /* Preview surfaces */
+  /* Preview window chrome */
+  --gs-preview-window-surface-bg: linear-gradient(to bottom, rgb(255 255 255 / 0.88), rgb(248 246 242 / 0.82));
+  --gs-preview-window-surface-border: rgb(52 47 60 / 0.12);
+  --gs-preview-window-surface-border-active: rgb(52 47 60 / 0.2);
+  --gs-preview-window-surface-shadow:
+    0 12px 24px rgb(44 37 48 / 0.08),
+    0 2px 8px rgb(44 37 48 / 0.04);
+  --gs-preview-window-surface-shadow-active:
+    0 22px 48px rgb(44 37 48 / 0.14),
+    0 8px 20px rgb(44 37 48 / 0.06);
+  --gs-preview-header-surface: rgb(252 251 249 / 0.68);
+  --gs-preview-header-surface-active: rgb(255 255 255 / 0.8);
+  --gs-preview-header-surface-inactive: rgb(244 240 236 / 0.56);
+  --gs-preview-urlbar-surface: rgb(239 235 230 / 0.78);
+  --gs-preview-urlbar-surface-active: rgb(244 241 236 / 0.84);
+  --gs-preview-urlbar-surface-inactive: rgb(233 229 223 / 0.5);
+  --gs-preview-header-elevation-shadow: 0 10px 24px rgb(0 0 0 / 0.06);
+  /* Preview dropzone surfaces */
+  --gs-preview-drop-icon-surface: rgb(255 255 255 / 0.42);
+  --gs-preview-drop-icon-border: rgb(68 61 80 / 0.08);
+  --gs-preview-drop-surface-bg:
+    radial-gradient(circle at 82% 100%, rgb(var(--gs-preview-support) / 0.08), transparent 30%),
+    radial-gradient(circle at 18% 0%, rgb(var(--gs-preview-accent) / 0.05), transparent 34%),
+    rgb(255 255 255 / 0.82);
+  --gs-preview-drop-surface-border: rgb(68 61 80 / 0.1);
+  --gs-preview-drop-surface-shadow: 0 14px 24px rgb(44 37 48 / 0.08);
+  --gs-preview-drop-surface-bg-hover:
+    radial-gradient(circle at 82% 100%, rgb(var(--gs-preview-support) / 0.15), transparent 34%),
+    radial-gradient(circle at 18% 0%, rgb(var(--gs-preview-accent) / 0.11), transparent 40%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(248 244 239 / 0.9));
+  --gs-preview-drop-surface-border-hover: rgb(var(--gs-preview-support) / 0.24);
+  --gs-preview-drop-surface-shadow-hover:
+    0 18px 34px rgb(44 37 48 / 0.12),
+    0 0 0 1px rgb(var(--gs-preview-support) / 0.07);
+  --gs-preview-drop-slot-pill-bg: rgb(255 255 255 / 0.58);
+  --gs-preview-drop-slot-pill-border: rgb(68 61 80 / 0.06);
+  --gs-preview-drop-slot-pill-hover-bg: rgb(255 255 255 / 0.68);
+  --gs-preview-drop-slot-pill-hover-border: rgb(var(--gs-preview-support) / 0.12);
+  --gs-preview-drop-pill-shadow: var(--gs-shadow-inset-highlight-strong);
+  --gs-preview-drop-pill-shadow-hover:
+    0 12px 24px rgb(44 37 48 / 0.1),
+    0 0 0 1px rgb(255 255 255 / 0.35) inset;
+  --gs-preview-drop-kicker: rgb(var(--gs-preview-accent));
+  --gs-preview-drop-slot-glow:
+    radial-gradient(circle at 24% 30%, rgb(var(--gs-preview-accent) / 0.16), transparent 48%),
+    radial-gradient(circle at 78% 76%, rgb(var(--gs-preview-support) / 0.2), transparent 54%);
+  --gs-preview-drop-slot-sheen:
+    linear-gradient(118deg, transparent 14%, rgb(255 255 255 / 0.6) 42%, rgb(255 245 232 / 0.42) 54%, transparent 78%);
+  --gs-preview-drop-slot-sheen-blend: soft-light;
+  --gs-preview-drop-slot-sheen-opacity: 0.92;
+  --gs-preview-drop-title-foreground: rgb(34 29 45 / 0.9);
+  --gs-preview-drop-copy-foreground: rgb(74 69 82 / 0.66);
+  --gs-preview-drop-icon-foreground: rgb(var(--gs-preview-accent-strong));
+  --gs-preview-drop-icon-surface-hover:
+    linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(var(--gs-preview-support) / 0.1));
+  --gs-preview-drop-icon-surface-shadow-hover:
+    0 10px 18px rgb(44 37 48 / 0.12),
+    0 0 0 1px rgb(var(--gs-preview-support) / 0.08),
+    var(--gs-shadow-inset-highlight-bright);
+  --gs-preview-drop-title-glow-hover: 0 8px 18px rgb(var(--gs-preview-support) / 0.16);
+  /* Preview drop overlay surfaces */
+  --gs-preview-drop-overlay-bg:
+    radial-gradient(circle at top left, rgb(var(--gs-preview-accent) / 0.08), transparent 30%),
+    radial-gradient(circle at bottom right, rgb(var(--gs-preview-support) / 0.06), transparent 24%),
+    rgb(242 240 237 / 0.44);
+  --gs-preview-drop-overlay-surface-bg: rgb(255 252 248 / 0.82);
+  --gs-preview-drop-overlay-surface-border: rgb(68 61 80 / 0.1);
+  --gs-preview-drop-overlay-surface-shadow: 0 20px 42px rgb(44 37 48 / 0.12);
+  --gs-preview-drop-overlay-ring: radial-gradient(circle, rgb(var(--gs-preview-accent) / 0.12), transparent 68%);
+  --gs-preview-drop-overlay-panel-glow:
+    radial-gradient(circle at 22% 18%, rgb(var(--gs-preview-accent) / 0.11), transparent 40%),
+    radial-gradient(circle at 82% 84%, rgb(var(--gs-preview-support) / 0.14), transparent 44%);
+  --gs-preview-drop-overlay-panel-sheen:
+    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.52), transparent 58%);
+  /* Preview floating feedback surfaces */
+  --gs-preview-tooltip-surface-bg: rgb(255 255 255 / 0.96);
+  --gs-preview-tooltip-surface-shadow:
+    0 14px 28px rgb(44 37 48 / 0.12),
+    0 2px 8px rgb(44 37 48 / 0.05);
+  --gs-preview-toast-surface-bg: rgb(255 255 255 / 0.96);
+  --gs-preview-toast-surface-shadow:
+    0 12px 26px rgb(44 37 48 / 0.1),
+    0 0 0 1px rgb(255 255 255 / 0.4) inset;
+  /* Preview foregrounds */
+  /* Preview text roles */
+  --gs-preview-text: var(--text);
+  --gs-preview-text-strong: var(--text-strong);
+  --gs-preview-text-dim: var(--text-dim);
+  --gs-preview-text-label: var(--text-label);
+  --gs-preview-group-divider: rgb(52 47 60 / 0.08);
+  --gs-preview-brand-foreground: rgb(52 47 60 / 0.36);
+  --gs-preview-brand-foreground-active: var(--gs-accent);
+  --gs-preview-header-border: rgb(52 47 60 / 0.06);
+  --gs-preview-header-border-active: rgb(52 47 60 / 0.08);
+  --gs-preview-header-border-inactive: rgb(52 47 60 / 0.04);
+  --gs-preview-header-highlight: rgb(255 255 255 / 0.5);
+  --gs-preview-urlbar-border: rgb(52 47 60 / 0.06);
+  --gs-preview-urlbar-border-active: rgb(52 47 60 / 0.08);
+  --gs-preview-urlbar-border-inactive: rgb(52 47 60 / 0.04);
+  --gs-preview-urlbar-highlight: rgb(255 255 255 / 0.44);
+  --gs-preview-urlbar-highlight-active: rgb(255 255 255 / 0.58);
+  --gs-preview-url-foreground: var(--gs-preview-text);
+  --gs-preview-url-foreground-active: var(--gs-preview-text-strong);
+  --gs-preview-url-foreground-inactive: var(--gs-preview-text-dim);
+  /* Preview brand and action foregrounds */
+  --gs-preview-brand-glow: drop-shadow(0 0 0.6px rgb(52 47 60 / 0.16));
+  --gs-preview-brand-glow-active: drop-shadow(0 0 0.8px rgb(var(--gs-preview-accent) / 0.16));
+  --gs-preview-action-foreground: rgb(52 47 60 / 0.66);
+  --gs-preview-action-foreground-inactive: rgb(78 72 89 / 0.38);
+  --gs-preview-action-foreground-hover: rgb(var(--gs-preview-accent-strong) / 0.9);
+  --gs-preview-action-surface-hover: linear-gradient(135deg, rgb(var(--gs-preview-accent) / 0.06), rgb(var(--gs-preview-support) / 0.05));
+  --gs-preview-action-glow: drop-shadow(0 0 0.45px rgb(52 47 60 / 0.12));
+  --gs-preview-action-glow-inactive: drop-shadow(0 0 0.4px rgb(52 47 60 / 0.08));
+  --gs-preview-action-glow-hover: drop-shadow(0 0 0.6px rgb(var(--gs-preview-accent) / 0.08));
+  --gs-preview-tooltip-surface-border: rgb(52 47 60 / 0.08);
+  --gs-preview-tooltip-foreground: var(--gs-preview-text-strong);
+  --gs-preview-toast-surface-border: rgb(var(--gs-preview-accent) / 0.12);
+  --gs-preview-toast-foreground: rgb(var(--gs-preview-accent-strong) / 0.9);
+  --gs-preview-resize-handle-foreground: rgb(52 47 60 / 0.2);
+  --gs-preview-resize-handle-foreground-active: rgb(52 47 60 / 0.3);
+  /* Preview interaction state */
+  /* Preview semantic states */
+  --gs-preview-action-ring-hover: 0 0 0 1px rgb(var(--gs-preview-accent) / 0.08) inset;
+  --gs-preview-action-surface-pressed: rgb(var(--gs-preview-accent) / 0.1);
+  --gs-preview-body-overlay: linear-gradient(to bottom, rgb(0 0 0 / 0.02), rgb(0 0 0 / 0.06));
+  --gs-preview-danger-surface: var(--gs-danger-bg-strong);
+  --gs-preview-danger-foreground: var(--gs-danger-text);
+  --gs-preview-warning-surface: var(--gs-warning-bg);
+  --gs-preview-warning-foreground: var(--gs-warning-text);
+
+  /* Settings theme
+     Keep the same role grouping as dark mode so theme diffs stay easy to review. */
+  /* Settings accents */
   --gs-settings-accent: var(--gs-accent-rgb);
   --gs-settings-accent-strong: var(--gs-accent-strong-rgb);
   --gs-settings-support: var(--gs-support-rgb);
   --gs-settings-support-strong: var(--gs-support-strong-rgb);
-  --gs-settings-border: rgb(63 56 74 / 0.12);
+  /* Settings surfaces */
+  /* Settings foundation surfaces */
+  --gs-settings-surface-border: rgb(63 56 74 / 0.12);
   --gs-settings-surface: linear-gradient(180deg, rgb(255 255 255 / 0.9), rgb(252 251 249 / 0.82) 48%, rgb(243 240 236 / 0.72));
   --gs-settings-surface-strong: linear-gradient(180deg, rgb(255 255 255 / 0.94), rgb(248 246 242 / 0.84) 48%, rgb(238 234 229 / 0.78));
   --gs-settings-surface-active: linear-gradient(135deg, rgb(var(--gs-accent-rgb) / 0.12), rgb(var(--gs-support-rgb) / 0.08));
-  --gs-settings-highlight: rgb(255 255 255 / 0.74);
+  --gs-settings-theme-swatch-surface: linear-gradient(135deg, rgb(255 255 255), rgb(var(--gs-support-rgb) / 0.14) 52%, rgb(var(--gs-accent-strong-rgb) / 0.82));
+  /* Settings component surfaces */
+  --gs-settings-badge-border: rgb(var(--gs-settings-accent) / 0.1);
+  --gs-settings-badge-surface: linear-gradient(135deg, rgb(var(--gs-settings-accent) / 0.06), rgb(var(--gs-settings-support) / 0.05));
+  --gs-settings-icon-surface: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.08), rgb(var(--gs-settings-support) / 0.06));
+  --gs-settings-icon-surface-hover: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.1), rgb(var(--gs-settings-support) / 0.08));
+  --gs-settings-icon-surface-active: linear-gradient(145deg, rgb(var(--gs-settings-accent) / 0.14), rgb(var(--gs-settings-support) / 0.1));
+  --gs-settings-icon-surface-border: rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-icon-surface-border-strong: rgb(var(--gs-settings-accent) / 0.14);
+  --gs-settings-control-surface: rgb(255 255 255 / 0.66);
+  --gs-settings-control-surface-hover: rgb(255 255 255 / 0.82);
+  --gs-settings-secondary-action-surface: rgb(255 255 255 / 0.7);
+  --gs-settings-secondary-action-surface-hover: rgb(255 255 255 / 0.84);
+  /* Settings atmospheric effects */
+  /* Settings shell atmosphere */
+  --gs-settings-surface-highlight: rgb(255 255 255 / 0.74);
   --gs-settings-shadow: 0 20px 54px rgb(44 37 48 / 0.1), 0 2px 10px rgb(44 37 48 / 0.06);
   --gs-settings-overlay-fill: rgb(242 240 237 / 0.42);
   --gs-settings-halo-a: rgb(var(--gs-accent-rgb) / 0.06);
   --gs-settings-halo-b: rgb(var(--gs-support-rgb) / 0.05);
+  /* Settings elevations and emphasis */
+  --gs-settings-panel-glow: radial-gradient(circle at top left, rgb(var(--gs-settings-accent) / 0.04), transparent 32%);
+  --gs-settings-panel-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.82), transparent 38%);
+  --gs-settings-card-glow: radial-gradient(circle at top right, rgb(var(--gs-settings-support) / 0.04), transparent 30%);
+  --gs-settings-depth-soft: 0 8px 18px rgb(44 37 48 / 0.05);
+  --gs-settings-depth-hover: 0 10px 22px rgb(44 37 48 / 0.08);
+  --gs-settings-card-surface-shadow: 0 16px 30px rgb(44 37 48 / 0.06);
+  --gs-settings-card-surface-shadow-hover: 0 18px 34px rgb(44 37 48 / 0.1);
+  --gs-settings-accent-emphasis-shadow: 0 12px 24px rgb(var(--gs-settings-accent) / 0.08);
+  --gs-settings-accent-emphasis-shadow-strong: 0 14px 28px rgb(var(--gs-settings-accent) / 0.1);
+  --gs-settings-primary-action-surface-start: 96 82 122;
+  --gs-settings-primary-action-surface-end: 124 93 68;
+  --gs-settings-primary-action-border: rgb(108 91 138 / 0.18);
+  --gs-settings-primary-action-foreground-shadow: 0 1px 1px rgb(0 0 0 / 0.1);
+  --gs-settings-primary-action-shadow: 0 12px 24px rgb(92 77 116 / 0.12), 0 0 14px rgb(120 90 64 / 0.04);
+  --gs-settings-primary-action-shadow-hover: 0 14px 28px rgb(92 77 116 / 0.16), 0 0 18px rgb(120 90 64 / 0.08);
+  --gs-settings-primary-action-glow-hover: 0 0 14px rgb(92 77 116 / 0.1), 0 0 18px rgb(120 90 64 / 0.05);
+  --gs-settings-title-gradient: linear-gradient(135deg, rgb(36 31 44), rgb(var(--gs-settings-accent)) 56%, rgb(126 87 35));
+  --gs-settings-title-text-glow: 0 1px 0 rgb(255 255 255 / 0.44);
+  --gs-settings-title-underline: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.16), rgb(var(--gs-settings-support) / 0.12));
+  /* Settings foregrounds */
+  /* Settings text and interaction foregrounds */
   --gs-settings-scrollbar: rgb(var(--gs-accent-rgb) / 0.24);
-  --gs-settings-tab-text: rgb(57 51 67 / 0.78);
+  --gs-settings-tab-foreground: rgb(57 51 67 / 0.78);
   --gs-settings-muted: rgb(74 69 82 / 0.58);
   --gs-settings-faint: rgb(92 87 98 / 0.42);
-  --gs-settings-theme-swatch-bg: linear-gradient(135deg, rgb(255 255 255), rgb(var(--gs-support-rgb) / 0.14) 52%, rgb(var(--gs-accent-strong-rgb) / 0.82));
+  --gs-settings-control-border-hover-soft: rgb(var(--gs-settings-accent) / 0.08);
+  --gs-settings-control-border-hover: rgb(var(--gs-settings-accent) / 0.1);
+  --gs-settings-control-border-active-soft: rgb(var(--gs-settings-accent) / 0.12);
+  --gs-settings-control-border-active: rgb(var(--gs-settings-accent) / 0.16);
+  --gs-settings-control-border-active-strong: rgb(var(--gs-settings-accent) / 0.2);
 }

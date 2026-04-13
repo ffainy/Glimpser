@@ -34,6 +34,10 @@
       key: 'blacklist',
       svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.5 11.5L11 13l4-3.5M12 20a16.4 16.4 0 0 1-5.092-5.804A16.7 16.7 0 0 1 5 6.666L12 4l7 2.667a16.7 16.7 0 0 1-1.908 7.529A16.4 16.4 0 0 1 12 20"/></svg>',
     },
+    {
+      key: 'about',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 10.5v4m0-7.25h.01"/></svg>',
+    },
   ];
 
   const DEFAULT_SETTINGS = {
@@ -109,9 +113,37 @@
         return `${_t('labelPos')} · ${_t('labelDefaultWindowSize')} · ${_t('labelHeaderActions')}`;
       case 'blacklist':
         return `${_t('labelBlacklistDomains')} · ${_t('hintBlacklistExactMatchShort')}`;
+      case 'about':
+        return `${_t('aboutVersion')} · ${_t('aboutAuthor')} · ${_t('aboutHomepage')}`;
       default:
         return _t('aboutDescText');
     }
+  }
+
+  function _getAboutInfo() {
+    const manifest = nativeAPI.runtime.getManifest();
+    const version = manifest.version || '—';
+    const author = manifest.author || '—';
+    const homepage = manifest.homepage_url || '';
+    const releaseLink = homepage ? `${homepage.replace(/\/$/, '')}/releases/tag/v${version}` : '';
+    const homepageHost = homepage ? (() => {
+      try {
+        return new URL(homepage).hostname;
+      } catch (e) {
+        return homepage;
+      }
+    })() : '—';
+
+    return {
+      name: _t('extName') || manifest.name || 'Glimpser',
+      description: _t('aboutDescText'),
+      version,
+      author,
+      homepage,
+      homepageHost,
+      releaseLink,
+      authorLink: 'https://github.com/ffainy',
+    };
   }
 
   function _normalizeDomainInput(value) {
@@ -266,6 +298,14 @@
             value: currentDomain ? _t(_isCurrentPageBlacklisted() ? 'blacklistCurrentSiteBlocked' : 'blacklistCurrentSiteAllowed') : '—',
             tone: currentDomain && _isCurrentPageBlacklisted() ? 'danger' : '',
           },
+        ];
+      }
+      case 'about': {
+        const about = _getAboutInfo();
+        return [
+          { label: _t('aboutVersion'), value: `v${about.version}` },
+          { label: _t('aboutAuthor'), value: about.author },
+          { label: _t('aboutHomepage'), value: about.homepageHost },
         ];
       }
       default:
@@ -451,48 +491,7 @@
     brandNameBlock.appendChild(brandTitle);
     brandTop.append(brandBadge, brandNameBlock);
 
-    const brandMiddle = document.createElement('div');
-    brandMiddle.className = 'gs-settings-brand-middle';
-
-    const brandHint = document.createElement('div');
-    brandHint.className = 'gs-settings-brand-hint';
-    brandHint.textContent = _t('aboutDescText');
-    brandMiddle.appendChild(brandHint);
-
-    const manifest = nativeAPI.runtime.getManifest();
-    const version = manifest.version || '—';
-    const author = manifest.author || '—';
-    const homepage = manifest.homepage_url || '';
-    const releaseLink = homepage ? `${homepage.replace(/\/$/, '')}/releases/tag/v${version}` : '';
-
-    const brandMeta = document.createElement('div');
-    brandMeta.className = 'gs-settings-brand-meta';
-    [
-      { label: _t('aboutVersion'), value: `v${version}`, link: releaseLink },
-      { label: _t('aboutAuthor'), value: author, link: 'https://github.com/ffainy' },
-      { label: _t('aboutHomepage'), value: homepage, link: homepage },
-    ].forEach(({ label, value, link }) => {
-      const row = document.createElement('div');
-      row.className = 'gs-settings-brand-meta-row';
-
-      const labelEl = document.createElement('span');
-      labelEl.className = 'gs-settings-brand-meta-label';
-      labelEl.textContent = label;
-
-      const valueEl = link ? document.createElement('a') : document.createElement('span');
-      valueEl.className = link ? 'gs-settings-brand-meta-value gs-settings-brand-meta-link' : 'gs-settings-brand-meta-value';
-      valueEl.textContent = value;
-      if (link) {
-        valueEl.href = link;
-        valueEl.target = '_blank';
-        valueEl.rel = 'noopener noreferrer';
-      }
-
-      row.append(labelEl, valueEl);
-      brandMeta.appendChild(row);
-    });
-
-    brand.append(sidebarGlow, brandTop, brandMiddle, brandMeta);
+    brand.append(sidebarGlow, brandTop);
 
     const tabNav = document.createElement('nav');
     tabNav.className = 'gs-settings-tabs';
@@ -565,6 +564,7 @@
     scroll.appendChild(_renderAppearanceTab());
     scroll.appendChild(_renderWorkspaceTab());
     scroll.appendChild(_renderBlacklistTab());
+    scroll.appendChild(_renderAboutTab());
 
     // Footer
     const footer = document.createElement('div');
@@ -1045,6 +1045,67 @@
     return tab;
   }
 
+  function _renderAboutTab() {
+    const tab = _makeTab('about');
+    const about = _getAboutInfo();
+
+    tab.appendChild(_makeCard('', () => {
+      const content = document.createElement('div');
+      content.className = 'gs-settings-about-content';
+
+      const header = document.createElement('div');
+      header.className = 'gs-settings-about-header';
+
+      const nameBlock = document.createElement('div');
+      nameBlock.className = 'gs-settings-about-name-block';
+
+      const name = document.createElement('div');
+      name.className = 'gs-settings-about-name';
+      name.textContent = about.name;
+
+      nameBlock.append(name);
+      header.append(nameBlock);
+
+      const desc = document.createElement('div');
+      desc.className = 'gs-settings-about-desc';
+      desc.textContent = about.description;
+
+      const details = document.createElement('div');
+      details.className = 'gs-settings-about-details';
+
+      [
+        { label: _t('aboutVersion'), value: `v${about.version}`, link: about.releaseLink },
+        { label: _t('aboutAuthor'), value: about.author, link: about.authorLink },
+        { label: _t('aboutHomepage'), value: about.homepage || '—', link: about.homepage || '' },
+      ].forEach(({ label, value, link }) => {
+        const row = document.createElement('div');
+        row.className = 'gs-settings-about-row';
+
+        const labelEl = document.createElement('div');
+        labelEl.className = 'gs-settings-about-label';
+        labelEl.textContent = label;
+
+        const valueEl = link ? document.createElement('a') : document.createElement('div');
+        valueEl.className = link ? 'gs-settings-about-value gs-settings-about-link' : 'gs-settings-about-value';
+        valueEl.textContent = value;
+
+        if (link) {
+          valueEl.href = link;
+          valueEl.target = '_blank';
+          valueEl.rel = 'noopener noreferrer';
+        }
+
+        row.append(labelEl, valueEl);
+        details.appendChild(row);
+      });
+
+      content.append(header, desc, details);
+      return content;
+    }, 'gs-card--about gs-card--feature'));
+
+    return tab;
+  }
+
   // ── Helpers ────────────────────────────────────────────────────────────
   function _makeTab(key) {
     const div = document.createElement('div');
@@ -1072,12 +1133,14 @@
   function _makeCard(titleText, content, className = '') {
     const card = document.createElement('div');
     card.className = `gs-card${className ? ` ${className}` : ''}`;
-    const t = document.createElement('div');
-    t.className = 'gs-card-title';
-    t.textContent = titleText;
     const contentWrap = document.createElement('div');
     contentWrap.className = 'gs-card-content';
-    card.appendChild(t);
+    if (titleText) {
+      const t = document.createElement('div');
+      t.className = 'gs-card-title';
+      t.textContent = titleText;
+      card.appendChild(t);
+    }
     if (typeof content === 'function') {
       const result = content();
       if (result instanceof DocumentFragment || result instanceof Node) {

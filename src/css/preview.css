@@ -5,278 +5,66 @@
 /* ── Shared preview tokens ───────────────────────────────────────────────── */
 :host,
 [data-dp-theme] {
-  --gs-drop-slot-kicker: rgb(var(--gs-accent-rgb));
-  --gs-drop-title-color: var(--text-strong);
-  --gs-drop-copy-color: var(--text);
-  --gs-drop-icon-color: rgb(var(--gs-accent-rgb));
-  --gs-drop-icon-bg: rgb(255 255 255 / 0.08);
-  --gs-drop-icon-border: rgb(var(--gs-accent-rgb) / 0.16);
-  --gs-drop-slot-bg:
-    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.05), transparent 26%),
-    rgb(255 255 255 / 0.04);
-  --gs-drop-slot-border: rgb(var(--gs-accent-rgb) / 0.14);
-  --gs-drop-slot-shadow: 0 16px 30px rgb(0 0 0 / 0.12);
-  --gs-drop-slot-hover-bg:
-    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.08), transparent 28%),
-    rgb(255 255 255 / 0.06);
-  --gs-drop-slot-hover-border: rgb(var(--gs-accent-rgb) / 0.26);
-  --gs-drop-slot-hover-shadow: 0 18px 34px rgb(0 0 0 / 0.18);
-  --gs-drop-slot-pill-bg: rgb(255 255 255 / 0.12);
-  --gs-drop-slot-pill-border: rgb(var(--gs-accent-rgb) / 0.12);
-  --gs-drop-slot-pill-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14);
-  --gs-drop-slot-pill-hover-bg: rgb(255 255 255 / 0.14);
-  --gs-drop-slot-pill-hover-border: rgb(var(--gs-accent-rgb) / 0.22);
-  --gs-drop-slot-pill-hover-shadow:
-    0 14px 28px rgb(0 0 0 / 0.12),
-    0 0 0 1px rgb(255 255 255 / 0.05) inset;
-  --gs-drop-slot-glow:
-    radial-gradient(circle at 50% 50%, rgb(var(--gs-accent-rgb) / 0.18), transparent 62%);
-  --gs-drop-slot-sheen:
-    linear-gradient(120deg, transparent 18%, rgb(255 255 255 / 0.18) 50%, transparent 82%);
-  --gs-drop-slot-sheen-blend: screen;
-  --gs-drop-slot-sheen-opacity: 0.72;
-  --gs-drop-icon-hover-bg: linear-gradient(180deg, rgb(255 255 255 / 0.16), var(--gs-drop-icon-bg));
-  --gs-drop-icon-hover-shadow:
-    0 10px 20px rgb(0 0 0 / 0.12),
-    inset 0 1px 0 rgb(255 255 255 / 0.22);
-  --gs-drop-title-hover-shadow: 0 6px 18px rgb(var(--gs-accent-rgb) / 0.18);
-  --gs-drop-overlay-bg:
-    radial-gradient(circle at top left, rgb(var(--gs-accent-rgb) / 0.12), transparent 28%),
-    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.1), transparent 22%),
-    rgb(0 0 0 / 0.42);
-  --gs-drop-overlay-panel-bg: rgb(255 255 255 / 0.06);
-  --gs-drop-overlay-panel-border: rgb(var(--gs-accent-rgb) / 0.12);
-  --gs-drop-overlay-panel-shadow: 0 24px 58px rgb(0 0 0 / 0.24);
-  --gs-drop-overlay-ring: radial-gradient(circle, rgb(var(--gs-accent-rgb) / 0.16), transparent 66%);
-  --gs-drop-overlay-panel-glow:
-    radial-gradient(circle at 20% 18%, rgb(var(--gs-accent-rgb) / 0.16), transparent 42%),
-    radial-gradient(circle at 82% 84%, rgb(var(--gs-support-rgb) / 0.12), transparent 46%);
-  --gs-drop-overlay-panel-sheen:
-    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.16), transparent 58%);
+  /* Theme-level preview surfaces, borders, foregrounds, shadows, and filters.
+     Prefer role-based names such as window, header, urlbar, brand, and action
+     so the preview system can evolve without leaking raw color values. */
+  --gs-drop-slot-kicker: var(--gs-preview-drop-kicker);
+  --gs-drop-title-foreground: var(--gs-preview-drop-title-foreground);
+  --gs-drop-copy-foreground: var(--gs-preview-drop-copy-foreground);
+  --gs-drop-icon-foreground: var(--gs-preview-drop-icon-foreground);
+  --gs-drop-icon-surface: var(--gs-preview-drop-icon-surface);
+  --gs-drop-icon-border: var(--gs-preview-drop-icon-border);
+  --gs-drop-surface-bg: var(--gs-preview-drop-surface-bg);
+  --gs-drop-surface-border: var(--gs-preview-drop-surface-border);
+  --gs-drop-surface-shadow: var(--gs-preview-drop-surface-shadow);
+  --gs-drop-surface-bg-hover: var(--gs-preview-drop-surface-bg-hover);
+  --gs-drop-surface-border-hover: var(--gs-preview-drop-surface-border-hover);
+  --gs-drop-surface-shadow-hover: var(--gs-preview-drop-surface-shadow-hover);
+  --gs-drop-slot-pill-bg: var(--gs-preview-drop-slot-pill-bg);
+  --gs-drop-slot-pill-border: var(--gs-preview-drop-slot-pill-border);
+  --gs-drop-pill-shadow: var(--gs-preview-drop-pill-shadow);
+  --gs-drop-slot-pill-hover-bg: var(--gs-preview-drop-slot-pill-hover-bg);
+  --gs-drop-slot-pill-hover-border: var(--gs-preview-drop-slot-pill-hover-border);
+  --gs-drop-pill-shadow-hover: var(--gs-preview-drop-pill-shadow-hover);
+  --gs-drop-slot-glow: var(--gs-preview-drop-slot-glow);
+  --gs-drop-slot-sheen: var(--gs-preview-drop-slot-sheen);
+  --gs-drop-slot-sheen-blend: var(--gs-preview-drop-slot-sheen-blend);
+  --gs-drop-slot-sheen-opacity: var(--gs-preview-drop-slot-sheen-opacity);
+  --gs-drop-icon-surface-hover: var(--gs-preview-drop-icon-surface-hover);
+  --gs-drop-icon-surface-shadow-hover: var(--gs-preview-drop-icon-surface-shadow-hover);
+  --gs-drop-title-glow-hover: var(--gs-preview-drop-title-glow-hover);
+  --gs-drop-overlay-bg: var(--gs-preview-drop-overlay-bg);
+  --gs-drop-overlay-surface-bg: var(--gs-preview-drop-overlay-surface-bg);
+  --gs-drop-overlay-surface-border: var(--gs-preview-drop-overlay-surface-border);
+  --gs-drop-overlay-surface-shadow: var(--gs-preview-drop-overlay-surface-shadow);
+  --gs-drop-overlay-ring: var(--gs-preview-drop-overlay-ring);
+  --gs-drop-overlay-panel-glow: var(--gs-preview-drop-overlay-panel-glow);
+  --gs-drop-overlay-panel-sheen: var(--gs-preview-drop-overlay-panel-sheen);
 
-  --gs-preview-action-danger-bg: var(--gs-danger-bg-strong);
-  --gs-preview-action-bulk-bg: var(--gs-warning-bg);
-  --gs-preview-action-bulk-color: var(--gs-warning-text);
+  --gs-preview-action-danger-surface: var(--gs-preview-danger-surface);
+  --gs-preview-action-bulk-surface: var(--gs-preview-warning-surface);
+  --gs-preview-action-bulk-foreground: var(--gs-preview-warning-foreground);
 }
 
 /* ── Dropzone tokens scoped from theme ───────────────────────────────────── */
 :host([data-dp-theme="dark"]),
 [data-dp-theme="dark"] {
-  --gs-drop-slot-bg:
-    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.08), transparent 28%),
-    rgb(16 15 21 / 0.84);
-  --gs-drop-slot-border: rgb(235 228 246 / 0.14);
-  --gs-drop-slot-shadow: 0 18px 36px rgb(3 2 7 / 0.28), 0 0 20px rgb(var(--gs-accent-rgb) / 0.06);
-  --gs-drop-slot-hover-bg:
-    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.12), transparent 30%),
-    rgb(18 16 24 / 0.88);
-  --gs-drop-slot-hover-border: rgb(var(--gs-accent-rgb) / 0.28);
-  --gs-drop-slot-hover-shadow: 0 22px 42px rgb(3 2 7 / 0.34), 0 0 24px rgb(var(--gs-accent-rgb) / 0.14);
-  --gs-drop-slot-pill-bg: rgb(255 255 255 / 0.055);
-  --gs-drop-slot-pill-border: rgb(235 228 246 / 0.08);
-  --gs-drop-slot-pill-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
-  --gs-drop-slot-pill-hover-bg: rgb(255 255 255 / 0.08);
-  --gs-drop-slot-pill-hover-border: rgb(var(--gs-accent-rgb) / 0.24);
-  --gs-drop-slot-pill-hover-shadow:
-    0 18px 34px rgb(3 2 7 / 0.26),
-    0 0 0 1px rgb(var(--gs-accent-rgb) / 0.08) inset;
-  --gs-drop-title-color: rgb(248 243 255 / 0.94);
-  --gs-drop-copy-color: rgb(225 218 238 / 0.72);
-  --gs-drop-icon-color: rgb(var(--gs-accent-strong-rgb));
-  --gs-drop-icon-bg: rgb(var(--gs-accent-rgb) / 0.08);
-  --gs-drop-icon-border: rgb(var(--gs-accent-rgb) / 0.14);
-  --gs-drop-slot-glow:
-    radial-gradient(circle at 50% 50%, rgb(var(--gs-accent-rgb) / 0.28), transparent 62%);
-  --gs-drop-slot-sheen:
-    linear-gradient(120deg, transparent 16%, rgb(255 255 255 / 0.16) 50%, transparent 84%);
-  --gs-drop-slot-sheen-blend: screen;
-  --gs-drop-slot-sheen-opacity: 0.72;
-  --gs-drop-icon-hover-bg: linear-gradient(180deg, rgb(255 255 255 / 0.16), var(--gs-drop-icon-bg));
-  --gs-drop-icon-hover-shadow:
-    0 10px 20px rgb(0 0 0 / 0.12),
-    inset 0 1px 0 rgb(255 255 255 / 0.22);
-  --gs-drop-title-hover-shadow: 0 6px 18px rgb(var(--gs-accent-rgb) / 0.18);
-  --gs-drop-overlay-bg:
-    radial-gradient(circle at top left, rgb(var(--gs-accent-rgb) / 0.18), transparent 28%),
-    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.14), transparent 24%),
-    rgb(6 5 12 / 0.52);
-  --gs-drop-overlay-panel-bg: rgb(24 21 34 / 0.64);
-  --gs-drop-overlay-panel-border: rgb(235 228 246 / 0.12);
-  --gs-drop-overlay-panel-shadow: 0 28px 64px rgb(3 2 7 / 0.38), 0 0 38px rgb(var(--gs-accent-rgb) / 0.12);
-  --gs-drop-overlay-ring: radial-gradient(circle, rgb(var(--gs-accent-rgb) / 0.24), transparent 66%);
-  --gs-drop-overlay-panel-glow:
-    radial-gradient(circle at 22% 18%, rgb(var(--gs-accent-rgb) / 0.22), transparent 42%),
-    radial-gradient(circle at 80% 82%, rgb(var(--gs-support-rgb) / 0.14), transparent 48%);
-  --gs-drop-overlay-panel-sheen:
-    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.12), transparent 56%);
-
-  --gs-preview-window-bg: linear-gradient(to bottom, rgb(21 18 30 / 0.92), rgb(15 13 23 / 0.88));
-  --gs-preview-window-border: rgb(235 229 245 / 0.1);
-  --gs-preview-window-border-active: rgb(var(--gs-accent-rgb) / 0.3);
-  --gs-preview-divider: rgb(235 229 245 / 0.12);
-  --gs-preview-window-shadow: 0 18px 42px rgb(3 2 7 / 0.46),
-                              0 6px 18px rgb(3 2 7 / 0.2);
-  --gs-preview-window-shadow-active: 0 34px 92px rgb(3 2 7 / 0.7),
-                                     0 0 38px rgb(var(--gs-accent-rgb) / 0.16),
-                                     0 0 20px rgb(var(--gs-support-rgb) / 0.08);
-  --gs-preview-header-bg: rgb(24 23 30 / 0.58);
-  --gs-preview-header-bg-active: rgb(28 26 34 / 0.66);
-  --gs-preview-header-bg-inactive: rgb(20 19 25 / 0.5);
-  --gs-preview-header-border: rgb(235 229 245 / 0.08);
-  --gs-preview-header-border-active: rgb(235 229 245 / 0.12);
-  --gs-preview-header-border-inactive: rgb(235 229 245 / 0.05);
-  --gs-preview-header-highlight: rgb(255 255 255 / 0.03);
-  --gs-preview-urlbar-bg: rgb(30 28 36 / 0.64);
-  --gs-preview-urlbar-bg-active: rgb(34 31 40 / 0.72);
-  --gs-preview-urlbar-bg-inactive: rgb(24 22 29 / 0.54);
-  --gs-preview-urlbar-border: rgb(235 229 245 / 0.08);
-  --gs-preview-urlbar-border-active: rgb(235 229 245 / 0.12);
-  --gs-preview-urlbar-border-inactive: rgb(235 229 245 / 0.05);
-  --gs-preview-urlbar-highlight: rgb(255 255 255 / 0.03);
-  --gs-preview-urlbar-highlight-active: rgb(255 255 255 / 0.04);
-  --gs-preview-brand-color: rgb(235 229 245 / 0.3);
   --gs-preview-brand-opacity: 0.74;
-  --gs-preview-brand-filter: drop-shadow(0 0 0.6px rgb(235 229 245 / 0.28)) drop-shadow(0 0 2px rgb(var(--gs-accent-rgb) / 0.08));
-  --gs-preview-brand-active-color: rgb(var(--gs-accent-rgb));
-  --gs-preview-brand-active-filter: drop-shadow(0 0 0.9px rgb(var(--gs-accent-rgb) / 0.34)) drop-shadow(0 0 10px rgb(var(--gs-accent-rgb) / 0.32));
-  --gs-preview-action-color: rgb(238 232 247 / 0.78);
-  --gs-preview-action-filter: drop-shadow(0 0 0.55px rgb(235 229 245 / 0.22)) drop-shadow(0 0 2px rgb(var(--gs-accent-rgb) / 0.06));
-  --gs-preview-action-color-inactive: rgb(206 197 220 / 0.4);
-  --gs-preview-action-filter-inactive: drop-shadow(0 0 0.45px rgb(235 229 245 / 0.12));
-  --gs-preview-action-hover-bg: linear-gradient(135deg, rgb(var(--gs-accent-rgb) / 0.18), rgb(var(--gs-support-rgb) / 0.1));
-  --gs-preview-action-hover-color: rgb(var(--gs-accent-strong-rgb) / 0.98);
-  --gs-preview-action-hover-filter: drop-shadow(0 0 0.9px rgb(var(--gs-accent-rgb) / 0.28)) drop-shadow(0 0 8px rgb(var(--gs-accent-rgb) / 0.2));
-  --gs-preview-action-hover-ring: 0 0 0 1px rgb(var(--gs-accent-rgb) / 0.18) inset;
-  --gs-preview-action-pressed-bg: rgb(255 255 255 / 0.14);
-  --gs-preview-action-danger-color: var(--gs-danger-text-soft-strong);
-  --gs-preview-urltext: rgb(241 236 249 / 0.84);
-  --gs-preview-urltext-active: rgb(249 246 255 / 0.92);
-  --gs-preview-urltext-inactive: rgb(206 197 220 / 0.44);
-  --gs-tooltip-border: rgb(235 229 245 / 0.1);
-  --gs-tooltip-bg: rgb(22 19 31 / 0.94);
-  --gs-tooltip-text: rgb(244 240 251 / 0.9);
-  --gs-tooltip-shadow: 0 20px 40px rgb(3 2 7 / 0.4),
-                       0 0 20px rgb(var(--gs-accent-rgb) / 0.08);
-  --gs-toast-border: rgb(var(--gs-accent-rgb) / 0.3);
-  --gs-toast-bg: rgb(26 21 38 / 0.96);
-  --gs-toast-text: rgb(var(--gs-accent-strong-rgb) / 0.98);
-  --gs-toast-shadow: 0 18px 38px rgb(3 2 7 / 0.4),
-                     0 0 18px rgb(var(--gs-accent-rgb) / 0.14),
-                     0 0 0 1px rgb(255 255 255 / 0.05) inset;
-  --gs-preview-resize-handle: rgb(235 229 245 / 0.34);
-  --gs-preview-resize-handle-active: rgb(var(--gs-accent-rgb) / 0.66);
+  --gs-preview-action-danger-foreground: var(--gs-preview-danger-foreground);
+  --gs-tooltip-surface-border: var(--gs-preview-tooltip-surface-border);
+  --gs-tooltip-foreground: var(--gs-preview-tooltip-foreground);
+  --gs-toast-surface-border: var(--gs-preview-toast-surface-border);
+  --gs-toast-foreground: var(--gs-preview-toast-foreground);
 }
 
 :host([data-dp-theme="light"]),
 [data-dp-theme="light"] {
-  --gs-drop-slot-bg:
-    radial-gradient(circle at 82% 100%, rgb(var(--gs-support-rgb) / 0.08), transparent 30%),
-    radial-gradient(circle at 18% 0%, rgb(var(--gs-accent-rgb) / 0.05), transparent 34%),
-    rgb(255 255 255 / 0.82);
-  --gs-drop-slot-border: rgb(68 61 80 / 0.1);
-  --gs-drop-slot-shadow: 0 14px 24px rgb(44 37 48 / 0.08);
-  --gs-drop-slot-hover-bg:
-    radial-gradient(circle at 82% 100%, rgb(var(--gs-support-rgb) / 0.15), transparent 34%),
-    radial-gradient(circle at 18% 0%, rgb(var(--gs-accent-rgb) / 0.11), transparent 40%),
-    linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(248 244 239 / 0.9));
-  --gs-drop-slot-hover-border: rgb(var(--gs-support-rgb) / 0.24);
-  --gs-drop-slot-hover-shadow:
-    0 18px 34px rgb(44 37 48 / 0.12),
-    0 0 0 1px rgb(var(--gs-support-rgb) / 0.07);
-  --gs-drop-slot-pill-bg: rgb(255 255 255 / 0.58);
-  --gs-drop-slot-pill-border: rgb(68 61 80 / 0.06);
-  --gs-drop-slot-pill-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5);
-  --gs-drop-slot-pill-hover-bg: rgb(255 255 255 / 0.68);
-  --gs-drop-slot-pill-hover-border: rgb(var(--gs-support-rgb) / 0.12);
-  --gs-drop-slot-pill-hover-shadow:
-    0 12px 24px rgb(44 37 48 / 0.1),
-    0 0 0 1px rgb(255 255 255 / 0.35) inset;
-  --gs-drop-title-color: rgb(34 29 45 / 0.9);
-  --gs-drop-copy-color: rgb(74 69 82 / 0.66);
-  --gs-drop-icon-color: rgb(var(--gs-accent-strong-rgb));
-  --gs-drop-icon-bg: rgb(255 255 255 / 0.42);
-  --gs-drop-icon-border: rgb(68 61 80 / 0.08);
-  --gs-drop-slot-glow:
-    radial-gradient(circle at 24% 30%, rgb(var(--gs-accent-rgb) / 0.16), transparent 48%),
-    radial-gradient(circle at 78% 76%, rgb(var(--gs-support-rgb) / 0.2), transparent 54%);
-  --gs-drop-slot-sheen:
-    linear-gradient(118deg, transparent 14%, rgb(255 255 255 / 0.6) 42%, rgb(255 245 232 / 0.42) 54%, transparent 78%);
-  --gs-drop-slot-sheen-blend: soft-light;
-  --gs-drop-slot-sheen-opacity: 0.92;
-  --gs-drop-icon-hover-bg:
-    linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(var(--gs-support-rgb) / 0.1));
-  --gs-drop-icon-hover-shadow:
-    0 10px 18px rgb(44 37 48 / 0.12),
-    0 0 0 1px rgb(var(--gs-support-rgb) / 0.08),
-    inset 0 1px 0 rgb(255 255 255 / 0.78);
-  --gs-drop-title-hover-shadow: 0 8px 18px rgb(var(--gs-support-rgb) / 0.16);
-  --gs-drop-overlay-bg:
-    radial-gradient(circle at top left, rgb(var(--gs-accent-rgb) / 0.08), transparent 30%),
-    radial-gradient(circle at bottom right, rgb(var(--gs-support-rgb) / 0.06), transparent 24%),
-    rgb(242 240 237 / 0.44);
-  --gs-drop-overlay-panel-bg: rgb(255 252 248 / 0.82);
-  --gs-drop-overlay-panel-border: rgb(68 61 80 / 0.1);
-  --gs-drop-overlay-panel-shadow: 0 20px 42px rgb(44 37 48 / 0.12);
-  --gs-drop-overlay-ring: radial-gradient(circle, rgb(var(--gs-accent-rgb) / 0.12), transparent 68%);
-  --gs-drop-overlay-panel-glow:
-    radial-gradient(circle at 22% 18%, rgb(var(--gs-accent-rgb) / 0.11), transparent 40%),
-    radial-gradient(circle at 82% 84%, rgb(var(--gs-support-rgb) / 0.14), transparent 44%);
-  --gs-drop-overlay-panel-sheen:
-    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.52), transparent 58%);
-
-  --gs-preview-window-bg: linear-gradient(to bottom, rgb(255 255 255 / 0.88), rgb(248 246 242 / 0.82));
-  --gs-preview-window-border: rgb(52 47 60 / 0.12);
-  --gs-preview-window-border-active: rgb(52 47 60 / 0.2);
-  --gs-preview-divider: rgb(52 47 60 / 0.08);
-  --gs-preview-window-shadow: 0 12px 24px rgb(44 37 48 / 0.08),
-                              0 2px 8px rgb(44 37 48 / 0.04);
-  --gs-preview-window-shadow-active: 0 22px 48px rgb(44 37 48 / 0.14),
-                                     0 8px 20px rgb(44 37 48 / 0.06);
-  --gs-preview-header-bg: rgb(252 251 249 / 0.68);
-  --gs-preview-header-bg-active: rgb(255 255 255 / 0.8);
-  --gs-preview-header-bg-inactive: rgb(244 240 236 / 0.56);
-  --gs-preview-header-border: rgb(52 47 60 / 0.06);
-  --gs-preview-header-border-active: rgb(52 47 60 / 0.08);
-  --gs-preview-header-border-inactive: rgb(52 47 60 / 0.04);
-  --gs-preview-header-highlight: rgb(255 255 255 / 0.5);
-  --gs-preview-urlbar-bg: rgb(239 235 230 / 0.78);
-  --gs-preview-urlbar-bg-active: rgb(244 241 236 / 0.84);
-  --gs-preview-urlbar-bg-inactive: rgb(233 229 223 / 0.5);
-  --gs-preview-urlbar-border: rgb(52 47 60 / 0.06);
-  --gs-preview-urlbar-border-active: rgb(52 47 60 / 0.08);
-  --gs-preview-urlbar-border-inactive: rgb(52 47 60 / 0.04);
-  --gs-preview-urlbar-highlight: rgb(255 255 255 / 0.44);
-  --gs-preview-urlbar-highlight-active: rgb(255 255 255 / 0.58);
-  --gs-preview-brand-color: rgb(52 47 60 / 0.36);
   --gs-preview-brand-opacity: 0.8;
-  --gs-preview-brand-filter: drop-shadow(0 0 0.6px rgb(52 47 60 / 0.16));
-  --gs-preview-brand-active-color: var(--gs-accent);
-  --gs-preview-brand-active-filter: drop-shadow(0 0 0.8px rgb(var(--gs-accent-rgb) / 0.16));
-  --gs-preview-action-color: rgb(52 47 60 / 0.66);
-  --gs-preview-action-filter: drop-shadow(0 0 0.45px rgb(52 47 60 / 0.12));
-  --gs-preview-action-color-inactive: rgb(78 72 89 / 0.38);
-  --gs-preview-action-filter-inactive: drop-shadow(0 0 0.4px rgb(52 47 60 / 0.08));
-  --gs-preview-action-hover-bg: linear-gradient(135deg, rgb(var(--gs-accent-rgb) / 0.06), rgb(var(--gs-support-rgb) / 0.05));
-  --gs-preview-action-hover-color: rgb(var(--gs-accent-strong-rgb) / 0.9);
-  --gs-preview-action-hover-filter: drop-shadow(0 0 0.6px rgb(var(--gs-accent-rgb) / 0.08));
-  --gs-preview-action-hover-ring: 0 0 0 1px rgb(var(--gs-accent-rgb) / 0.08) inset;
-  --gs-preview-action-pressed-bg: rgb(var(--gs-accent-rgb) / 0.1);
-  --gs-preview-action-danger-color: var(--gs-danger-text);
-  --gs-preview-urltext: rgb(52 47 60 / 0.72);
-  --gs-preview-urltext-active: rgb(34 29 45 / 0.88);
-  --gs-preview-urltext-inactive: rgb(78 72 89 / 0.42);
-  --gs-tooltip-border: rgb(52 47 60 / 0.08);
-  --gs-tooltip-bg: rgb(255 255 255 / 0.96);
-  --gs-tooltip-text: rgb(34 29 45 / 0.82);
-  --gs-tooltip-shadow: 0 14px 28px rgb(44 37 48 / 0.12),
-                       0 2px 8px rgb(44 37 48 / 0.05);
-  --gs-toast-border: rgb(var(--gs-accent-rgb) / 0.12);
-  --gs-toast-bg: rgb(255 255 255 / 0.96);
-  --gs-toast-text: rgb(var(--gs-accent-strong-rgb) / 0.9);
-  --gs-toast-shadow: 0 12px 26px rgb(44 37 48 / 0.1),
-                     0 0 0 1px rgb(255 255 255 / 0.4) inset;
-  --gs-preview-resize-handle: rgb(52 47 60 / 0.2);
-  --gs-preview-resize-handle-active: rgb(52 47 60 / 0.3);
+  --gs-preview-action-danger-foreground: var(--gs-preview-danger-foreground);
+  --gs-tooltip-surface-border: var(--gs-preview-tooltip-surface-border);
+  --gs-tooltip-foreground: var(--gs-preview-tooltip-foreground);
+  --gs-toast-surface-border: var(--gs-preview-toast-surface-border);
+  --gs-toast-foreground: var(--gs-preview-toast-foreground);
 }
 
 /* ── Drop Zone ───────────────────────────────────────────────────────────── */
@@ -294,7 +82,7 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: none;
-  border-radius: var(--gs-radius-lg);
+  border-radius: var(--gs-radius-control);
   box-shadow: none;
   font-family: var(--gs-font-family);
   opacity: 0;
@@ -316,9 +104,9 @@
 }
 
 #gs-dropzone.hovered .gs-drop-surface--slot {
-  background: var(--gs-drop-slot-hover-bg);
-  border-color: var(--gs-drop-slot-hover-border);
-  box-shadow: var(--gs-drop-slot-hover-shadow);
+  background: var(--gs-drop-surface-bg-hover);
+  border-color: var(--gs-drop-surface-border-hover);
+  box-shadow: var(--gs-drop-surface-shadow-hover);
 }
 
 /* ── Fullscreen Drop Overlay ─────────────────────────────────────────────── */
@@ -358,7 +146,7 @@
   inset: 50%;
   width: min(440px, 86vw);
   height: min(440px, 86vw);
-  border-radius: 50%;
+  border-radius: var(--gs-radius-round);
   transform: translate(-50%, -50%);
   background: var(--gs-drop-overlay-ring);
   filter: blur(22px);
@@ -376,12 +164,12 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--gs-space-roomy);
   width: 100%;
-  border: 1px solid var(--gs-drop-slot-border);
-  background: var(--gs-drop-slot-bg);
-  box-shadow: var(--gs-drop-slot-shadow);
-  color: var(--gs-drop-copy-color);
+  border: 1px solid var(--gs-drop-surface-border);
+  background: var(--gs-drop-surface-bg);
+  box-shadow: var(--gs-drop-surface-shadow);
+  color: var(--gs-drop-copy-foreground);
 }
 
 .gs-drop-surface::before {
@@ -394,7 +182,7 @@
 
 .gs-drop-surface--slot {
   justify-content: center;
-  padding: 10px 14px;
+  padding: var(--gs-space-base) var(--gs-space-roomy);
   border-radius: inherit;
   backdrop-filter: blur(calc(var(--gs-blur-dropzone) * 0.9)) saturate(1.2);
   -webkit-backdrop-filter: blur(calc(var(--gs-blur-dropzone) * 0.9)) saturate(1.2);
@@ -437,12 +225,12 @@
   z-index: 1;
   flex-direction: column;
   text-align: center;
-  gap: 18px;
-  padding: 28px 32px;
-  border-radius: var(--gs-radius-3xl);
-  border-color: var(--gs-drop-overlay-panel-border);
-  background: var(--gs-drop-overlay-panel-bg);
-  box-shadow: var(--gs-drop-overlay-panel-shadow);
+  gap: var(--gs-space-group);
+  padding: var(--gs-space-page) var(--gs-space-hero);
+  border-radius: var(--gs-radius-surface);
+  border-color: var(--gs-drop-overlay-surface-border);
+  background: var(--gs-drop-overlay-surface-bg);
+  box-shadow: var(--gs-drop-overlay-surface-shadow);
   backdrop-filter: blur(var(--gs-blur-panel)) saturate(1.08);
   -webkit-backdrop-filter: blur(var(--gs-blur-panel)) saturate(1.08);
   overflow: hidden;
@@ -472,17 +260,17 @@
   width: 42px;
   height: 42px;
   flex-shrink: 0;
-  border-radius: 14px;
+  border-radius: var(--gs-radius-icon);
   border: 1px solid var(--gs-drop-icon-border);
-  background: var(--gs-drop-icon-bg);
-  color: var(--gs-drop-icon-color);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+  background: var(--gs-drop-icon-surface);
+  color: var(--gs-drop-icon-foreground);
+  box-shadow: var(--gs-shadow-inset-highlight-strong);
 }
 
 .gs-drop-icon-shell--slot {
   width: 28px;
   height: 28px;
-  border-radius: 10px;
+  border-radius: var(--gs-radius-badge);
   transition:
     transform 0.32s var(--gs-ease-standard),
     border-color 0.28s var(--gs-ease-standard),
@@ -499,7 +287,7 @@
 .gs-drop-icon-shell--overlay {
   width: 58px;
   height: 58px;
-  border-radius: 18px;
+  border-radius: var(--gs-radius-icon-large);
 }
 
 .gs-drop-icon-shell svg {
@@ -511,20 +299,20 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--gs-space-micro);
   min-width: 0;
 }
 
 .gs-drop-copy--overlay {
   align-items: center;
-  gap: 8px;
+  gap: var(--gs-space-compact);
 }
 
 .gs-drop-kicker {
   font-family: var(--gs-font-family);
-  font-size: var(--gs-font-size-2xs);
-  font-weight: var(--gs-font-weight-bold);
-  letter-spacing: 0.14em;
+  font-size: var(--gs-font-size-kicker);
+  font-weight: var(--gs-font-weight-title);
+  letter-spacing: var(--gs-letter-spacing-kicker-wide);
   text-transform: uppercase;
   color: var(--gs-drop-slot-kicker);
   opacity: 0.72;
@@ -532,11 +320,11 @@
 
 .gs-drop-title {
   font-family: var(--gs-font-family);
-  font-size: var(--gs-font-size-md);
-  font-weight: var(--gs-font-weight-semibold);
-  line-height: 1.35;
-  letter-spacing: 0.01em;
-  color: var(--gs-drop-title-color);
+  font-size: var(--gs-font-size-tab-label);
+  font-weight: var(--gs-font-weight-action);
+  line-height: var(--gs-line-height-label);
+  letter-spacing: var(--gs-letter-spacing-body);
+  color: var(--gs-drop-title-foreground);
   pointer-events: none;
   user-select: none;
   transition:
@@ -546,8 +334,8 @@
 }
 
 .gs-drop-surface--slot .gs-drop-title {
-  font-size: var(--gs-font-size-sm);
-  letter-spacing: 0.01em;
+  font-size: var(--gs-font-size-body);
+  letter-spacing: var(--gs-letter-spacing-body);
 }
 
 .gs-drop-slot-pill {
@@ -555,14 +343,14 @@
   z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--gs-space-base);
   max-width: min(100%, 320px);
   min-height: 42px;
-  padding: 0 14px;
-  border-radius: var(--gs-radius-pill);
+  padding: 0 var(--gs-space-roomy);
+  border-radius: var(--gs-radius-chip);
   border: 1px solid var(--gs-drop-slot-pill-border);
   background: var(--gs-drop-slot-pill-bg);
-  box-shadow: var(--gs-drop-slot-pill-shadow);
+  box-shadow: var(--gs-drop-pill-shadow);
   transition:
     transform 0.32s var(--gs-ease-standard),
     background 0.28s var(--gs-ease-standard),
@@ -573,7 +361,7 @@
 #gs-dropzone.hovered .gs-drop-slot-pill {
   background: var(--gs-drop-slot-pill-hover-bg);
   border-color: var(--gs-drop-slot-pill-hover-border);
-  box-shadow: var(--gs-drop-slot-pill-hover-shadow);
+  box-shadow: var(--gs-drop-pill-shadow-hover);
   transform: translateY(-1px) scale(1.01);
   animation: gs-drop-slot-hover-float 1.8s ease-in-out infinite;
 }
@@ -590,8 +378,8 @@
 
 #gs-dropzone.hovered .gs-drop-icon-shell--slot {
   transform: translateY(-1px) scale(1.08);
-  background: var(--gs-drop-icon-hover-bg);
-  box-shadow: var(--gs-drop-icon-hover-shadow);
+  background: var(--gs-drop-icon-surface-hover);
+  box-shadow: var(--gs-drop-icon-surface-shadow-hover);
 }
 
 #gs-dropzone.hovered .gs-drop-icon-shell--slot svg {
@@ -600,7 +388,7 @@
 
 #gs-dropzone.hovered .gs-drop-title {
   transform: translateY(-0.5px);
-  text-shadow: var(--gs-drop-title-hover-shadow);
+  text-shadow: var(--gs-drop-title-glow-hover);
 }
 
 @keyframes gs-drop-slot-hover-float {
@@ -628,12 +416,12 @@
   flex-direction: column;
   pointer-events: all;
   overflow: hidden;
-  border-radius: var(--gs-window-radius, var(--gs-radius-lg));
-  border: 1px solid var(--gs-preview-window-border);
-  background: var(--gs-preview-window-bg);
+  border-radius: var(--gs-window-radius, var(--gs-radius-control));
+  border: 1px solid var(--gs-preview-window-surface-border);
+  background: var(--gs-preview-window-surface-bg);
   backdrop-filter: blur(var(--gs-blur-md)) saturate(0.92);
   -webkit-backdrop-filter: blur(var(--gs-blur-md)) saturate(0.92);
-  box-shadow: var(--gs-preview-window-shadow);
+  box-shadow: var(--gs-preview-window-surface-shadow);
   transition: box-shadow var(--gs-motion-base), border-color var(--gs-motion-fast);
   user-select: none;
   isolation: isolate;
@@ -641,8 +429,8 @@
 }
 
 .gs-preview-window.active {
-  border-color: var(--gs-preview-window-border-active);
-  box-shadow: var(--gs-preview-window-shadow-active);
+  border-color: var(--gs-preview-window-surface-border-active);
+  box-shadow: var(--gs-preview-window-surface-shadow-active);
 }
 
 .gs-preview-header {
@@ -650,18 +438,18 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: stretch;
-  gap: 8px;
-  padding: 6px 8px;
+  gap: var(--gs-space-compact);
+  padding: var(--gs-space-tight) var(--gs-space-compact);
   border-bottom: 1px solid var(--gs-preview-header-border);
-  background: var(--gs-preview-header-bg);
+  background: var(--gs-preview-header-surface);
   font-family: var(--gs-font-family);
   box-shadow:
     0 1px 0 var(--gs-preview-header-highlight) inset,
-    0 10px 24px rgb(0 0 0 / 0.06);
+    var(--gs-preview-header-elevation-shadow);
 }
 
 .gs-preview-window.active .gs-preview-header {
-  background: var(--gs-preview-header-bg-active);
+  background: var(--gs-preview-header-surface-active);
   border-bottom-color: var(--gs-preview-header-border-active);
 }
 
@@ -670,14 +458,14 @@
 }
 
 .gs-preview-window:not(.active) .gs-preview-header {
-  background: var(--gs-preview-header-bg-inactive);
+  background: var(--gs-preview-header-surface-inactive);
   border-bottom-color: var(--gs-preview-header-border-inactive);
 }
 
 .gs-preview-group {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: var(--gs-space-micro-tight);
 }
 
 .gs-preview-toolbar {
@@ -686,10 +474,10 @@
 }
 
 .gs-preview-group--danger {
-  gap: 4px;
-  margin-left: 9px;
-  padding-left: 9px;
-  border-left: 1px solid var(--gs-preview-divider);
+  gap: var(--gs-space-micro);
+  margin-left: var(--gs-space-divider);
+  padding-left: var(--gs-space-divider);
+  border-left: 1px solid var(--gs-preview-group-divider);
 }
 
 .gs-preview-brand {
@@ -698,16 +486,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--gs-preview-brand-color);
+  color: var(--gs-preview-brand-foreground);
   opacity: var(--gs-preview-brand-opacity);
-  filter: var(--gs-preview-brand-filter);
+  filter: var(--gs-preview-brand-glow);
   transition: color var(--gs-motion-fast), opacity var(--gs-motion-fast), filter var(--gs-motion-fast);
 }
 
 .gs-preview-window.active .gs-preview-brand {
-  color: var(--gs-preview-brand-active-color);
+  color: var(--gs-preview-brand-foreground-active);
   opacity: 1;
-  filter: var(--gs-preview-brand-active-filter);
+  filter: var(--gs-preview-brand-glow-active);
 }
 
 .gs-preview-brand svg {
@@ -724,10 +512,10 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--gs-radius-action);
   background: transparent;
-  color: var(--gs-preview-action-color);
-  filter: var(--gs-preview-action-filter);
+  color: var(--gs-preview-action-foreground);
+  filter: var(--gs-preview-action-glow);
   cursor: pointer;
   transition: background var(--gs-motion-fast), color var(--gs-motion-fast), transform var(--gs-motion-fast), opacity var(--gs-motion-fast), box-shadow var(--gs-motion-fast), filter var(--gs-motion-fast);
 }
@@ -740,22 +528,22 @@
 
 .gs-preview-window:not(.active) .gs-preview-action,
 .gs-preview-window:not(.active) .gs-pill-action {
-  color: var(--gs-preview-action-color-inactive);
-  filter: var(--gs-preview-action-filter-inactive);
+  color: var(--gs-preview-action-foreground-inactive);
+  filter: var(--gs-preview-action-glow-inactive);
 }
 
 .gs-preview-action:hover,
 .gs-pill-action:hover {
-  background: var(--gs-preview-action-hover-bg);
-  color: var(--gs-preview-action-hover-color);
-  filter: var(--gs-preview-action-hover-filter);
+  background: var(--gs-preview-action-surface-hover);
+  color: var(--gs-preview-action-foreground-hover);
+  filter: var(--gs-preview-action-glow-hover);
   transform: translateY(-1px);
-  box-shadow: var(--gs-preview-action-hover-ring);
+  box-shadow: var(--gs-preview-action-ring-hover);
 }
 
 .gs-preview-action:active,
 .gs-pill-action:active {
-  background: var(--gs-preview-action-pressed-bg);
+  background: var(--gs-preview-action-surface-pressed);
   transform: scale(0.96);
 }
 
@@ -767,13 +555,13 @@
 }
 
 .gs-preview-action-close:hover {
-  background: var(--gs-preview-action-danger-bg);
-  color: var(--gs-preview-action-danger-color);
+  background: var(--gs-preview-action-danger-surface);
+  color: var(--gs-preview-action-danger-foreground);
 }
 
 .gs-preview-action-bulk-close:hover {
-  background: var(--gs-preview-action-bulk-bg);
-  color: var(--gs-preview-action-bulk-color);
+  background: var(--gs-preview-action-bulk-surface);
+  color: var(--gs-preview-action-bulk-foreground);
 }
 
 .gs-preview-action.is-loading svg,
@@ -796,24 +584,24 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 2px;
-  padding: 0 4px;
+  gap: var(--gs-space-hairline);
+  padding: 0 var(--gs-space-micro);
   min-height: 24px;
-  border-radius: var(--gs-window-radius, var(--gs-radius-lg));
+  border-radius: var(--gs-window-radius, var(--gs-radius-control));
   border: 1px solid var(--gs-preview-urlbar-border);
-  background: var(--gs-preview-urlbar-bg);
+  background: var(--gs-preview-urlbar-surface);
   font-family: var(--gs-font-family);
   box-shadow: 0 1px 0 var(--gs-preview-urlbar-highlight) inset;
 }
 
 .gs-preview-window.active .gs-preview-urlbar {
   border-color: var(--gs-preview-urlbar-border-active);
-  background: var(--gs-preview-urlbar-bg-active);
+  background: var(--gs-preview-urlbar-surface-active);
   box-shadow: 0 1px 0 var(--gs-preview-urlbar-highlight-active) inset;
 }
 
 .gs-preview-window:not(.active) .gs-preview-urlbar {
-  background: var(--gs-preview-urlbar-bg-inactive);
+  background: var(--gs-preview-urlbar-surface-inactive);
   border-color: var(--gs-preview-urlbar-border-inactive);
 }
 
@@ -823,13 +611,13 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--gs-font-family-mono);
-  font-size: var(--gs-font-size-2xs);
-  font-weight: var(--gs-font-weight-bold);
+  font-size: var(--gs-font-size-caption);
+  font-weight: var(--gs-font-weight-code-strong);
   font-variant-numeric: tabular-nums;
-  color: var(--gs-preview-urltext);
+  color: var(--gs-preview-url-foreground);
   text-align: left;
-  line-height: 1;
-  padding: 0 4px;
+  line-height: var(--gs-line-height-tight);
+  padding: 0 var(--gs-space-micro);
 }
 
 .gs-tooltip {
@@ -838,17 +626,17 @@
   top: 0;
   z-index: calc(var(--gs-z-preview-base) + 20);
   max-width: 220px;
-  padding: 7px 10px;
-  border-radius: 10px;
-  border: 1px solid var(--gs-tooltip-border);
-  background: var(--gs-tooltip-bg);
-  color: var(--gs-tooltip-text);
+  padding: 7px var(--gs-space-base);
+  border-radius: var(--gs-radius-badge);
+  border: 1px solid var(--gs-tooltip-surface-border);
+  background: var(--gs-tooltip-surface-bg);
+  color: var(--gs-tooltip-foreground);
   font-family: var(--gs-font-family);
-  font-size: var(--gs-font-size-2xs);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0.01em;
-  box-shadow: var(--gs-tooltip-shadow);
+  font-size: var(--gs-font-size-caption);
+  font-weight: var(--gs-font-weight-label);
+  line-height: var(--gs-line-height-title);
+  letter-spacing: var(--gs-letter-spacing-body);
+  box-shadow: var(--gs-tooltip-surface-shadow);
   pointer-events: none;
   opacity: 0;
   transform: translateY(4px) scale(0.96);
@@ -870,11 +658,11 @@
 }
 
 .gs-preview-window:not(.active) .gs-preview-urltext {
-  color: var(--gs-preview-urltext-inactive);
+  color: var(--gs-preview-url-foreground-inactive);
 }
 
 .gs-preview-window.active .gs-preview-urltext {
-  color: var(--gs-preview-urltext-active);
+  color: var(--gs-preview-url-foreground-active);
 }
 
 .gs-preview-body {
@@ -911,18 +699,18 @@
   left: 50%;
   transform: translate(-50%, -8px) scale(0.97);
   z-index: 3;
-  padding: 8px 12px;
-  border-radius: var(--gs-radius-pill);
-  border: 1px solid var(--gs-toast-border);
-  background: var(--gs-toast-bg);
-  color: var(--gs-toast-text);
+  padding: var(--gs-space-compact) var(--gs-space-comfortable);
+  border-radius: var(--gs-radius-chip);
+  border: 1px solid var(--gs-toast-surface-border);
+  background: var(--gs-toast-surface-bg);
+  color: var(--gs-toast-foreground);
   font-family: var(--gs-font-family-mono);
-  font-size: var(--gs-font-size-2xs);
-  font-weight: var(--gs-font-weight-bold);
+  font-size: var(--gs-font-size-caption);
+  font-weight: var(--gs-font-weight-code-strong);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--gs-letter-spacing-toast);
   white-space: nowrap;
-  box-shadow: var(--gs-toast-shadow);
+  box-shadow: var(--gs-toast-surface-shadow);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--gs-motion-fast), transform var(--gs-motion-fast);
@@ -937,7 +725,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgb(0 0 0 / 0.02), rgb(0 0 0 / 0.06));
+  background: var(--gs-preview-body-overlay);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--gs-motion-fast);
@@ -977,7 +765,7 @@
 
 .gs-preview-resize-handle {
   position: absolute;
-  color: var(--gs-preview-resize-handle);
+  color: var(--gs-preview-resize-handle-foreground);
   opacity: 0;
   touch-action: none;
 }
@@ -988,7 +776,7 @@
 }
 
 .gs-preview-window.active .gs-preview-resize-handle {
-  color: var(--gs-preview-resize-handle-active);
+  color: var(--gs-preview-resize-handle-foreground-active);
 }
 
 .gs-preview-resize-se,
@@ -1045,7 +833,7 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 2;
-  filter: drop-shadow(0 8px 24px rgb(0 0 0 / 0.14));
+  filter: var(--gs-shadow-filter-float);
 }
 
 .gs-preview-spinner svg { display: block; }
@@ -1060,15 +848,15 @@
   transform: translate(-50%, -50%);
   min-width: 240px;
   max-width: min(420px, calc(100% - 48px));
-  padding: 14px 18px;
+  padding: var(--gs-space-roomy) var(--gs-space-group);
   background: var(--gs-surface-card);
   border: 1px solid var(--error-border);
-  border-radius: 14px;
-  box-shadow: 0 18px 38px rgb(0 0 0 / 0.12);
+  border-radius: var(--gs-radius-icon);
+  box-shadow: var(--gs-shadow-elevation-float);
   color: var(--error-text);
   font-family: var(--gs-font-family);
-  font-size: var(--gs-font-size-sm);
-  line-height: 1.45;
+  font-size: var(--gs-font-size-body);
+  line-height: var(--gs-line-height-body);
   text-align: center;
   pointer-events: none;
   z-index: 2;
