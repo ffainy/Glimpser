@@ -23,8 +23,8 @@
   // ── Tab definitions ────────────────────────────────────────────────────
   const TABS = [
     {
-      key: 'appearance',
-      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m7.533 11.862l.01-.003m5.581 7.143c-.5.515-.92.847-1.06.89c-.48.145-5.43-1.28-6.238-3.33c-.81-2.051-1.831-5.816-1.89-6.22c-.06-.404 1.56-1.724 3.597-2.61m1.989 8.055c-.227.262-.39.56-.556.847M13.5 12c.5.5 1 1.049 2 1.049S17 12.5 17.5 12m-4-4h.01m3.99 0h.01M10.5 5.5c0-.29 2.5-1.5 5-1.5s5 1.136 5 1.5V12c0 1.966-4.291 5-5 5c-.743 0-5-3.034-5-5z"/></svg>',
+      key: 'general',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7h-9m-4 0H4m7 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0m9 10h-5m-4 0H4m11 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0"/></svg>',
     },
     {
       key: 'preview',
@@ -62,7 +62,7 @@
   let _host = null;
   let _shadow = null;
   let _fontsLink = null;
-  let _activeTab = 'appearance';
+  let _activeTab = 'general';
   let _settings = null;
   let _scrollLockState = null;
   let _blacklistDraft = '';
@@ -112,8 +112,8 @@
 
   function _getTabDescription(key) {
     switch (key) {
-      case 'appearance':
-        return `${_t('labelTheme')} · ${_t('labelLang')} · ${_t('labelCorners')}`;
+      case 'general':
+        return `${_t('labelLang')} · ${_t('labelTheme')}`;
       case 'preview':
         return `${_t('labelPreviewTrigger')} · ${_t('labelDefaultWindowSize')} · ${_t('labelAdvancedPreview')}`;
       case 'blacklist':
@@ -281,11 +281,10 @@
 
   function _getHeaderMetaItems() {
     switch (_activeTab) {
-      case 'appearance':
+      case 'general':
         return [
-          { label: _t('labelTheme'), value: _getActiveThemeLabel() },
           { label: _t('labelLang'), value: _getSelectedLanguageLabel() },
-          { label: _t('labelCorners'), value: _settings?.corners === 'square' ? _t('cornersSquare') : _t('cornersRounded') },
+          { label: _t('labelTheme'), value: _getActiveThemeLabel() },
         ];
       case 'preview':
         return [
@@ -573,7 +572,7 @@
     const scroll = document.createElement('div');
     scroll.className = 'gs-settings-scroll';
 
-    scroll.appendChild(_renderAppearanceTab());
+    scroll.appendChild(_renderGeneralTab());
     scroll.appendChild(_renderPreviewTab());
     scroll.appendChild(_renderBlacklistTab());
     scroll.appendChild(_renderAboutTab());
@@ -638,12 +637,12 @@
     requestAnimationFrame(() => overlay.classList.add('visible'));
   }
 
-  // ── Tab: Appearance ────────────────────────────────────────────────────
-  function _renderAppearanceTab() {
-    const tab = _makeTab('appearance');
+  // ── Tab: General ───────────────────────────────────────────────────────
+  function _renderGeneralTab() {
+    const tab = _makeTab('general');
 
-    // Language
-    tab.appendChild(_makeCard(_t('labelLang'), _makeOptionGroup([
+    const languageContent = document.createDocumentFragment();
+    languageContent.appendChild(_makeOptionGroup([
       { label: 'English', value: 'en' },
       { label: '中文',    value: 'zh' },
     ], _getSelectedLanguageValue(), v => {
@@ -653,58 +652,63 @@
       }).catch(() => {
         _render();
       });
-    })));
+    }));
+    languageContent.appendChild(_makeHint(_t('hintLanguage')));
 
-    // Theme
-    tab.appendChild(_makeCard(_t('labelTheme'), _makeOptionGroupWithHints([
+    const themeContent = document.createDocumentFragment();
+    themeContent.appendChild(_makeOptionGroupWithHints([
       { label: _t('themeDark'),  value: 'dark',  hint: _t('hintThemeDark')  },
       { label: _t('themeLight'), value: 'light', hint: _t('hintThemeLight') },
     ], _settings?.theme || 'dark', v => {
       _settings.theme = v;
       _syncThemeState(v, _shadow?.querySelector('.gs-settings-theme-badge'), _shadow?.querySelector('.gs-settings-meta'));
-    })));
-
-    // Corners
-    tab.appendChild(_makeCard(_t('labelCorners'), () => {
-      const wrap = document.createDocumentFragment();
-      const radiusRow = _makeSliderRow(
-        _t('labelCornerRadius'),
-        4,
-        28,
-        _settings?.cornerRadius ?? 16,
-        (value) => { _settings.cornerRadius = value; },
-        'px'
-      );
-
-      const cornersGroup = document.createElement('div');
-      cornersGroup.className = 'gs-setting-group';
-
-      const radiusGroup = document.createElement('div');
-      radiusGroup.className = 'gs-setting-group';
-
-      const group = _makeOptionGroup([
-        { label: _t('cornersRounded'), value: 'rounded' },
-        { label: _t('cornersSquare'),  value: 'square'  },
-      ], _settings?.corners || 'rounded', v => {
-        _settings.corners = v;
-        radiusRow.style.opacity = v === 'square' ? '0.5' : '1';
-        radiusRow.style.pointerEvents = v === 'square' ? 'none' : '';
-      });
-
-      radiusRow.style.opacity = (_settings?.corners || 'rounded') === 'square' ? '0.5' : '1';
-      radiusRow.style.pointerEvents = (_settings?.corners || 'rounded') === 'square' ? 'none' : '';
-
-      cornersGroup.appendChild(group);
-      cornersGroup.appendChild(_makeHint(_t('hintCorners')));
-      radiusGroup.appendChild(radiusRow);
-      radiusGroup.appendChild(_makeHint(_t('hintCornerRadius')));
-
-      wrap.appendChild(cornersGroup);
-      wrap.appendChild(radiusGroup);
-      return wrap;
     }));
 
+    const preferencesContent = document.createDocumentFragment();
+    preferencesContent.appendChild(_makeLabeledBlock(_t('labelLang'), languageContent));
+    preferencesContent.appendChild(_makeLabeledBlock(_t('labelTheme'), themeContent));
+    tab.appendChild(_makeCard(_t('labelPreferences'), preferencesContent, 'gs-card--feature'));
+
     return tab;
+  }
+
+  function _makeWindowCornersContent() {
+    const wrap = document.createDocumentFragment();
+    const radiusRow = _makeSliderRow(
+      _t('labelCornerRadius'),
+      4,
+      28,
+      _settings?.cornerRadius ?? 16,
+      (value) => { _settings.cornerRadius = value; },
+      'px'
+    );
+
+    const cornersGroup = document.createElement('div');
+    cornersGroup.className = 'gs-setting-group';
+
+    const radiusGroup = document.createElement('div');
+    radiusGroup.className = 'gs-setting-group';
+
+    const group = _makeOptionGroup([
+      { label: _t('cornersRounded'), value: 'rounded' },
+      { label: _t('cornersSquare'),  value: 'square'  },
+    ], _settings?.corners || 'rounded', v => {
+      _settings.corners = v;
+      radiusRow.style.opacity = v === 'square' ? '0.5' : '1';
+      radiusRow.style.pointerEvents = v === 'square' ? 'none' : '';
+    });
+
+    radiusRow.style.opacity = (_settings?.corners || 'rounded') === 'square' ? '0.5' : '1';
+    radiusRow.style.pointerEvents = (_settings?.corners || 'rounded') === 'square' ? 'none' : '';
+
+    cornersGroup.appendChild(group);
+    cornersGroup.appendChild(_makeHint(_t('hintCorners')));
+    radiusGroup.appendChild(radiusRow);
+    radiusGroup.appendChild(_makeHint(_t('hintCornerRadius')));
+
+    wrap.appendChild(cornersGroup);
+    wrap.appendChild(radiusGroup);
+    return wrap;
   }
 
   // ── Tab: Preview ───────────────────────────────────────────────────────
@@ -849,6 +853,7 @@
     offsetGroup.appendChild(offsetContent);
 
     windowDefaultsContent.appendChild(_makeLabeledBlock(_t('labelDefaultWindowSize'), previewSizeContent));
+    windowDefaultsContent.appendChild(_makeLabeledBlock(_t('labelCorners'), _makeWindowCornersContent()));
     windowDefaultsContent.appendChild(maxWindowsGroup);
     windowDefaultsContent.appendChild(offsetGroup);
     tab.appendChild(_makeCard(_t('labelWindowDefaults'), windowDefaultsContent, 'gs-card--feature'));
