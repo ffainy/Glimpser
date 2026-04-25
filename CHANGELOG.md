@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- changelog: preserve tagged release entries
 - ui: resolve token and mobile layout issues
 
 ## [0.0.4] - 2026-04-19
