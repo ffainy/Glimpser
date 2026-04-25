@@ -45,7 +45,8 @@ export function findPreviousTag(tags, currentTag = null) {
 }
 
 export function getTagDate(tag) {
-  return runGit(['log', '-1', '--format=%cs', tag])
+  const taggerDate = runGit(['for-each-ref', '--format=%(taggerdate:short)', `refs/tags/${tag}`])
+  return taggerDate || runGit(['log', '-1', '--format=%cs', tag])
 }
 
 export function getCommits(fromRef, toRef = 'HEAD') {
@@ -102,6 +103,7 @@ export function mapSection(commit) {
     case 'fix':
       return 'Fixed'
     case 'perf':
+    case 'refactor':
       return 'Changed'
     default:
       return commit.isBreaking ? 'Changed' : null

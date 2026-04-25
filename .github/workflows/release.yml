@@ -39,7 +39,7 @@ jobs:
           node scripts/build.js ${{ steps.version.outputs.VERSION }}
 
       - name: Refresh Unreleased changelog for tag
-        run: node scripts/update-changelog.mjs --mode unreleased
+        run: node scripts/update-changelog.mjs --mode unreleased --tag ${{ github.ref_name }}
 
       - name: Generate release changelog and notes
         run: node scripts/update-changelog.mjs --mode release --tag ${{ github.ref_name }}

@@ -18,7 +18,7 @@ import {
 
 function parseArgs(argv) {
   let mode = ''
-  let tag = process.env.GITHUB_REF_NAME || ''
+  let tag = process.env.GITHUB_REF_TYPE === 'tag' ? process.env.GITHUB_REF_NAME || '' : ''
   let ref = 'HEAD'
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -48,13 +48,13 @@ function parseArgs(argv) {
     throw new Error(`Unsupported mode: ${mode}. Expected unreleased or release.`)
   }
 
+  if (tag && !/^v\d+\.\d+\.\d+$/.test(tag)) {
+    throw new Error(`Unsupported tag format: ${tag}. Expected vX.Y.Z.`)
+  }
+
   if (mode === 'release') {
     if (!tag) {
       throw new Error('Missing tag. Pass --tag vX.Y.Z or set GITHUB_REF_NAME.')
-    }
-
-    if (!/^v\d+\.\d+\.\d+$/.test(tag)) {
-      throw new Error(`Unsupported tag format: ${tag}. Expected vX.Y.Z.`)
     }
   }
 
@@ -66,9 +66,9 @@ function parseArgs(argv) {
   }
 }
 
-function updateUnreleased(ref) {
+function updateUnreleased(ref, currentTag) {
   const tags = listReleaseTags()
-  const previousTag = findPreviousTag(tags)
+  const previousTag = findPreviousTag(tags, currentTag || null)
   const commits = getCommits(previousTag, ref)
   const sections = buildSections(commits)
   const unreleasedContent = renderSectionContent(sections)
@@ -102,7 +102,7 @@ function main() {
   const { mode, tag, version, ref } = parseArgs(process.argv.slice(2))
 
   if (mode === 'unreleased') {
-    updateUnreleased(ref)
+    updateUnreleased(ref, tag)
     return
   }
 
