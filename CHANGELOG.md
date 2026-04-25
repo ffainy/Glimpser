@@ -12,8 +12,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.4] - 2026-04-19
 
+### Added
+- settings: add domain blacklist controls
+- preview: support multiple simultaneous preview windows
+
 ### Changed
-- maintenance release
+- ui: unify semantic design tokens for settings and preview
+- settings: separate brand and title gradients
+- settings: simplify gradient title styling
+- preview: unify drop area styling and structure
+- settings: refine panel layout and visual hierarchy
+- settings: refine panel typography and information hierarchy
+- ui: refine theme styling and unify css tokens
+- styles: split css system into reusable ui layers
+- settings: inline standalone settings bootstrap
+- i18n: unify settings panel copy in locale files
+
+### Fixed
+- changelog: align rebuild output with unreleased updates
+- ui: load shared fonts from document head
+- settings: keep theme badge in sync with theme changes
+- settings: align language selection with active locale
+- settings: refine panel layout and stabilize ci
 
 ## [0.0.3] - 2026-04-02
 
