@@ -27,7 +27,7 @@
       svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m7.533 11.862l.01-.003m5.581 7.143c-.5.515-.92.847-1.06.89c-.48.145-5.43-1.28-6.238-3.33c-.81-2.051-1.831-5.816-1.89-6.22c-.06-.404 1.56-1.724 3.597-2.61m1.989 8.055c-.227.262-.39.56-.556.847M13.5 12c.5.5 1 1.049 2 1.049S17 12.5 17.5 12m-4-4h.01m3.99 0h.01M10.5 5.5c0-.29 2.5-1.5 5-1.5s5 1.136 5 1.5V12c0 1.966-4.291 5-5 5c-.743 0-5-3.034-5-5z"/></svg>',
     },
     {
-      key: 'workspace',
+      key: 'preview',
       svg: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-5l-3 3v-3H6a2 2 0 0 1-2-2zm4 3h8m-8-3h8"/></svg>',
     },
     {
@@ -109,8 +109,8 @@
     switch (key) {
       case 'appearance':
         return `${_t('labelTheme')} · ${_t('labelLang')} · ${_t('labelCorners')}`;
-      case 'workspace':
-        return `${_t('labelPos')} · ${_t('labelDefaultWindowSize')} · ${_t('labelHeaderActions')}`;
+      case 'preview':
+        return `${_t('labelPos')} · ${_t('labelDefaultWindowSize')} · ${_t('labelAdvancedPreview')}`;
       case 'blacklist':
         return `${_t('labelBlacklistDomains')} · ${_t('hintBlacklistExactMatchShort')}`;
       case 'about':
@@ -282,7 +282,7 @@
           { label: _t('labelLang'), value: _getSelectedLanguageLabel() },
           { label: _t('labelCorners'), value: _settings?.corners === 'square' ? _t('cornersSquare') : _t('cornersRounded') },
         ];
-      case 'workspace':
+      case 'preview':
         return [
           { label: _t('labelPos'), value: _t(`pos${(_settings?.dropZonePosition || 'bottom').charAt(0).toUpperCase()}${(_settings?.dropZonePosition || 'bottom').slice(1)}`) },
           { label: _t('labelDefaultWindowSize'), value: `${_settings?.defaultWindowScale?.width ?? DEFAULT_SETTINGS.defaultWindowScale.width}% × ${_settings?.defaultWindowScale?.height ?? DEFAULT_SETTINGS.defaultWindowScale.height}%` },
@@ -562,7 +562,7 @@
     scroll.className = 'gs-settings-scroll';
 
     scroll.appendChild(_renderAppearanceTab());
-    scroll.appendChild(_renderWorkspaceTab());
+    scroll.appendChild(_renderPreviewTab());
     scroll.appendChild(_renderBlacklistTab());
     scroll.appendChild(_renderAboutTab());
 
@@ -695,9 +695,9 @@
     return tab;
   }
 
-  // ── Tab: Drop Zone ─────────────────────────────────────────────────────
-  function _renderWorkspaceTab() {
-    const tab = _makeTab('workspace');
+  // ── Tab: Preview ───────────────────────────────────────────────────────
+  function _renderPreviewTab() {
+    const tab = _makeTab('preview');
 
     // Position — each option has its own hint shown below the group
     const posHints = {
@@ -714,32 +714,40 @@
     ], _settings?.dropZonePosition || 'bottom', v => {
       _settings.dropZonePosition = v;
       posHintEl.textContent = posHints[v];
-      sizeCard.style.display = v === 'fullscreen' ? 'none' : '';
+      dropSizeBlock.style.display = v === 'fullscreen' ? 'none' : '';
     });
 
     const posContent = document.createDocumentFragment();
     posContent.appendChild(posGroup);
     posContent.appendChild(posHintEl);
-    tab.appendChild(_makeCard(_t('labelPos'), posContent, 'gs-card--feature'));
 
     const dropSizeContent = document.createDocumentFragment();
     dropSizeContent.appendChild(_makeSliderRow(
       _t('labelW'), 100, 1200,
       _settings?.dropZoneCustomSize?.width ?? 300,
-      v => { _settings.dropZoneCustomSize.width = v; },
+      v => {
+        _settings.dropZoneCustomSize = _settings.dropZoneCustomSize || {};
+        _settings.dropZoneCustomSize.width = v;
+      },
       'px'
     ));
     dropSizeContent.appendChild(_makeSliderRow(
       _t('labelH'), 60, 400,
       _settings?.dropZoneCustomSize?.height ?? 150,
-      v => { _settings.dropZoneCustomSize.height = v; },
+      v => {
+        _settings.dropZoneCustomSize = _settings.dropZoneCustomSize || {};
+        _settings.dropZoneCustomSize.height = v;
+      },
       'px'
     ));
     dropSizeContent.appendChild(_makeHint(_t('hintSize')));
 
-    const sizeCard = _makeCard(_t('labelSize'), dropSizeContent);
-    if (_settings?.dropZonePosition === 'fullscreen') sizeCard.style.display = 'none';
-    tab.appendChild(sizeCard);
+    const dropTargetContent = document.createDocumentFragment();
+    const dropSizeBlock = _makeLabeledBlock(_t('labelSize'), dropSizeContent);
+    if (_settings?.dropZonePosition === 'fullscreen') dropSizeBlock.style.display = 'none';
+    dropTargetContent.appendChild(_makeLabeledBlock(_t('labelPos'), posContent));
+    dropTargetContent.appendChild(dropSizeBlock);
+    tab.appendChild(_makeCard(_t('labelDropTarget'), dropTargetContent, 'gs-card--feature'));
 
     const windowScale = _resolveDefaultWindowScale(_settings);
     const previewSizeContent = document.createDocumentFragment();
@@ -767,8 +775,6 @@
     ));
     previewSizeContent.appendChild(_makeHint(_t('hintDefaultWindowSize')));
 
-    tab.appendChild(_makeCard(_t('labelDefaultWindowSize'), previewSizeContent));
-
     const maxWindowsContent = document.createDocumentFragment();
     maxWindowsContent.appendChild(_makeSliderRow(
       _t('labelMaxPreviewWindows'),
@@ -779,7 +785,6 @@
       ''
     ));
     maxWindowsContent.appendChild(_makeHint(_t('hintMaxPreviewWindows')));
-    tab.appendChild(_makeCard(_t('labelMaxPreviewWindows'), maxWindowsContent));
 
     const offsetContent = document.createDocumentFragment();
     offsetContent.appendChild(_makeSliderRow(
@@ -790,25 +795,37 @@
       (value) => { _settings.newWindowOffset = value; }
     ));
     offsetContent.appendChild(_makeHint(_t('hintWindowOffset')));
-    tab.appendChild(_makeCard(_t('labelWindowOffset'), offsetContent));
+
+    const windowDefaultsContent = document.createDocumentFragment();
+    const maxWindowsGroup = document.createElement('div');
+    maxWindowsGroup.className = 'gs-setting-group';
+    maxWindowsGroup.appendChild(maxWindowsContent);
+
+    const offsetGroup = document.createElement('div');
+    offsetGroup.className = 'gs-setting-group';
+    offsetGroup.appendChild(offsetContent);
+
+    windowDefaultsContent.appendChild(_makeLabeledBlock(_t('labelDefaultWindowSize'), previewSizeContent));
+    windowDefaultsContent.appendChild(maxWindowsGroup);
+    windowDefaultsContent.appendChild(offsetGroup);
+    tab.appendChild(_makeCard(_t('labelWindowDefaults'), windowDefaultsContent, 'gs-card--feature'));
 
     const openBehaviorContent = document.createDocumentFragment();
     openBehaviorContent.appendChild(_makeOptionGroup([
-      { label: _t('debugOn'), value: true },
-      { label: _t('debugOff'), value: false },
+      { label: _t('optionOn'), value: true },
+      { label: _t('optionOff'), value: false },
     ], _settings?.closePreviewOnOpenNewTab ?? true, (value) => {
       _settings.closePreviewOnOpenNewTab = value;
     }));
     openBehaviorContent.appendChild(_makeHint(_t('hintClosePreviewOnOpenNewTab')));
-    tab.appendChild(_makeCard(_t('labelClosePreviewOnOpenNewTab'), openBehaviorContent));
 
     const headerActionsContent = document.createDocumentFragment();
 
     const closeOthersContent = document.createElement('div');
     closeOthersContent.className = 'gs-option-hint-group';
     closeOthersContent.appendChild(_makeOptionGroup([
-      { label: _t('debugOn'), value: true },
-      { label: _t('debugOff'), value: false },
+      { label: _t('optionOn'), value: true },
+      { label: _t('optionOff'), value: false },
     ], _settings?.showCloseOthersButton ?? true, (value) => {
       _settings.showCloseOthersButton = value;
     }));
@@ -818,15 +835,18 @@
     const closeAllContent = document.createElement('div');
     closeAllContent.className = 'gs-option-hint-group';
     closeAllContent.appendChild(_makeOptionGroup([
-      { label: _t('debugOn'), value: true },
-      { label: _t('debugOff'), value: false },
+      { label: _t('optionOn'), value: true },
+      { label: _t('optionOff'), value: false },
     ], _settings?.showCloseAllButton ?? true, (value) => {
       _settings.showCloseAllButton = value;
     }));
     closeAllContent.appendChild(_makeHint(_t('hintShowCloseAllButton')));
     headerActionsContent.appendChild(_makeLabeledBlock(_t('labelShowCloseAllButton'), closeAllContent));
 
-    tab.appendChild(_makeCard(_t('labelHeaderActions'), headerActionsContent, 'gs-card--feature'));
+    const advancedContent = document.createDocumentFragment();
+    advancedContent.appendChild(_makeLabeledBlock(_t('labelClosePreviewOnOpenNewTab'), openBehaviorContent));
+    advancedContent.appendChild(_makeLabeledBlock(_t('labelHeaderActions'), headerActionsContent));
+    tab.appendChild(_makeCard(_t('labelAdvancedPreview'), advancedContent, 'gs-card--feature'));
 
     return tab;
   }
