@@ -571,8 +571,8 @@
 
 .gs-preview-action svg,
 .gs-pill-action svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 .gs-preview-window:not(.active) .gs-preview-action,

@@ -238,8 +238,8 @@
 }
 
 .gs-settings-tab svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -1275,8 +1275,8 @@
   }
 
   .gs-settings-tab svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
   }
 
   .gs-settings-tab-copy {
