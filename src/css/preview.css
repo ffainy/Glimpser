@@ -44,6 +44,10 @@
   --gs-preview-action-danger-surface: var(--gs-preview-danger-surface);
   --gs-preview-action-bulk-surface: var(--gs-preview-warning-surface);
   --gs-preview-action-bulk-foreground: var(--gs-preview-warning-foreground);
+  --gs-tooltip-surface-bg: var(--gs-preview-tooltip-surface-bg);
+  --gs-tooltip-surface-shadow: var(--gs-preview-tooltip-surface-shadow);
+  --gs-toast-surface-bg: var(--gs-preview-toast-surface-bg);
+  --gs-toast-surface-shadow: var(--gs-preview-toast-surface-shadow);
 }
 
 /* ── Dropzone tokens scoped from theme ───────────────────────────────────── */

@@ -761,6 +761,10 @@ textarea {
   --gs-settings-primary-action-shadow: 0 12px 24px rgb(92 77 116 / 0.12), 0 0 14px rgb(120 90 64 / 0.04);
   --gs-settings-primary-action-shadow-hover: 0 14px 28px rgb(92 77 116 / 0.16), 0 0 18px rgb(120 90 64 / 0.08);
   --gs-settings-primary-action-glow-hover: 0 0 14px rgb(92 77 116 / 0.1), 0 0 18px rgb(120 90 64 / 0.05);
+  --gs-settings-slider-thumb-focus-shadow: 0 0 0 4px rgb(var(--gs-settings-accent) / 0.16), 0 8px 18px rgb(var(--gs-settings-accent) / 0.22);
+  --gs-settings-slider-thumb-focus-shadow-hover: 0 0 0 6px rgb(var(--gs-settings-accent) / 0.18), 0 12px 20px rgb(var(--gs-settings-support) / 0.24);
+  --gs-settings-display-text-glow: 0 1px 0 rgb(255 255 255 / 0.24);
+  --gs-settings-display-text-glow-strong: 0 1px 0 rgb(255 255 255 / 0.32);
   --gs-settings-title-gradient: linear-gradient(135deg, rgb(36 31 44), rgb(var(--gs-settings-accent)) 56%, rgb(126 87 35));
   --gs-settings-title-text-glow: 0 1px 0 rgb(255 255 255 / 0.44);
   --gs-settings-title-underline: linear-gradient(90deg, rgb(var(--gs-settings-accent) / 0.16), rgb(var(--gs-settings-support) / 0.12));
