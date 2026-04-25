@@ -136,6 +136,20 @@
 
 #gs-dropzone-overlay.active { opacity: 1; pointer-events: all; }
 
+#gs-direct-release-layer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--gs-z-backdrop);
+  display: none;
+  pointer-events: none;
+  background: transparent;
+}
+
+#gs-direct-release-layer.active {
+  display: block;
+  pointer-events: all;
+}
+
 #gs-dropzone-overlay .gs-drop-overlay-stage {
   position: relative;
   display: flex;

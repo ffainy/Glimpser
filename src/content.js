@@ -4,6 +4,7 @@
 const DEFAULT_SETTINGS = {
   dropZonePosition: 'bottom',
   dropZoneCustomSize: { width: 300, height: 150 },
+  previewTriggerMode: 'release',
   defaultWindowScale: { width: 75, height: 82 },
   maxPreviewWindows: 1,
   newWindowOffset: 24,
@@ -22,6 +23,7 @@ const DROP_ZONE_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="22" h
 
 const state = {
   draggedLink: null,
+  dragSession: null,
 }
 
 const previewManager = {
@@ -42,6 +44,8 @@ const FRAME_DRAG_END_MESSAGE = 'gs:frame-drag-end'
 const FRAME_FOCUS_MESSAGE = 'gs:frame-focus'
 const FRAME_ESCAPE_MESSAGE = 'gs:frame-escape'
 const DROP_AREA_SHOW_DELAY_MS = 100
+const PREVIEW_RELEASE_ARM_DELAY_MS = 180
+const PREVIEW_RELEASE_MIN_DISTANCE_PX = 18
 const GOOGLE_FONTS_STYLESHEET = 'https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Nunito+Sans:wght@400;500;600;700;800&family=Young+Serif&display=swap'
 
 const ICON_REFRESH = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/></svg>`
@@ -156,6 +160,10 @@ function _isPreviewBlockedOnThisPage(settings = _settings || DEFAULT_SETTINGS) {
   return !!currentDomain && _getBlacklistDomains(settings).includes(currentDomain)
 }
 
+function _resolvePreviewTriggerMode(settings = _settings || DEFAULT_SETTINGS) {
+  return settings?.previewTriggerMode === 'drop-area' ? 'drop-area' : 'release'
+}
+
 function detectDraggedLink(event) {
   if (!event || !event.target) {
     return null
@@ -178,6 +186,98 @@ function detectDraggedLink(event) {
   return anchor.href
 }
 
+function _eventDragPoint(event) {
+  if (!event) {
+    return null
+  }
+
+  const screenX = Number(event.screenX)
+  const screenY = Number(event.screenY)
+  if (Number.isFinite(screenX) && Number.isFinite(screenY) && (screenX !== 0 || screenY !== 0)) {
+    return { x: screenX, y: screenY }
+  }
+
+  const clientX = Number(event.clientX)
+  const clientY = Number(event.clientY)
+  if (Number.isFinite(clientX) && Number.isFinite(clientY) && (clientX !== 0 || clientY !== 0)) {
+    return { x: clientX, y: clientY }
+  }
+
+  return null
+}
+
+function _dragDistance(startPoint, endPoint) {
+  if (!startPoint || !endPoint) {
+    return Infinity
+  }
+  return Math.hypot(endPoint.x - startPoint.x, endPoint.y - startPoint.y)
+}
+
+function _startLinkDrag(url, event, source = 'page') {
+  _clearLinkDragTimer()
+  const point = source === 'frame' ? null : _eventDragPoint(event)
+  state.draggedLink = url
+  state.dragSession = {
+    url,
+    source,
+    startedAt: performance.now(),
+    startPoint: point,
+    lastPoint: point,
+    armTimer: null,
+  }
+  return state.dragSession
+}
+
+function _clearLinkDragTimer() {
+  if (state.dragSession?.armTimer) {
+    clearTimeout(state.dragSession.armTimer)
+    state.dragSession.armTimer = null
+  }
+}
+
+function _clearLinkDragState() {
+  _clearLinkDragTimer()
+  state.draggedLink = null
+  state.dragSession = null
+  _setDirectReleaseLayerActive(false)
+}
+
+function _updateLinkDragPoint(event) {
+  const session = state.dragSession
+  if (!session || session.source === 'frame') {
+    return
+  }
+
+  const point = _eventDragPoint(event)
+  if (!point) {
+    return
+  }
+
+  session.lastPoint = point
+  if (!session.startPoint) {
+    session.startPoint = point
+  }
+}
+
+function _isLinkReleaseIntentReady() {
+  const session = state.dragSession
+  if (!session) {
+    return false
+  }
+
+  const elapsed = performance.now() - session.startedAt
+  const distance = _dragDistance(session.startPoint, session.lastPoint)
+  return elapsed >= PREVIEW_RELEASE_ARM_DELAY_MS && distance >= PREVIEW_RELEASE_MIN_DISTANCE_PX
+}
+
+function _getDroppedUrl(event) {
+  return state.draggedLink ||
+    event?.dataTransfer?.getData('text/uri-list') ||
+    event?.dataTransfer?.getData('URL') ||
+    event?.dataTransfer?.getData('text/plain') ||
+    ''
+}
+
 async function loadSettings() {
   try {
     const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
@@ -194,8 +294,8 @@ function _detectSystemTheme() {
 }
 
 function _removeDragHandlers() {
-  for (const { target, type, fn } of _dragHandlers) {
-    target.removeEventListener(type, fn)
+  for (const { target, type, fn, options } of _dragHandlers) {
+    target.removeEventListener(type, fn, options)
   }
   _dragHandlers = []
 }
@@ -1120,6 +1220,11 @@ function applyContentTheme(theme) {
     _previewBackdrop.setAttribute('data-dp-theme', resolvedTheme)
   }
 
+  const directReleaseLayer = _shadowRoot ? _shadowRoot.getElementById('gs-direct-release-layer') : null
+  if (directReleaseLayer) {
+    directReleaseLayer.setAttribute('data-dp-theme', resolvedTheme)
+  }
+
   const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
   if (zone) {
     zone.setAttribute('data-dp-theme', resolvedTheme)
@@ -1191,7 +1296,80 @@ function _setFullscreenOverlayActive(isActive) {
   document.body.classList.toggle('gs-dropzone-fullscreen-active', isActive)
 
   if (!isActive) {
-    state.draggedLink = null
+    _clearLinkDragState()
+  }
+}
+
+function _ensureDirectReleaseLayer() {
+  let layer = _shadowRoot.getElementById('gs-direct-release-layer')
+  if (layer) {
+    layer.setAttribute('data-dp-theme', _currentTheme)
+    return layer
+  }
+
+  layer = document.createElement('div')
+  layer.id = 'gs-direct-release-layer'
+  layer.setAttribute('data-dp-theme', _currentTheme)
+  _shadowRoot.appendChild(layer)
+  return layer
+}
+
+function _setDirectReleaseLayerActive(isActive) {
+  const layer = _shadowRoot ? _shadowRoot.getElementById('gs-direct-release-layer') : null
+  if (!layer) {
+    return
+  }
+
+  layer.classList.toggle('active', isActive)
+  layer.setAttribute('data-dp-theme', _currentTheme)
+}
+
+function _maybeActivateDirectReleaseLayer(event) {
+  if (_isPreviewBlockedOnThisPage() || _resolvePreviewTriggerMode() !== 'release' || !state.draggedLink) {
+    return false
+  }
+
+  _updateLinkDragPoint(event)
+  const isReady = _isLinkReleaseIntentReady()
+  if (isReady) {
+    _setDirectReleaseLayerActive(true)
+  }
+  return isReady
+}
+
+function _scheduleDirectReleaseLayerActivation() {
+  const session = state.dragSession
+  if (!session) {
+    return
+  }
+
+  _clearLinkDragTimer()
+  session.armTimer = setTimeout(() => {
+    _maybeActivateDirectReleaseLayer()
+  }, PREVIEW_RELEASE_ARM_DELAY_MS)
+}
+
+function _handleDirectReleaseDrop(event) {
+  if (!state.draggedLink) {
+    return
+  }
+
+  event.preventDefault()
+  event.stopPropagation()
+
+  const url = _getDroppedUrl(event)
+  const isReady = _isLinkReleaseIntentReady()
+  _clearLinkDragState()
+
+  if (!isReady) {
+    _dlog('preview release ignored before drag intent threshold')
+    return
+  }
+
+  if (validateURL(url)) {
+    openPreview(url)
+  } else {
+    console.warn(t('warnInvalidUrl'))
   }
 }
 
@@ -1204,7 +1382,7 @@ function _bindDropZoneEvents(dropZone) {
     if (!url) {
       return
     }
-    state.draggedLink = url
+    _startLinkDrag(url, event)
     setTimeout(() => {
       dropZone.classList.add('active')
     }, DROP_AREA_SHOW_DELAY_MS)
@@ -1213,7 +1391,7 @@ function _bindDropZoneEvents(dropZone) {
   const onDragEnd = () => {
     setTimeout(() => {
       dropZone.classList.remove('active', 'hovered')
-      state.draggedLink = null
+      _clearLinkDragState()
     }, DROP_AREA_SHOW_DELAY_MS)
   }
 
@@ -1243,25 +1421,77 @@ function _bindDropZoneEvents(dropZone) {
 
   dropZone.addEventListener('drop', (event) => {
     if (_isPreviewBlockedOnThisPage()) {
-      state.draggedLink = null
+      _clearLinkDragState()
       return
     }
     event.preventDefault()
     event.stopPropagation()
     dropZone.classList.remove('active', 'hovered')
 
-    const url = state.draggedLink ||
-      event.dataTransfer.getData('text/uri-list') ||
-      event.dataTransfer.getData('URL') ||
-      event.dataTransfer.getData('text/plain')
-
-    state.draggedLink = null
+    const url = _getDroppedUrl(event)
+    _clearLinkDragState()
     if (validateURL(url)) {
       openPreview(url)
     } else {
       console.warn(t('warnInvalidUrl'))
     }
   })
+}
+
+function _bindDirectReleaseDragEvents() {
+  const layer = _ensureDirectReleaseLayer()
+
+  const onDragStart = (event) => {
+    if (_isPreviewBlockedOnThisPage()) {
+      return
+    }
+    const url = detectDraggedLink(event)
+    if (!url) {
+      return
+    }
+    _startLinkDrag(url, event)
+    _scheduleDirectReleaseLayerActivation()
+  }
+
+  const onDragOver = (event) => {
+    if (!state.draggedLink) {
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+
+    const isReady = _maybeActivateDirectReleaseLayer(event)
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = isReady ? 'copy' : 'none'
+    }
+  }
+
+  const onDrop = (event) => {
+    _handleDirectReleaseDrop(event)
+  }
+
+  const onDragEnd = () => {
+    setTimeout(() => {
+      _clearLinkDragState()
+    }, DROP_AREA_SHOW_DELAY_MS)
+  }
+
+  document.addEventListener('dragstart', onDragStart, true)
+  document.addEventListener('dragover', onDragOver, true)
+  document.addEventListener('drop', onDrop, true)
+  document.addEventListener('dragend', onDragEnd, true)
+  layer.addEventListener('dragover', onDragOver)
+  layer.addEventListener('drop', onDrop)
+
+  _dragHandlers.push(
+    { target: document, type: 'dragstart', fn: onDragStart, options: true },
+    { target: document, type: 'dragover', fn: onDragOver, options: true },
+    { target: document, type: 'drop', fn: onDrop, options: true },
+    { target: document, type: 'dragend', fn: onDragEnd, options: true },
+    { target: layer, type: 'dragover', fn: onDragOver },
+    { target: layer, type: 'drop', fn: onDrop }
+  )
 }
 
 function _bindFrameDragBridge() {
@@ -1364,7 +1594,7 @@ function _bindFullscreenDragEvents() {
     if (!url) {
       return
     }
-    state.draggedLink = url
+    _startLinkDrag(url, event)
     setTimeout(() => {
       _ensureFullscreenOverlay()
       _setFullscreenOverlayActive(true)
@@ -1392,7 +1622,7 @@ function _bindFullscreenDragEvents() {
 
   const onOverlayDrop = (event) => {
     if (_isPreviewBlockedOnThisPage()) {
-      state.draggedLink = null
+      _clearLinkDragState()
       return
     }
     if (!state.draggedLink) {
@@ -1433,9 +1663,19 @@ function reinitDropZone() {
     oldFullscreen.remove()
   }
 
-  state.draggedLink = null
+  const oldDirectReleaseLayer = _shadowRoot.getElementById('gs-direct-release-layer')
+  if (oldDirectReleaseLayer) {
+    oldDirectReleaseLayer.remove()
+  }
+
+  _clearLinkDragState()
 
   if (_isPreviewBlockedOnThisPage()) {
+    return
+  }
+
+  if (_resolvePreviewTriggerMode() === 'release') {
+    _bindDirectReleaseDragEvents()
     return
   }
 
@@ -1520,7 +1760,13 @@ if (typeof exports === 'undefined') {
     }
 
     if (event.data?.type === FRAME_DRAG_MESSAGE && !_isPreviewBlockedOnThisPage() && validateURL(event.data.url)) {
-      state.draggedLink = event.data.url
+      if (_resolvePreviewTriggerMode() === 'release') {
+        _startLinkDrag(event.data.url, null, 'frame')
+        _scheduleDirectReleaseLayerActivation()
+        return
+      }
+
+      _startLinkDrag(event.data.url, null, 'frame')
       const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
       const fullscreen = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
       if (zone) {
@@ -1532,6 +1778,13 @@ if (typeof exports === 'undefined') {
     }
 
     if (event.data?.type === FRAME_DRAG_END_MESSAGE) {
+      if (_resolvePreviewTriggerMode() === 'release') {
+        setTimeout(() => {
+          _clearLinkDragState()
+        }, DROP_AREA_SHOW_DELAY_MS)
+        return
+      }
+
       const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
       const fullscreen = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
       if (zone) {
@@ -1540,7 +1793,7 @@ if (typeof exports === 'undefined') {
       if (fullscreen) {
         fullscreen.classList.remove('active')
       }
-      state.draggedLink = null
+      _clearLinkDragState()
     }
 
     if (event.data?.type === FRAME_FOCUS_MESSAGE) {

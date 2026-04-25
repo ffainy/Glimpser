@@ -43,6 +43,7 @@
   const DEFAULT_SETTINGS = {
     dropZonePosition:   'bottom',
     dropZoneCustomSize: { width: 300, height: 150 },
+    previewTriggerMode: 'release',
     defaultWindowScale: { width: 75, height: 82 },
     maxPreviewWindows:  1,
     newWindowOffset:    24,
@@ -105,12 +106,16 @@
     return _getSelectedLanguageValue() === 'zh' ? '中文' : 'English';
   }
 
+  function _getPreviewTriggerMode(settings = _settings) {
+    return settings?.previewTriggerMode === 'drop-area' ? 'drop-area' : DEFAULT_SETTINGS.previewTriggerMode;
+  }
+
   function _getTabDescription(key) {
     switch (key) {
       case 'appearance':
         return `${_t('labelTheme')} · ${_t('labelLang')} · ${_t('labelCorners')}`;
       case 'preview':
-        return `${_t('labelPos')} · ${_t('labelDefaultWindowSize')} · ${_t('labelAdvancedPreview')}`;
+        return `${_t('labelPreviewTrigger')} · ${_t('labelDefaultWindowSize')} · ${_t('labelAdvancedPreview')}`;
       case 'blacklist':
         return `${_t('labelBlacklistDomains')} · ${_t('hintBlacklistExactMatchShort')}`;
       case 'about':
@@ -284,7 +289,7 @@
         ];
       case 'preview':
         return [
-          { label: _t('labelPos'), value: _t(`pos${(_settings?.dropZonePosition || 'bottom').charAt(0).toUpperCase()}${(_settings?.dropZonePosition || 'bottom').slice(1)}`) },
+          { label: _t('labelPreviewTrigger'), value: _t(_getPreviewTriggerMode() === 'release' ? 'triggerRelease' : 'triggerDropArea') },
           { label: _t('labelDefaultWindowSize'), value: `${_settings?.defaultWindowScale?.width ?? DEFAULT_SETTINGS.defaultWindowScale.width}% × ${_settings?.defaultWindowScale?.height ?? DEFAULT_SETTINGS.defaultWindowScale.height}%` },
           { label: _t('labelMaxPreviewWindows'), value: String(_settings?.maxPreviewWindows ?? DEFAULT_SETTINGS.maxPreviewWindows) },
         ];
@@ -699,22 +704,48 @@
   function _renderPreviewTab() {
     const tab = _makeTab('preview');
 
-    // Position — each option has its own hint shown below the group
+    const triggerMode = _getPreviewTriggerMode();
+    const triggerHints = {
+      release:     _t('hintPreviewTriggerRelease'),
+      'drop-area': _t('hintPreviewTriggerDropArea'),
+    };
+    const triggerHintEl = _makeHint(triggerHints[triggerMode]);
+    if (triggerMode === 'drop-area' && !['bottom', 'top'].includes(_settings?.dropZonePosition)) {
+      _settings.dropZonePosition = DEFAULT_SETTINGS.dropZonePosition;
+    }
+    const currentDropZonePosition = ['bottom', 'top'].includes(_settings?.dropZonePosition)
+      ? _settings.dropZonePosition
+      : DEFAULT_SETTINGS.dropZonePosition;
+
     const posHints = {
       bottom:     _t('hintPosBottom'),
       top:        _t('hintPosTop'),
-      fullscreen: _t('hintPosFullscreen'),
     };
-    const posHintEl = _makeHint(posHints[_settings?.dropZonePosition || 'bottom']);
+    const posHintEl = _makeHint(posHints[currentDropZonePosition]);
+
+    const triggerGroup = _makeOptionGroup([
+      { label: _t('triggerRelease'),  value: 'release' },
+      { label: _t('triggerDropArea'), value: 'drop-area' },
+    ], triggerMode, v => {
+      _settings.previewTriggerMode = v;
+      triggerHintEl.textContent = triggerHints[v];
+      if (v === 'drop-area' && !['bottom', 'top'].includes(_settings.dropZonePosition)) {
+        _settings.dropZonePosition = DEFAULT_SETTINGS.dropZonePosition;
+      }
+      posBlock.style.display = v === 'drop-area' ? '' : 'none';
+      dropSizeBlock.style.display = v === 'drop-area' ? '' : 'none';
+    });
+
+    const triggerContent = document.createDocumentFragment();
+    triggerContent.appendChild(triggerGroup);
+    triggerContent.appendChild(triggerHintEl);
 
     const posGroup = _makeOptionGroup([
       { label: _t('posBottom'),     value: 'bottom'     },
       { label: _t('posTop'),        value: 'top'        },
-      { label: _t('posFullscreen'), value: 'fullscreen' },
-    ], _settings?.dropZonePosition || 'bottom', v => {
+    ], currentDropZonePosition, v => {
       _settings.dropZonePosition = v;
       posHintEl.textContent = posHints[v];
-      dropSizeBlock.style.display = v === 'fullscreen' ? 'none' : '';
     });
 
     const posContent = document.createDocumentFragment();
@@ -744,8 +775,13 @@
 
     const dropTargetContent = document.createDocumentFragment();
     const dropSizeBlock = _makeLabeledBlock(_t('labelSize'), dropSizeContent);
-    if (_settings?.dropZonePosition === 'fullscreen') dropSizeBlock.style.display = 'none';
-    dropTargetContent.appendChild(_makeLabeledBlock(_t('labelPos'), posContent));
+    const posBlock = _makeLabeledBlock(_t('labelPos'), posContent);
+    if (triggerMode !== 'drop-area') {
+      posBlock.style.display = 'none';
+      dropSizeBlock.style.display = 'none';
+    }
+    dropTargetContent.appendChild(_makeLabeledBlock(_t('labelPreviewTrigger'), triggerContent));
+    dropTargetContent.appendChild(posBlock);
     dropTargetContent.appendChild(dropSizeBlock);
     tab.appendChild(_makeCard(_t('labelDropTarget'), dropTargetContent, 'gs-card--feature'));
 
