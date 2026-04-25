@@ -527,8 +527,8 @@
 }
 
 .gs-preview-brand {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -544,10 +544,13 @@
   filter: var(--gs-preview-brand-glow-active);
 }
 
-.gs-preview-brand svg {
-  width: 16px;
-  height: 16px;
+.gs-preview-brand-logo {
+  width: 20px;
+  height: 20px;
   display: block;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 .gs-preview-action,

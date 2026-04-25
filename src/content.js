@@ -56,7 +56,7 @@ const ICON_COPY_SUCCESS = `<svg xmlns="http://www.w3.org/2000/svg" width="24" he
 const ICON_CLOSE = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L17.94 6M18 18L6.06 6"/></svg>`
 const ICON_CLOSE_OTHERS = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.5 8.046H11V6.119c0-.921-.9-1.446-1.524-.894l-5.108 4.49a1.2 1.2 0 0 0 0 1.739l5.108 4.49c.624.556 1.524.027 1.524-.893v-1.928h2a3.023 3.023 0 0 1 3 3.046V19a5.593 5.593 0 0 0-1.5-10.954"/></svg>`
 const ICON_CLOSE_ALL = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.757 6L3.24 10.95a1.05 1.05 0 0 0 0 1.549l5.611 5.088m5.73-3.214v1.615a.948.948 0 0 1-1.524.845l-5.108-4.251a1.1 1.1 0 0 1 0-1.646l5.108-4.251a.95.95 0 0 1 1.524.846v1.7c3.312 0 6 2.979 6 6.654v1.329a.7.7 0 0 1-1.345.353a5.17 5.17 0 0 0-4.652-3.191z"/></svg>`
-const ICON_BRAND = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0C4.492 2.746-.885 11.312.502 19.963C.502 19.963 4.989 24 12 24s11.496-4.037 11.496-4.037C24.882 11.312 19.508 2.746 12 0m0 1.846s2.032.726 3.945 2.488c.073.067.13.163.129.277c-.001.168-.128.287-.301.287a.5.5 0 0 1-.137-.027a6.5 6.5 0 0 0-2.316-.4a6.63 6.63 0 0 0-3.914 1.273l-.002.002a7.98 7.98 0 0 1 6.808.768C20.48 9.11 22.597 14.179 21.902 19c0 0-1.646 1.396-4.129 2.172a.37.37 0 0 1-.303-.026c-.144-.084-.185-.255-.1-.404a.5.5 0 0 1 .094-.103a6.6 6.6 0 0 0 1.504-1.809a6.63 6.63 0 0 0 .856-4.027l-.002-.002a7.95 7.95 0 0 1-3.838 5.383c-4.42 2.552-9.99 1.882-13.885-1.184c0 0-.388-2.124.182-4.662a.37.37 0 0 1 .176-.25c.145-.084.31-.033.396.117a.5.5 0 0 1 .045.13c.126.762.405 1.5.814 2.208a6.64 6.64 0 0 0 3.059 2.756a8 8 0 0 1-1.672-2.033a7.93 7.93 0 0 1-1.066-4.205C4.128 8.047 7.464 3.659 12 1.846m0 7.623c-2.726 0-5.117.93-6.483 2.332c-.064.32-.1.65-.1.984c0 3.146 2.947 5.695 6.583 5.695c3.635 0 6.584-2.549 6.584-5.695c0-.334-.038-.664-.102-.984C17.116 10.4 14.724 9.469 12 9.469m0 .693a3.12 3.12 0 0 1 0 6.238a3.118 3.118 0 0 1-2.872-4.336a1.3 1.3 0 1 0 1.657-1.656A3.1 3.1 0 0 1 12 10.162"/></svg>`
+const BRAND_LOGO_PATH = 'icons/logo.svg'
 
 let _shadowHost = null
 let _shadowRoot = null
@@ -318,6 +318,11 @@ function _makeIconButton(className, title, icon) {
   button.setAttribute('aria-label', title)
   button.innerHTML = icon
   return button
+}
+
+function _runtimeUrl(path) {
+  const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
+  return nativeAPI.runtime.getURL(path)
 }
 
 function _isCloseOthersButtonEnabled() {
@@ -627,7 +632,14 @@ function _createPreviewWindow(url, settings) {
   brandIcon.className = 'gs-preview-brand'
   brandIcon.dataset.tooltip = 'Glimpser'
   brandIcon.setAttribute('aria-label', 'Glimpser')
-  brandIcon.innerHTML = ICON_BRAND
+
+  const brandLogo = document.createElement('img')
+  brandLogo.className = 'gs-preview-brand-logo'
+  brandLogo.src = _runtimeUrl(BRAND_LOGO_PATH)
+  brandLogo.alt = ''
+  brandLogo.draggable = false
+  brandLogo.setAttribute('aria-hidden', 'true')
+  brandIcon.appendChild(brandLogo)
 
   const refreshButton = _makeIconButton('gs-pill-action', t('btnRefresh'), ICON_REFRESH)
   refreshButton.dataset.action = 'refresh'

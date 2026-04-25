@@ -155,9 +155,13 @@
   flex-shrink: 0;
 }
 
-.gs-settings-brand-badge svg {
-  width: 24px;
-  height: 24px;
+.gs-settings-brand-logo {
+  width: 34px;
+  height: 34px;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 .gs-settings-brand-top {
@@ -1237,9 +1241,9 @@
     border-radius: var(--gs-radius-badge);
   }
 
-  .gs-settings-brand-badge svg {
-    width: 20px;
-    height: 20px;
+  .gs-settings-brand-logo {
+    width: 28px;
+    height: 28px;
   }
 
   .gs-settings-title {
