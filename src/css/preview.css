@@ -44,6 +44,9 @@
   --gs-preview-action-danger-surface: var(--gs-preview-danger-surface);
   --gs-preview-action-bulk-surface: var(--gs-preview-warning-surface);
   --gs-preview-action-bulk-foreground: var(--gs-preview-warning-foreground);
+  --gs-preview-backdrop-fill: var(--gs-settings-overlay-fill);
+  --gs-preview-backdrop-halo-a: var(--gs-settings-halo-a);
+  --gs-preview-backdrop-halo-b: var(--gs-settings-halo-b);
   --gs-tooltip-surface-bg: var(--gs-preview-tooltip-surface-bg);
   --gs-tooltip-surface-shadow: var(--gs-preview-tooltip-surface-shadow);
   --gs-toast-surface-bg: var(--gs-preview-toast-surface-bg);
@@ -412,6 +415,31 @@
   inset: 0;
   z-index: var(--gs-z-preview-base);
   pointer-events: none;
+}
+
+.gs-preview-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at top left, var(--gs-preview-backdrop-halo-a), transparent 30%),
+    radial-gradient(circle at bottom right, var(--gs-preview-backdrop-halo-b), transparent 24%),
+    var(--gs-preview-backdrop-fill);
+  backdrop-filter: blur(var(--gs-blur-md)) saturate(1.08);
+  -webkit-backdrop-filter: blur(var(--gs-blur-md)) saturate(1.08);
+  transition:
+    opacity var(--gs-motion-slow),
+    visibility 0s linear var(--gs-motion-slow);
+}
+
+.gs-preview-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
+  transition: opacity var(--gs-motion-slow);
 }
 
 .gs-preview-window {

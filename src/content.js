@@ -5,7 +5,7 @@ const DEFAULT_SETTINGS = {
   dropZonePosition: 'bottom',
   dropZoneCustomSize: { width: 300, height: 150 },
   defaultWindowScale: { width: 75, height: 82 },
-  maxPreviewWindows: 6,
+  maxPreviewWindows: 1,
   newWindowOffset: 24,
   closePreviewOnOpenNewTab: true,
   showCloseOthersButton: true,
@@ -57,6 +57,7 @@ const ICON_BRAND = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="1
 let _shadowHost = null
 let _shadowRoot = null
 let _previewLayer = null
+let _previewBackdrop = null
 let _tooltipLayer = null
 let _settings = null
 let _currentTheme = 'dark'
@@ -234,9 +235,63 @@ function ensurePreviewLayer() {
 
   _previewLayer = document.createElement('div')
   _previewLayer.id = 'gs-preview-layer'
+  _previewLayer.setAttribute('data-dp-theme', _currentTheme)
   _shadowRoot.appendChild(_previewLayer)
   previewManager.layer = _previewLayer
   return _previewLayer
+}
+
+function ensurePreviewBackdrop() {
+  if (_previewBackdrop) {
+    _previewBackdrop.setAttribute('data-dp-theme', _currentTheme)
+    return _previewBackdrop
+  }
+
+  _previewBackdrop = document.createElement('div')
+  _previewBackdrop.className = 'gs-preview-backdrop'
+  _previewBackdrop.setAttribute('aria-hidden', 'true')
+  _previewBackdrop.setAttribute('data-dp-theme', _currentTheme)
+  _previewBackdrop.addEventListener('pointerdown', (event) => {
+    event.stopPropagation()
+  })
+  _previewBackdrop.addEventListener('click', (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const preview = getActivePreview() || _getTopmostPreview()
+    if (preview) {
+      closePreview(preview.id)
+    }
+  })
+
+  ensurePreviewLayer().prepend(_previewBackdrop)
+  return _previewBackdrop
+}
+
+function _resolvePreviewWindowLimit(settings = _settings) {
+  const configured = settings && Number.isFinite(settings.maxPreviewWindows)
+    ? settings.maxPreviewWindows
+    : DEFAULT_SETTINGS.maxPreviewWindows
+  return clamp(configured, 1, 12)
+}
+
+function _isSinglePreviewWindowMode() {
+  return _resolvePreviewWindowLimit() === 1
+}
+
+function _syncPreviewBackdrop() {
+  if (!_shadowRoot) {
+    return
+  }
+
+  const shouldShow = _isSinglePreviewWindowMode() && previewManager.previews.size > 0
+  const backdrop = shouldShow ? ensurePreviewBackdrop() : _previewBackdrop
+  if (!backdrop) {
+    return
+  }
+
+  backdrop.classList.toggle('active', shouldShow)
+  backdrop.setAttribute('aria-hidden', shouldShow ? 'false' : 'true')
+  backdrop.setAttribute('data-dp-theme', _currentTheme)
 }
 
 function ensureTooltipLayer() {
@@ -899,17 +954,19 @@ function _getOldestPreview(preferNonActive = true) {
   return _getOldestPreview(false)
 }
 
-function _enforcePreviewWindowLimit() {
-  const configured = (_settings && _settings.maxPreviewWindows) || DEFAULT_SETTINGS.maxPreviewWindows
-  const limit = clamp(configured, 1, 12)
+function _enforcePreviewWindowLimit({ reserveSlot = false } = {}) {
+  const limit = _resolvePreviewWindowLimit()
+  const targetCount = reserveSlot ? Math.max(0, limit - 1) : limit
 
-  while (previewManager.previews.size >= limit) {
+  while (previewManager.previews.size > targetCount) {
     const oldest = _getOldestPreview(true)
     if (!oldest) {
       break
     }
     closePreview(oldest.id)
   }
+
+  _syncPreviewBackdrop()
 }
 
 function closePreview(id) {
@@ -931,6 +988,7 @@ function closePreview(id) {
   }
 
   _syncAllPreviewActionVisibility()
+  _syncPreviewBackdrop()
 }
 
 function closeAllPreviews(exceptId = null) {
@@ -954,13 +1012,14 @@ function openPreview(url) {
     return null
   }
 
-  _enforcePreviewWindowLimit()
+  _enforcePreviewWindowLimit({ reserveSlot: true })
   const preview = _createPreviewWindow(url, _settings || DEFAULT_SETTINGS)
   _normalizePreviewBounds(preview)
   ensurePreviewLayer().appendChild(preview.elements.root)
   previewManager.previews.set(preview.id, preview)
   focusPreview(preview.id)
   _syncAllPreviewActionVisibility()
+  _syncPreviewBackdrop()
   _loadPreviewUrl(preview, url)
   return preview
 }
@@ -1051,6 +1110,14 @@ function applyContentTheme(theme) {
 
   if (_shadowHost) {
     _shadowHost.setAttribute('data-dp-theme', resolvedTheme)
+  }
+
+  if (_previewLayer) {
+    _previewLayer.setAttribute('data-dp-theme', resolvedTheme)
+  }
+
+  if (_previewBackdrop) {
+    _previewBackdrop.setAttribute('data-dp-theme', resolvedTheme)
   }
 
   const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
@@ -1513,7 +1580,7 @@ if (typeof exports === 'undefined') {
       return
     }
 
-    if (newSettings.maxPreviewWindows) {
+    if (Object.prototype.hasOwnProperty.call(newSettings, 'maxPreviewWindows')) {
       _enforcePreviewWindowLimit()
     }
 

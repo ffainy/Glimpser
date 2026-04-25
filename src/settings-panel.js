@@ -44,7 +44,7 @@
     dropZonePosition:   'bottom',
     dropZoneCustomSize: { width: 300, height: 150 },
     defaultWindowScale: { width: 75, height: 82 },
-    maxPreviewWindows:  6,
+    maxPreviewWindows:  1,
     newWindowOffset:    24,
     closePreviewOnOpenNewTab: true,
     showCloseOthersButton: true,
@@ -780,7 +780,7 @@
       _t('labelMaxPreviewWindows'),
       1,
       12,
-      _settings?.maxPreviewWindows ?? 6,
+      _settings?.maxPreviewWindows ?? DEFAULT_SETTINGS.maxPreviewWindows,
       (value) => { _settings.maxPreviewWindows = value; },
       ''
     ));

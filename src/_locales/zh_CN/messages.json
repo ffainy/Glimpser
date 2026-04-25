@@ -60,7 +60,7 @@
   "labelWindowHeight":    { "message": "高度" },
   "hintDefaultWindowSize": { "message": "设置预览窗口打开时的默认大小。" },
   "labelMaxPreviewWindows": { "message": "预览窗口数量上限" },
-  "hintMaxPreviewWindows": { "message": "达到上限后，会自动关闭最早打开的预览窗口。" },
+  "hintMaxPreviewWindows": { "message": "设为 1 时会启用遮罩，点击遮罩即可关闭预览；大于 1 时保持多窗口悬浮。" },
   "labelWindowOffset":    { "message": "预览窗口偏移" },
   "hintWindowOffset":     { "message": "设置每个预览窗口与当前窗口之间的偏移距离。" },
   "labelClosePreviewOnOpenNewTab": { "message": "在新标签页打开后关闭预览" },

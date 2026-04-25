@@ -60,7 +60,7 @@
   "labelWindowHeight":    { "message": "Height" },
   "hintDefaultWindowSize": { "message": "Sets how large preview windows are when they open." },
   "labelMaxPreviewWindows": { "message": "Preview window limit" },
-  "hintMaxPreviewWindows": { "message": "When you reach this limit, the oldest preview window closes automatically." },
+  "hintMaxPreviewWindows": { "message": "At 1, previews use a backdrop you can click to close. Higher limits keep previews free-floating." },
   "labelWindowOffset":    { "message": "Preview window offset" },
   "hintWindowOffset":     { "message": "Sets how far each preview window is placed from the current one." },
   "labelClosePreviewOnOpenNewTab": { "message": "Close preview after opening in a new tab" },
