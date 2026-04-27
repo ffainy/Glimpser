@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- preview: add release-anywhere trigger
+- preview: add single-window backdrop mode
+
 ### Changed
+- ui: unify settings and preview icons
+- settings: clarify general and preview sections
+- ui: use shared logo asset
 - settings: clarify preview settings layout
 
 ### Fixed
