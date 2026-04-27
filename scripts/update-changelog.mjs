@@ -10,11 +10,38 @@ import {
   insertVersionSection,
   listReleaseTags,
   findPreviousTag,
+  parseVersionSections,
   renderSectionContent,
   renderVersionSection,
   replaceUnreleasedContent,
   writeFileIfChanged,
 } from './changelog-lib.mjs'
+
+function compareVersions(left, right) {
+  const leftParts = left.split('.').map((part) => Number.parseInt(part, 10))
+  const rightParts = right.split('.').map((part) => Number.parseInt(part, 10))
+
+  for (let index = 0; index < 3; index += 1) {
+    const diff = (leftParts[index] || 0) - (rightParts[index] || 0)
+    if (diff !== 0) {
+      return diff
+    }
+  }
+
+  return 0
+}
+
+function shouldKeepExistingUnreleased(currentTag, latestReleasedVersion, previousVersion) {
+  if (!latestReleasedVersion) {
+    return false
+  }
+
+  if (currentTag) {
+    return !previousVersion || compareVersions(latestReleasedVersion, previousVersion) > 0
+  }
+
+  return previousVersion && compareVersions(previousVersion, latestReleasedVersion) > 0
+}
 
 function parseArgs(argv) {
   let mode = ''
@@ -69,10 +96,20 @@ function parseArgs(argv) {
 function updateUnreleased(ref, currentTag) {
   const tags = listReleaseTags()
   const previousTag = findPreviousTag(tags, currentTag || null)
+  const existingContent = ensureBaseChangelog()
+  const latestReleasedVersion = parseVersionSections(existingContent)[0]?.version || ''
+  const previousVersion = previousTag ? previousTag.slice(1) : ''
+
+  if (shouldKeepExistingUnreleased(currentTag, latestReleasedVersion, previousVersion)) {
+    console.log(
+      `Keeping existing Unreleased changelog because latest CHANGELOG.md version ${latestReleasedVersion} does not align with previous tag ${previousTag || '(none)'}`
+    )
+    return
+  }
+
   const commits = getCommits(previousTag, ref)
   const sections = buildSections(commits)
   const unreleasedContent = renderSectionContent(sections)
-  const existingContent = ensureBaseChangelog()
   const nextContent = replaceUnreleasedContent(existingContent, unreleasedContent)
 
   writeFileIfChanged(CHANGELOG_PATH, nextContent)
