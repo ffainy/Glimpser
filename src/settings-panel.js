@@ -106,6 +106,15 @@
     return _getSelectedLanguageValue() === 'zh' ? '中文' : 'English';
   }
 
+  function _syncStandaloneDocumentText() {
+    if (!document.documentElement.dataset.dpStandalone) {
+      return;
+    }
+
+    document.title = _t('settingsTitle');
+    document.documentElement.lang = _getSelectedLanguageValue() === 'zh' ? 'zh-CN' : 'en';
+  }
+
   function _getPreviewTriggerMode(settings = _settings) {
     return settings?.previewTriggerMode === 'drop-area' ? 'drop-area' : DEFAULT_SETTINGS.previewTriggerMode;
   }
@@ -298,7 +307,7 @@
           { label: _t('labelBlacklistCount'), value: String(_getBlacklistDomains().length) },
           { label: _t('labelCurrentDomain'), value: currentDomain || _t('blacklistCurrentDomainUnavailable') },
           {
-            label: _t('labelCurrentSiteStatus'),
+            label: _t('labelPreviewStatus'),
             value: currentDomain ? _t(_isCurrentPageBlacklisted() ? 'blacklistCurrentSiteBlocked' : 'blacklistCurrentSiteAllowed') : '—',
             tone: currentDomain && _isCurrentPageBlacklisted() ? 'danger' : '',
           },
@@ -462,6 +471,7 @@
 
     const theme = _settings?.theme || 'dark';
     _syncThemeState(theme);
+    _syncStandaloneDocumentText();
 
     const overlay = document.createElement('div');
     overlay.className = 'gs-settings-overlay';
@@ -941,7 +951,7 @@
 
     const manualLabel = document.createElement('div');
     manualLabel.className = 'gs-field-label';
-    manualLabel.textContent = _t('labelBlacklistDomains');
+    manualLabel.textContent = _t('labelDomainToBlock');
 
     const manualRow = document.createElement('div');
     manualRow.className = 'gs-blacklist-input-row';
