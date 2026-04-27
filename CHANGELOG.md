@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - preview: add single-window backdrop mode
 
 ### Changed
+- ui: clarify settings and preview copy
 - ui: unify settings and preview icons
 - settings: clarify general and preview sections
 - ui: use shared logo asset
