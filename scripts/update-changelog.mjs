@@ -97,8 +97,14 @@ function updateUnreleased(ref, currentTag) {
   const tags = listReleaseTags()
   const previousTag = findPreviousTag(tags, currentTag || null)
   const existingContent = ensureBaseChangelog()
+  const existingUnreleasedContent = getUnreleasedContent(existingContent)
   const latestReleasedVersion = parseVersionSections(existingContent)[0]?.version || ''
   const previousVersion = previousTag ? previousTag.slice(1) : ''
+
+  if (!previousTag && existingUnreleasedContent) {
+    console.log('Keeping existing Unreleased changelog because no previous release tag exists')
+    return
+  }
 
   if (shouldKeepExistingUnreleased(currentTag, latestReleasedVersion, previousVersion)) {
     console.log(
