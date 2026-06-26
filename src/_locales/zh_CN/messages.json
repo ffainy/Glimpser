@@ -101,6 +101,7 @@
   "aboutAuthor":          { "message": "作者" },
   "aboutHomepage":        { "message": "主页" },
   "aboutDescText":        { "message": "拖动链接即可在当前页面中打开悬浮预览窗口，不必离开当前页面。" },
+  "labelPreviewEnabled":  { "message": "启用预览" },
   "btnSave":              { "message": "保存" },
   "labelTheme":           { "message": "主题" },
   "themeDark":            { "message": "深色" },

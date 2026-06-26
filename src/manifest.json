@@ -7,7 +7,8 @@
   "homepage_url": "https://github.com/ffainy/glimpser",
   "default_locale": "en",
   "action": {
-    "default_title": "Glimpser"
+    "default_title": "Glimpser",
+    "default_popup": "popup.html"
   },
   "options_ui": {
     "page": "settings.html",
@@ -24,7 +25,7 @@
     {
       "matches": ["<all_urls>"],
       "all_frames": true,
-      "js": ["i18n.js", "settings-panel.js", "content.js"],
+      "js": ["i18n.js", "content.js"],
       "run_at": "document_idle"
     }
   ],

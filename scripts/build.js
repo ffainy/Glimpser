@@ -20,7 +20,9 @@ const SOURCE_FILES = [
   'background.js',
   'content.js',
   'settings.html',
-  'settings-panel.js',
+  'settings.js',
+  'popup.html',
+  'popup.js',
 ]
 const SOURCE_DIRS = ['icons', '_locales', 'css']
 

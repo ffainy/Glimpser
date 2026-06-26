@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glimpser</title>
+  <link rel="stylesheet" href="css/popup.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <span class="brand">Glimpser</span>
+    </header>
+
+    <div class="control-group">
+      <label class="toggle-row">
+        <span class="toggle-label" data-i18n="labelPreviewEnabled">Enable preview</span>
+        <label class="switch">
+          <input type="checkbox" id="previewEnabled" />
+          <span class="slider"></span>
+        </label>
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label class="select-row">
+        <span class="select-label" data-i18n="labelPreviewTrigger">Trigger mode</span>
+        <select id="previewTriggerMode">
+          <option value="release" data-i18n="triggerRelease">Release anywhere</option>
+          <option value="drop-area" data-i18n="triggerDropArea">Drop area</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label class="select-row">
+        <span class="select-label" data-i18n="labelTheme">Theme</span>
+        <select id="theme">
+          <option value="dark" data-i18n="themeDark">Dark</option>
+          <option value="light" data-i18n="themeLight">Light</option>
+          <option value="system">System</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button id="openSettings" class="btn-settings">
+        <span class="icon-gear">&#9881;</span>
+        <span data-i18n="settingsTitle">Glimpser Settings</span>
+      </button>
+    </div>
+  </div>
+  <script src="i18n.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

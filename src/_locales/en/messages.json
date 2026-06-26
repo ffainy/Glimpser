@@ -101,6 +101,7 @@
   "aboutAuthor":          { "message": "Author" },
   "aboutHomepage":        { "message": "Homepage" },
   "aboutDescText":        { "message": "Drag a link to open it in a floating preview window without leaving the page." },
+  "labelPreviewEnabled":  { "message": "Enable preview" },
   "btnSave":              { "message": "Save" },
   "labelTheme":           { "message": "Theme" },
   "themeDark":            { "message": "Dark" },

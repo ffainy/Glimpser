@@ -82,20 +82,7 @@ nativeAPI.storage.onChanged.addListener((changes) => {
   }
 });
 
-/**
- * 点击扩展图标时，尝试向当前 tab 的 content script 发送 toggleSettings 消息。
- * 若失败（特殊页面无法注入 content script），则打开 popup.html 作为兜底。
- */
-nativeAPI.action.onClicked.addListener(async (tab) => {
-  _dlog('action clicked', { tabId: tab?.id, url: tab?.url });
-  try {
-    await nativeAPI.tabs.sendMessage(tab.id, { action: 'toggleSettings' });
-  } catch (e) {
-    // Content script unavailable (chrome://, about:, new tab, etc.)
-    // Open the options page in a new tab
-    nativeAPI.runtime.openOptionsPage();
-  }
-});
+// Popup is declared in manifest.json — no action.onClicked needed.
 
 // Export for testing (Node.js / vitest environment only)
 if (typeof exports !== 'undefined') {

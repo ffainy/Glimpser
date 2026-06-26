@@ -2,6 +2,7 @@
 // Injects a drop zone and creates floating preview windows for dragged links.
 
 const DEFAULT_SETTINGS = {
+  previewEnabled: true,
   dropZonePosition: 'bottom',
   dropZoneCustomSize: { width: 300, height: 150 },
   previewTriggerMode: 'release',
@@ -156,6 +157,7 @@ function _getBlacklistDomains(settings = _settings || DEFAULT_SETTINGS) {
 }
 
 function _isPreviewBlockedOnThisPage(settings = _settings || DEFAULT_SETTINGS) {
+  if (settings.previewEnabled === false) return true
   const currentDomain = _getCurrentPageDomain()
   return !!currentDomain && _getBlacklistDomains(settings).includes(currentDomain)
 }
@@ -1826,9 +1828,6 @@ if (typeof exports === 'undefined') {
   nativeAPI.runtime.onMessage.addListener((msg) => {
     if (window !== top) {
       return
-    }
-    if (msg.action === 'toggleSettings') {
-      window.__gsSettingsPanel?.toggle()
     }
   })
 
