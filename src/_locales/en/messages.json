@@ -106,6 +106,8 @@
   "labelTheme":           { "message": "Theme" },
   "themeDark":            { "message": "Dark" },
   "themeLight":           { "message": "Light" },
+  "langEn":               { "message": "English" },
+  "langZh":               { "message": "中文" },
   "labelCorners":         { "message": "Preview window corners" },
   "cornersRounded":       { "message": "Rounded" },
   "cornersSquare":        { "message": "Square" }

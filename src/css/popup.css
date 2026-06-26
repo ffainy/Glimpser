@@ -1,158 +1,240 @@
 :root {
-  --popup-bg: #1a1a2e;
-  --popup-surface: #16213e;
-  --popup-border: #2a2a4a;
-  --popup-text: #e0e0e0;
-  --popup-text-secondary: #a0a0b0;
-  --popup-accent: #7c5cfc;
-  --popup-accent-hover: #6a4ae8;
-  --popup-toggle-bg: #2a2a4a;
-  --popup-toggle-active: #7c5cfc;
+  --bg-primary: #111114;
+  --bg-secondary: rgba(255, 255, 255, 0.055);
+  --bg-tertiary: rgba(255, 255, 255, 0.035);
+  --text-primary: #ececf1;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --accent-color: #7c5cfc;
+  --accent-hover: #6a4ae8;
+  --input-bg: #161618;
+  --input-focus-border-color: #7c5cfc80;
+  --rail-color: rgba(255, 255, 255, 0.20);
+  --badge-bg: rgba(255, 255, 255, 0.1);
+  --badge-text: rgba(255, 255, 255, 0.7);
+  --bezier: cubic-bezier(.4, 0, .2, 1);
+  --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%23ececf1' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+[data-theme="light"] {
+  --bg-primary: #f0f2f5;
+  --bg-secondary: rgb(255, 255, 255, 1);
+  --bg-tertiary: rgb(3, 35, 86, 0.04);
+  --text-primary: #222;
+  --text-secondary: #666;
+  --text-muted: #999;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --accent-color: #7c5cfc;
+  --accent-hover: #6a4ae8;
+  --input-bg: #fff;
+  --input-focus-border-color: #7c5cfc80;
+  --rail-color: rgba(0, 0, 0, 0.20);
+  --badge-bg: rgba(0, 0, 0, 0.08);
+  --badge-text: rgba(0, 0, 0, 0.5);
+  --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%23222' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
 }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   width: 280px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 13px;
-  color: var(--popup-text);
-  background: var(--popup-bg);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   overflow: hidden;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
 }
 
-#app {
-  padding: 12px;
-}
+#app { padding: 12px 14px 10px; }
 
-header {
-  text-align: center;
-  padding-bottom: 10px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--popup-border);
-}
-
-.brand {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--popup-accent);
-}
-
-.control-group {
-  margin-bottom: 8px;
-}
-
-.toggle-row,
-.select-row {
+/* ── Header ──────────────────────────────────────────────────────────── */
+.header {
   display: flex;
   align-items: center;
+  gap: 7px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo { flex-shrink: 0; }
+
+.brand {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.version {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--badge-text);
+  background: var(--badge-bg);
+  padding: 1px 5px 2px;
+  border-radius: 4px;
+  margin-top: 1px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  transition: opacity 0.15s, color 0.15s;
+  border-radius: 4px;
+}
+
+.header-btn:hover { opacity: 1; color: var(--accent-color); }
+
+/* ── Status rows ─────────────────────────────────────────────────────── */
+.status-row {
+  display: flex;
   justify-content: space-between;
-  padding: 6px 0;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.toggle-label,
-.select-label {
-  font-size: 13px;
-  color: var(--popup-text);
+.status-label { font-size: 13px; color: var(--text-primary); }
+
+/* ── Native checkbox ─────────────────────────────────────────────────── */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--border-color);
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  cursor: pointer;
+  vertical-align: middle;
+  flex-shrink: 0;
+  outline: none;
+  transition: background-color 0.1s, box-shadow 0.1s;
 }
 
-/* Toggle switch */
-.switch {
+input[type="checkbox"]:checked {
+  background-color: var(--accent-color);
+  box-shadow: 0 0 0 1px var(--accent-color);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+}
+
+/* ── Toggle switch ─────────────────────────────────────────────────── */
+.toggle {
+  display: inline-flex;
+  align-items: center;
   position: relative;
-  display: inline-block;
   width: 36px;
   height: 20px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+.toggle input[type="checkbox"] {
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  pointer-events: none;
 }
 
-.slider {
+.toggle .slider {
   position: absolute;
   cursor: pointer;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--popup-toggle-bg);
+  background-color: var(--rail-color);
+  transition: 0.25s;
   border-radius: 20px;
-  transition: background 0.2s;
 }
 
-.slider::before {
-  content: '';
+.toggle .slider::before {
   position: absolute;
-  width: 16px;
+  content: "";
   height: 16px;
+  width: 16px;
   left: 2px;
   bottom: 2px;
-  background: #888;
+  background-color: #fff;
+  transition: transform 0.2s var(--bezier), width 0.2s var(--bezier), left 0.2s var(--bezier);
   border-radius: 50%;
-  transition: transform 0.2s, background 0.2s;
 }
 
-.switch input:checked + .slider {
-  background: var(--popup-toggle-active);
+.toggle input:checked + .slider {
+  background-color: var(--accent-color);
 }
 
-.switch input:checked + .slider::before {
+.toggle input:checked + .slider::before {
   transform: translateX(16px);
-  background: #fff;
 }
 
-/* Select */
+.toggle .slider:active::before {
+  width: 22px;
+}
+
+.toggle input:checked + .slider:active::before {
+  left: -4px;
+}
+
+.toggle input:focus-visible + .slider {
+  box-shadow: 0 0 0 2px var(--input-focus-border-color);
+}
+
+/* ── Select (xs size) ────────────────────────────────────────────────── */
 select {
-  width: 140px;
-  padding: 4px 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 4px 22px 4px 8px;
   font-size: 12px;
-  color: var(--popup-text);
-  background: var(--popup-surface);
-  border: 1px solid var(--popup-border);
-  border-radius: 4px;
-  outline: none;
+  font-family: inherit;
+  line-height: 1.2;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: 0 0 0 0.75px var(--border-color);
+  background-color: var(--input-bg);
+  background-image: var(--select-arrow);
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  background-size: 14px;
+  color: var(--text-primary);
   cursor: pointer;
+  transition: box-shadow 0.15s;
+  width: auto;
+  min-width: 120px;
 }
 
 select:focus {
-  border-color: var(--popup-accent);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--input-focus-border-color);
 }
 
-/* Action button */
-.actions {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--popup-border);
+select option {
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
-.btn-settings {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  padding: 8px;
-  font-size: 13px;
-  color: #fff;
-  background: var(--popup-accent);
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
 
-.btn-settings:hover {
-  background: var(--popup-accent-hover);
-}
-
-.icon-gear {
-  font-size: 14px;
-}
