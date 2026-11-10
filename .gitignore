@@ -3,5 +3,6 @@
 .secret
 _temp
 .github/release-notes.md
+DEFERRED.md
 node_modules
 dist

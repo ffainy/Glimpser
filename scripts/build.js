@@ -4,11 +4,8 @@
 
 import fs from 'fs'
 import path from 'path'
-import { createRequire } from 'module'
 import { fileURLToPath } from 'url'
-
-const require = createRequire(import.meta.url)
-const archiver = require('archiver')
+import { ZipArchive } from 'archiver'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -121,7 +118,7 @@ function createZip(sourceDir, outputPath) {
   return new Promise((resolve, reject) => {
     ensureDir(path.dirname(outputPath))
     const output = fs.createWriteStream(outputPath)
-    const archive = archiver('zip', { zlib: { level: 9 } })
+    const archive = new ZipArchive({ zlib: { level: 9 } })
 
     output.on('close', () => resolve())
     archive.on('error', reject)
