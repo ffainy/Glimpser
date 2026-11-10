@@ -33,24 +33,27 @@ async function saveSettings(updates) {
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n
-    const translated = typeof t === 'function' ? t(key) : key
-    if (el.tagName === 'OPTION') {
-      el.textContent = translated
-    } else {
-      el.textContent = translated
-    }
+    el.textContent = typeof t === 'function' ? t(key) : key
+  })
+  document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+    const key = el.dataset.i18nAriaLabel
+    el.setAttribute('aria-label', typeof t === 'function' ? t(key) : key)
+  })
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.dataset.i18nTitle
+    el.setAttribute('title', typeof t === 'function' ? t(key) : key)
   })
 }
 
 async function initPopup() {
-  await applyLangPref(null)
+  const settings = await loadSettings()
 
+  await applyLangPref(settings.language)
   applyI18n()
+  document.documentElement.lang = typeof getLang === 'function' ? getLang() : 'en'
 
   const version = nativeAPI.runtime.getManifest().version || '0.0.0'
   document.getElementById('versionBadge').textContent = 'v' + version
-
-  const settings = await loadSettings()
 
   const previewToggle = document.getElementById('previewEnabled')
   const triggerSelect = document.getElementById('previewTriggerMode')
