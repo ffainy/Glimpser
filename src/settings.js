@@ -5,8 +5,6 @@ const DEFAULT_SETTINGS = {
   theme: null,
   previewEnabled: true,
   previewTriggerMode: 'release',
-  dropZonePosition: 'bottom',
-  dropZoneCustomSize: { width: 300, height: 150 },
   defaultWindowScale: { width: 75, height: 82 },
   maxPreviewWindows: 1,
   newWindowOffset: 24,
@@ -21,8 +19,10 @@ const DEFAULT_SETTINGS = {
 
 const TABS = ['general', 'preview', 'blacklist', 'about']
 let _settings = {}
-let _currentTheme = null
 let _activeTab = 'general'
+let _savedSnapshot = null
+let _isSaving = false
+let _resetPending = false
 
 const ICONS = {
   general: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2"/></svg>',
@@ -49,6 +49,63 @@ function _applyStaticI18n() {
 
 function _clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
+}
+
+function _clone(value) {
+  return JSON.parse(JSON.stringify(value))
+}
+
+function _stableStringify(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map(_stableStringify).join(',')}]`
+  }
+  if (value && typeof value === 'object') {
+    const entries = Object.keys(value)
+      .sort()
+      .map(key => `${JSON.stringify(key)}:${_stableStringify(value[key])}`)
+    return `{${entries.join(',')}}`
+  }
+  return JSON.stringify(value)
+}
+
+function _snapshotSettings() {
+  return _stableStringify(_settings)
+}
+
+function _isDirty() {
+  return _savedSnapshot !== null && _snapshotSettings() !== _savedSnapshot
+}
+
+function _buildResetSettings() {
+  return {
+    ..._clone(DEFAULT_SETTINGS),
+    // The blacklist is managed separately and must survive a form reset.
+    blacklistDomains: _clone(_settings.blacklistDomains || []),
+    // `debug` has no settings UI, so preserve it explicitly.
+    debug: _settings.debug,
+  }
+}
+
+function _updateDirtyState() {
+  const saveBtn = document.getElementById('btnSave')
+  const resetBtn = document.getElementById('btnReset')
+  const stateText = document.getElementById('saveStateText')
+  if (!saveBtn || !resetBtn || !stateText) return
+
+  const dirty = _isDirty()
+  document.body.classList.toggle('is-dirty', dirty)
+  saveBtn.disabled = !dirty || _isSaving
+  resetBtn.disabled = _isSaving
+
+  if (_isSaving) {
+    stateText.textContent = _t('stateSaving')
+  } else if (!dirty) {
+    stateText.textContent = _t('stateSaved')
+  } else if (_resetPending) {
+    stateText.textContent = _t('stateResetUnsaved')
+  } else {
+    stateText.textContent = _t('stateDirty')
+  }
 }
 
 function _currentLang() {
@@ -153,24 +210,6 @@ function _makeSelect(options, currentValue, onChange) {
   return sel
 }
 
-function _makeOptionGroup(options, currentValue, onChange) {
-  const group = document.createElement('div')
-  group.className = 'btn-group'
-  options.forEach(({ value, labelKey }) => {
-    const btn = document.createElement('button')
-    btn.className = 'option-btn' + (value === currentValue ? ' active' : '')
-    btn.dataset.value = value
-    btn.textContent = _t(labelKey)
-    btn.addEventListener('click', () => {
-      group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
-      onChange(value)
-    })
-    group.appendChild(btn)
-  })
-  return group
-}
-
 function _makeSlider(min, max, value, onChange) {
   const slider = document.createElement('input')
   slider.type = 'range'
@@ -216,18 +255,6 @@ function _sliderRow(labelKey, value, unit, controlEl, hintKey) {
   return row
 }
 
-function _saveRow() {
-  const row = document.createElement('div')
-  row.className = 'save-row'
-  row.style.padding = '12px 0'
-  const btn = document.createElement('button')
-  btn.className = 'btn btn-primary'
-  btn.textContent = _t('btnSave')
-  btn.addEventListener('click', _save)
-  row.appendChild(btn)
-  return row
-}
-
 // ── Tab builders ───────────────────────────────────────────────────────
 
 function _renderGeneralTab() {
@@ -245,20 +272,23 @@ function _renderGeneralTab() {
             document.documentElement.lang = _currentLang()
             _applyStaticI18n()
             _renderTabsAndContent()
+            _resetPending = false
+            _updateDirtyState()
           })
         }
       )
     ))
-    inner.appendChild(_settingRow('labelTheme', null, () =>
-      _makeOptionGroup(
+    inner.appendChild(_settingRow('labelTheme', 'hintTheme', () =>
+      _makeSelect(
         [
-          { value: 'dark', labelKey: 'themeDark' },
+          { value: 'system', labelKey: 'themeSystem' },
           { value: 'light', labelKey: 'themeLight' },
+          { value: 'dark', labelKey: 'themeDark' },
         ],
-        _settings.theme || (_detectSystemTheme() === 'dark' ? 'dark' : 'light'),
+        _settings.theme || 'system',
         v => {
-          _settings.theme = v
-          _applyTheme(v)
+          _settings.theme = v === 'system' ? null : v
+          _applyTheme(_resolveTheme())
         }
       )
     ))
@@ -269,9 +299,6 @@ function _renderGeneralTab() {
   })
   wrap.appendChild(body1)
 
-  const body2 = _sectionBody(null, null, _saveRow)
-  wrap.appendChild(body2)
-
   return wrap
 }
 
@@ -279,86 +306,15 @@ function _detectSystemTheme() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
+function _resolveTheme(theme = _settings.theme) {
+  return theme === 'light' || theme === 'dark' ? theme : _detectSystemTheme()
+}
+
 function _renderPreviewTab() {
   const wrap = document.createDocumentFragment()
 
   wrap.appendChild(_sectionBody(ICONS.preview, 'labelPreviewTrigger', () => {
     const inner = document.createDocumentFragment()
-
-    let positionHint = null
-    let sizeRow = null
-
-    const syncPositionHint = () => {
-      if (!positionHint) return
-      const pos = _settings.dropZonePosition || 'bottom'
-      const key = pos === 'fullscreen' ? 'hintPosFullscreen'
-        : pos === 'top' ? 'hintPosTop'
-        : 'hintPosBottom'
-      positionHint.textContent = _t(key)
-    }
-
-    const syncSizeRow = () => {
-      if (!sizeRow) return
-      const isDropArea = (_settings.previewTriggerMode || 'release') === 'drop-area'
-      const pos = _settings.dropZonePosition || 'bottom'
-      sizeRow.style.display = isDropArea && pos !== 'fullscreen' ? '' : 'none'
-    }
-
-    const positionRow = _settingRow('labelPos', 'hintPosBottom', () =>
-      _makeOptionGroup(
-        [
-          { value: 'bottom', labelKey: 'posBottom' },
-          { value: 'top', labelKey: 'posTop' },
-          { value: 'fullscreen', labelKey: 'posFullscreen' },
-        ],
-        _settings.dropZonePosition || 'bottom',
-        v => {
-          _settings.dropZonePosition = v
-          syncPositionHint()
-          syncSizeRow()
-        }
-      )
-    )
-    positionHint = positionRow.querySelector('.label-hint')
-
-    sizeRow = _settingRow('labelSize', 'hintSize', () => {
-      const group = document.createElement('div')
-      group.className = 'size-inputs'
-
-      const makeField = (labelKey, key, min, max, fallback) => {
-        const field = document.createElement('label')
-        field.className = 'size-field'
-        const text = document.createElement('span')
-        text.textContent = _t(labelKey)
-        const input = document.createElement('input')
-        input.type = 'number'
-        input.min = String(min)
-        input.max = String(max)
-        const stored = Number(_settings.dropZoneCustomSize?.[key])
-        input.value = String(Number.isFinite(stored) ? _clamp(stored, min, max) : fallback)
-        input.addEventListener('change', () => {
-          const parsed = parseInt(input.value, 10)
-          const next = _clamp(Number.isFinite(parsed) ? parsed : fallback, min, max)
-          input.value = String(next)
-          _settings.dropZoneCustomSize = {
-            ...(_settings.dropZoneCustomSize || {}),
-            [key]: next,
-          }
-        })
-        field.append(text, input)
-        return field
-      }
-
-      group.append(
-        makeField('labelW', 'width', 100, 1200, 300),
-        makeField('labelH', 'height', 60, 400, 150)
-      )
-      return group
-    })
-
-    const syncPositionRow = () => {
-      positionRow.style.display = (_settings.previewTriggerMode || 'release') === 'release' ? 'none' : ''
-    }
 
     let triggerHint = null
     const syncHint = () => {
@@ -370,46 +326,25 @@ function _renderPreviewTab() {
     }
 
     const triggerRow = _settingRow('labelPreviewTrigger', 'hintPreviewTriggerRelease', () =>
-      _makeOptionGroup(
-        [
-          { value: 'release', labelKey: 'triggerRelease' },
-          { value: 'drop-area', labelKey: 'triggerDropArea' },
-        ],
-        _settings.previewTriggerMode || 'release',
-        v => {
-          _settings.previewTriggerMode = v
-          syncPositionRow()
-          syncHint()
-          syncSizeRow()
-        }
-      )
+      _makeToggle((_settings.previewTriggerMode || 'release') === 'drop-area', v => {
+        _settings.previewTriggerMode = v ? 'drop-area' : 'release'
+        syncHint()
+      })
     )
     triggerHint = triggerRow.querySelector('.label-hint')
 
-    syncPositionRow()
     syncHint()
-    syncPositionHint()
-    syncSizeRow()
     inner.appendChild(triggerRow)
-    inner.appendChild(positionRow)
-    inner.appendChild(sizeRow)
     return inner
   }))
 
   wrap.appendChild(_sectionBody(ICONS.preview, 'labelWindowDefaults', () => {
     const inner = document.createDocumentFragment()
-    inner.appendChild(_settingRow('labelMaxPreviewWindows', 'hintMaxPreviewWindows', () => {
-      const input = document.createElement('input')
-      input.type = 'number'
-      input.min = '1'
-      input.max = '12'
-      input.value = String(_settings.maxPreviewWindows || 1)
-      input.addEventListener('change', () => {
-        const v = parseInt(input.value, 10)
-        if (!isNaN(v) && v >= 1 && v <= 12) _settings.maxPreviewWindows = v
+    inner.appendChild(_settingRow('labelMultiplePreviewWindows', 'hintMaxPreviewWindows', () =>
+      _makeToggle((_settings.maxPreviewWindows || 1) > 1, v => {
+        _settings.maxPreviewWindows = v ? 10 : 1
       })
-      return input
-    }))
+    ))
 
     inner.appendChild(_sliderRow('labelWindowWidth', _settings.defaultWindowScale?.width ?? 75, '%',
       _makeSlider(35, 92, _settings.defaultWindowScale?.width ?? 75, v => {
@@ -429,19 +364,31 @@ function _renderPreviewTab() {
 
   wrap.appendChild(_sectionBody(ICONS.preview, 'labelPreferences', () => {
     const inner = document.createDocumentFragment()
+
+    let radiusRow = null
+    const syncCorners = () => {
+      if (!radiusRow) return
+      const square = _settings.corners === 'square'
+      radiusRow.classList.toggle('is-disabled', square)
+      const input = radiusRow.querySelector('input[type="range"]')
+      if (input) {
+        input.disabled = square
+        input.setAttribute('aria-disabled', String(square))
+      }
+    }
+
     inner.appendChild(_settingRow('labelCorners', 'hintCorners', () =>
-      _makeOptionGroup(
-        [
-          { value: 'rounded', labelKey: 'cornersRounded' },
-          { value: 'square', labelKey: 'cornersSquare' },
-        ],
-        _settings.corners || 'rounded',
-        v => { _settings.corners = v }
-      )
+      _makeToggle(_settings.corners !== 'square', v => {
+        _settings.corners = v ? 'rounded' : 'square'
+        syncCorners()
+      })
     ))
-    inner.appendChild(_sliderRow('labelCornerRadius', _settings.cornerRadius ?? 16, 'px',
+
+    radiusRow = _sliderRow('labelCornerRadius', _settings.cornerRadius ?? 16, 'px',
       _makeSlider(4, 28, _settings.cornerRadius ?? 16, v => { _settings.cornerRadius = v }), 'hintCornerRadius'
-    ))
+    )
+    inner.appendChild(radiusRow)
+    syncCorners()
     return inner
   }))
 
@@ -463,8 +410,6 @@ function _renderPreviewTab() {
     ))
     return inner
   }))
-
-  wrap.appendChild(_sectionBody(null, null, _saveRow))
 
   return wrap
 }
@@ -491,6 +436,8 @@ function _renderBlacklistTab() {
       _settings.blacklistDomains.push(domain)
       input.value = ''
       _renderBlacklistItems(listEl)
+      _resetPending = false
+      _updateDirtyState()
       _showStatus(_t('blacklistDomainAdded'))
     })
     input.addEventListener('keydown', e => { if (e.key === 'Enter') addBtn.click() })
@@ -517,6 +464,8 @@ function _renderBlacklistTab() {
         }
         _settings.blacklistDomains.push(hostname)
         _renderBlacklistItems(listEl)
+        _resetPending = false
+        _updateDirtyState()
         _showStatus(_t('blacklistCurrentDomainAdded'))
       } catch (e) {
         _showStatus(_t('blacklistCurrentDomainUnavailable'), true)
@@ -551,6 +500,8 @@ function _renderBlacklistTab() {
         delBtn.addEventListener('click', () => {
           _settings.blacklistDomains.splice(idx, 1)
           _renderBlacklistItems(container)
+          _resetPending = false
+          _updateDirtyState()
           _showStatus(_t('blacklistDomainRemoved'))
         })
         tag.appendChild(delBtn)
@@ -562,8 +513,6 @@ function _renderBlacklistTab() {
     inner.appendChild(listEl)
     return inner
   }))
-
-  wrap.appendChild(_sectionBody(null, null, _saveRow))
 
   return wrap
 }
@@ -599,13 +548,39 @@ function _renderAboutTab() {
 // ── Save ───────────────────────────────────────────────────────────────
 
 async function _save() {
+  if (_isSaving) return
+  _isSaving = true
+  _updateDirtyState()
   try {
     _settings.blacklistDomains = _normalizeBlacklistDomains(_settings.blacklistDomains)
     await nativeAPI.storage.sync.set(_settings)
+    _savedSnapshot = _snapshotSettings()
+    _resetPending = false
     _showStatus(_t('saved'))
+    // Best-effort cleanup for settings removed in the fullscreen-only redesign.
+    Promise.resolve(nativeAPI.storage.sync.remove(['dropZonePosition', 'dropZoneCustomSize']))
+      .catch(() => {})
   } catch (e) {
     _showStatus(_t('saveFailed'), true)
+  } finally {
+    _isSaving = false
+    _updateDirtyState()
   }
+}
+
+async function _reset() {
+  const next = _buildResetSettings()
+  if (_stableStringify(next) === _snapshotSettings()) return
+  if (!confirm(_t('confirmReset'))) return
+
+  _settings = next
+  _resetPending = true
+  await applyLangPref(_settings.language)
+  document.documentElement.lang = _currentLang()
+  _applyStaticI18n()
+  _applyTheme(_resolveTheme())
+  _renderTabsAndContent()
+  _updateDirtyState()
 }
 
 function _showStatus(msg, isError = false) {
@@ -616,22 +591,12 @@ function _showStatus(msg, isError = false) {
   bar._timeout = setTimeout(() => { bar.className = '' }, 2500)
 }
 
-// ── Theme toggle ───────────────────────────────────────────────────────
+// ── Theme ──────────────────────────────────────────────────────────────
 
 function _applyTheme(theme) {
-  _currentTheme = theme
   const root = document.documentElement
   root.dataset.theme = theme
   root.dataset.dpTheme = theme
-  document.querySelectorAll('.option-btn[data-value="dark"], .option-btn[data-value="light"]').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.value === theme)
-  })
-  const icon = document.getElementById('themeIcon')
-  if (theme === 'light') {
-    icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
-  } else {
-    icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-  }
 }
 
 // ── Init ───────────────────────────────────────────────────────────────
@@ -643,11 +608,14 @@ async function init() {
   } catch (e) {
     _settings = {
       ...DEFAULT_SETTINGS,
-      dropZoneCustomSize: { ...DEFAULT_SETTINGS.dropZoneCustomSize },
       defaultWindowScale: { ...DEFAULT_SETTINGS.defaultWindowScale },
       blacklistDomains: [],
     }
   }
+
+  delete _settings.dropZonePosition
+  delete _settings.dropZoneCustomSize
+  _savedSnapshot = _snapshotSettings()
 
   await applyLangPref(_settings.language)
   document.documentElement.lang = _currentLang()
@@ -658,16 +626,36 @@ async function init() {
   document.getElementById('footerVersion').textContent = 'v' + version
 
   _renderTabsAndContent()
+  _applyTheme(_resolveTheme())
 
-  // Theme toggle
-  const currentTheme = _settings.theme || _detectSystemTheme()
-  _applyTheme(currentTheme)
+  document.getElementById('btnSave').addEventListener('click', _save)
+  document.getElementById('btnReset').addEventListener('click', _reset)
 
-  document.getElementById('themeToggle').addEventListener('click', () => {
-    const next = _currentTheme === 'dark' ? 'light' : 'dark'
-    _applyTheme(next)
-    _settings.theme = next
+  const content = document.getElementById('tab-content')
+  ;['input', 'change', 'click'].forEach((type) => {
+    content.addEventListener(type, () => {
+      _resetPending = false
+      _updateDirtyState()
+    })
   })
+
+  window.addEventListener('beforeunload', (event) => {
+    if (!_isDirty()) return
+    event.preventDefault()
+    event.returnValue = ''
+  })
+
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+  const onSystemThemeChange = () => {
+    if (!_settings.theme) _applyTheme(_detectSystemTheme())
+  }
+  if (typeof systemTheme.addEventListener === 'function') {
+    systemTheme.addEventListener('change', onSystemThemeChange)
+  } else if (typeof systemTheme.addListener === 'function') {
+    systemTheme.addListener(onSystemThemeChange)
+  }
+
+  _updateDirtyState()
 }
 
 function _renderTabsAndContent() {

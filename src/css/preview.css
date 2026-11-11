@@ -17,22 +17,6 @@
   --gs-drop-surface-bg: var(--gs-preview-drop-surface-bg);
   --gs-drop-surface-border: var(--gs-preview-drop-surface-border);
   --gs-drop-surface-shadow: var(--gs-preview-drop-surface-shadow);
-  --gs-drop-surface-bg-hover: var(--gs-preview-drop-surface-bg-hover);
-  --gs-drop-surface-border-hover: var(--gs-preview-drop-surface-border-hover);
-  --gs-drop-surface-shadow-hover: var(--gs-preview-drop-surface-shadow-hover);
-  --gs-drop-slot-pill-bg: var(--gs-preview-drop-slot-pill-bg);
-  --gs-drop-slot-pill-border: var(--gs-preview-drop-slot-pill-border);
-  --gs-drop-pill-shadow: var(--gs-preview-drop-pill-shadow);
-  --gs-drop-slot-pill-hover-bg: var(--gs-preview-drop-slot-pill-hover-bg);
-  --gs-drop-slot-pill-hover-border: var(--gs-preview-drop-slot-pill-hover-border);
-  --gs-drop-pill-shadow-hover: var(--gs-preview-drop-pill-shadow-hover);
-  --gs-drop-slot-glow: var(--gs-preview-drop-slot-glow);
-  --gs-drop-slot-sheen: var(--gs-preview-drop-slot-sheen);
-  --gs-drop-slot-sheen-blend: var(--gs-preview-drop-slot-sheen-blend);
-  --gs-drop-slot-sheen-opacity: var(--gs-preview-drop-slot-sheen-opacity);
-  --gs-drop-icon-surface-hover: var(--gs-preview-drop-icon-surface-hover);
-  --gs-drop-icon-surface-shadow-hover: var(--gs-preview-drop-icon-surface-shadow-hover);
-  --gs-drop-title-glow-hover: var(--gs-preview-drop-title-glow-hover);
   --gs-drop-overlay-bg: var(--gs-preview-drop-overlay-bg);
   --gs-drop-overlay-surface-bg: var(--gs-preview-drop-overlay-surface-bg);
   --gs-drop-overlay-surface-border: var(--gs-preview-drop-overlay-surface-border);
@@ -75,46 +59,6 @@
 }
 
 /* ── Drop Zone ───────────────────────────────────────────────────────────── */
-
-#gs-dropzone {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: var(--gs-z-backdrop);
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-  overflow: hidden;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: none;
-  border-radius: var(--gs-radius-control);
-  box-shadow: none;
-  font-family: var(--gs-font-family);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--gs-motion-base), transform var(--gs-motion-base);
-}
-
-#gs-dropzone[data-position="bottom"] { bottom: 16px; }
-#gs-dropzone[data-position="top"]    { top: 16px; }
-#gs-dropzone.active { opacity: 1; pointer-events: all; }
-
-#gs-dropzone .gs-drop-surface--slot {
-  width: 100%;
-  height: 100%;
-}
-
-#gs-dropzone.hovered {
-  transform: translateX(-50%) translateY(-3px) scale(1.018);
-}
-
-#gs-dropzone.hovered .gs-drop-surface--slot {
-  background: var(--gs-drop-surface-bg-hover);
-  border-color: var(--gs-drop-surface-border-hover);
-  box-shadow: var(--gs-drop-surface-shadow-hover);
-}
 
 /* ── Fullscreen Drop Overlay ─────────────────────────────────────────────── */
 
@@ -201,47 +145,6 @@
   pointer-events: none;
 }
 
-.gs-drop-surface--slot {
-  justify-content: center;
-  padding: var(--gs-space-base) var(--gs-space-roomy);
-  border-radius: inherit;
-  backdrop-filter: blur(calc(var(--gs-blur-dropzone) * 0.9)) saturate(1.2);
-  -webkit-backdrop-filter: blur(calc(var(--gs-blur-dropzone) * 0.9)) saturate(1.2);
-  overflow: hidden;
-  transition:
-    background 0.32s var(--gs-ease-standard),
-    border-color 0.28s var(--gs-ease-standard),
-    box-shadow 0.32s var(--gs-ease-standard),
-    transform 0.32s var(--gs-ease-standard);
-}
-
-.gs-drop-surface--slot::before,
-.gs-drop-surface--slot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  transition:
-    opacity 0.32s var(--gs-ease-standard),
-    transform 0.42s var(--gs-ease-standard);
-}
-
-.gs-drop-surface--slot::before {
-  background: var(--gs-drop-slot-glow);
-  opacity: 0.26;
-  transform: scale(0.94);
-  filter: blur(12px);
-}
-
-.gs-drop-surface--slot::after {
-  inset: -1px;
-  background: var(--gs-drop-slot-sheen);
-  opacity: 0;
-  transform: translateX(-26%);
-  mix-blend-mode: var(--gs-drop-slot-sheen-blend);
-}
-
 .gs-drop-surface--overlay {
   z-index: 1;
   flex-direction: column;
@@ -286,23 +189,6 @@
   background: var(--gs-drop-icon-surface);
   color: var(--gs-drop-icon-foreground);
   box-shadow: var(--gs-shadow-inset-highlight-strong);
-}
-
-.gs-drop-icon-shell--slot {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--gs-radius-badge);
-  transition:
-    transform 0.32s var(--gs-ease-standard),
-    border-color 0.28s var(--gs-ease-standard),
-    background 0.28s var(--gs-ease-standard),
-    box-shadow 0.32s var(--gs-ease-standard);
-}
-
-.gs-drop-icon-shell--slot svg {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.32s var(--gs-ease-standard);
 }
 
 .gs-drop-icon-shell--overlay {
@@ -352,74 +238,6 @@
     transform 0.32s var(--gs-ease-standard),
     color 0.28s var(--gs-ease-standard),
     text-shadow 0.32s var(--gs-ease-standard);
-}
-
-.gs-drop-surface--slot .gs-drop-title {
-  font-size: var(--gs-font-size-body);
-  letter-spacing: var(--gs-letter-spacing-body);
-}
-
-.gs-drop-slot-pill {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gs-space-base);
-  max-width: min(100%, 320px);
-  min-height: 42px;
-  padding: 0 var(--gs-space-roomy);
-  border-radius: var(--gs-radius-chip);
-  border: 1px solid var(--gs-drop-slot-pill-border);
-  background: var(--gs-drop-slot-pill-bg);
-  box-shadow: var(--gs-drop-pill-shadow);
-  transition:
-    transform 0.32s var(--gs-ease-standard),
-    background 0.28s var(--gs-ease-standard),
-    border-color 0.28s var(--gs-ease-standard),
-    box-shadow 0.32s var(--gs-ease-standard);
-}
-
-#gs-dropzone.hovered .gs-drop-slot-pill {
-  background: var(--gs-drop-slot-pill-hover-bg);
-  border-color: var(--gs-drop-slot-pill-hover-border);
-  box-shadow: var(--gs-drop-pill-shadow-hover);
-  transform: translateY(-1px) scale(1.01);
-  animation: gs-drop-slot-hover-float 1.8s ease-in-out infinite;
-}
-
-#gs-dropzone.hovered .gs-drop-surface--slot::before {
-  opacity: 0.72;
-  transform: scale(1.06);
-}
-
-#gs-dropzone.hovered .gs-drop-surface--slot::after {
-  opacity: var(--gs-drop-slot-sheen-opacity);
-  transform: translateX(18%);
-}
-
-#gs-dropzone.hovered .gs-drop-icon-shell--slot {
-  transform: translateY(-1px) scale(1.08);
-  background: var(--gs-drop-icon-surface-hover);
-  box-shadow: var(--gs-drop-icon-surface-shadow-hover);
-}
-
-#gs-dropzone.hovered .gs-drop-icon-shell--slot svg {
-  transform: translateY(-0.5px) scale(1.04);
-}
-
-#gs-dropzone.hovered .gs-drop-title {
-  transform: translateY(-0.5px);
-  text-shadow: var(--gs-drop-title-glow-hover);
-}
-
-@keyframes gs-drop-slot-hover-float {
-  0%, 100% {
-    transform: translateY(-1px) scale(1.01);
-  }
-
-  50% {
-    transform: translateY(-3px) scale(1.018);
-  }
 }
 
 /* ── Preview windows ─────────────────────────────────────────────────────── */

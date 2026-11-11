@@ -6,13 +6,13 @@ Glimpser is a Chrome and Firefox extension that opens links in a floating previe
 
 - Open links in a floating iframe preview instead of a new tab.
 - Two trigger modes:
-  - **Release anywhere** — after a deliberate drag, release anywhere on the page.
-  - **Drop area** — release on a fixed drop target at the bottom, top, or across the whole viewport.
+  - **Release anywhere** — after a deliberate drag, release anywhere on the page. No drop hint is shown.
+  - **Drop area** — a fullscreen drop hint appears while dragging; release anywhere to open a preview.
 - Configurable preview size, cascade offset, corner style, and corner radius.
-- Multiple preview windows with optional backdrop mode, "close others", and "close all" controls.
+- Single or multiple preview windows (up to 10) with optional backdrop mode, "close others", and "close all" controls.
 - Per-window toolbar for refresh, copy, open in current tab, and open in a new tab.
 - Domain blacklist to disable previews on selected sites.
-- Dark and light themes with English and Simplified Chinese UI.
+- Dark, light, and system themes with English and Simplified Chinese UI.
 - Settings sync through the browser's storage sync.
 
 ## Requirements
@@ -52,7 +52,7 @@ Firefox only loads temporary add-ons unsigned. For a permanent install, the pack
 ## Usage
 
 1. Drag a link on any page.
-2. Depending on the trigger mode, release it anywhere or on the visible drop area.
+2. Depending on the trigger mode, release it anywhere; in Drop area mode the fullscreen drop hint confirms where to release.
 3. Use the preview toolbar to refresh, copy the URL, open the page in the current tab, or open it in a new tab.
 4. Close the preview with the close button, `Escape`, or by clicking the backdrop when backdrop mode is active.
 
@@ -62,12 +62,14 @@ If a site refuses to load in a frame, open it in a new tab from the preview tool
 
 Open the extension popup and choose **Settings**, or open the options page from the browser's extension manager.
 
-- **General** — language, theme, and the global preview toggle.
-- **Preview** — trigger mode, drop area position and size, window defaults, corner style, and toolbar buttons.
+- **General** — language, theme (Light / Dark / System), and the global preview toggle.
+- **Preview** — trigger mode, single/multiple preview windows, window defaults, corner style, and toolbar buttons.
 - **Blacklist** — block previews for exact hostnames such as `example.com` or `www.example.com`.
 - **About** — version and project metadata.
 
-Language and theme changes preview immediately, but every setting is persisted only when you press **Save**.
+Language and theme changes preview immediately, but every setting is persisted only when you press **Save**. The bottom action bar shows whether the form has unsaved changes and keeps **Save** disabled while the form matches what is stored.
+
+**Reset** restores the form defaults without writing anything until you press **Save**. The domain blacklist and the internal `debug` flag are preserved by Reset. Reset asks for confirmation because unsaved changes are discarded.
 
 ## Permissions and privacy
 

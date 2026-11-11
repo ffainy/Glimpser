@@ -3,8 +3,6 @@
 
 const DEFAULT_SETTINGS = {
   previewEnabled: true,
-  dropZonePosition: 'bottom',
-  dropZoneCustomSize: { width: 300, height: 150 },
   previewTriggerMode: 'release',
   defaultWindowScale: { width: 75, height: 82 },
   maxPreviewWindows: 1,
@@ -290,7 +288,6 @@ async function loadSettings() {
   } catch (e) {
     return {
       ...DEFAULT_SETTINGS,
-      dropZoneCustomSize: { ...DEFAULT_SETTINGS.dropZoneCustomSize },
       defaultWindowScale: { ...DEFAULT_SETTINGS.defaultWindowScale },
       blacklistDomains: [],
     }
@@ -384,7 +381,7 @@ function _resolvePreviewWindowLimit(settings = _settings) {
   const configured = settings && Number.isFinite(settings.maxPreviewWindows)
     ? settings.maxPreviewWindows
     : DEFAULT_SETTINGS.maxPreviewWindows
-  return clamp(configured, 1, 12)
+  return clamp(configured, 1, 10)
 }
 
 function _isSinglePreviewWindowMode() {
@@ -1260,11 +1257,6 @@ function applyContentTheme(theme) {
     directReleaseLayer.setAttribute('data-dp-theme', resolvedTheme)
   }
 
-  const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
-  if (zone) {
-    zone.setAttribute('data-dp-theme', resolvedTheme)
-  }
-
   const fullscreen = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
   if (fullscreen) {
     fullscreen.setAttribute('data-dp-theme', resolvedTheme)
@@ -1296,29 +1288,6 @@ function _buildDropHintInner({ iconClass, title, copyClass = '', kicker = '' }) 
       <div class="gs-drop-title">${title}</div>
     </div>
   `
-}
-
-function _createDropZoneElement(position, customSize) {
-  const width = clamp((customSize && customSize.width) || 300, 100, 1200)
-  const height = clamp((customSize && customSize.height) || 150, 60, 400)
-
-  const zone = document.createElement('div')
-  zone.id = 'gs-dropzone'
-  zone.dataset.position = position
-  zone.setAttribute('data-dp-theme', _currentTheme)
-  zone.style.width = `${width}px`
-  zone.style.height = `${height}px`
-  zone.innerHTML = `
-    <div class="gs-drop-surface gs-drop-surface--slot">
-      <div class="gs-drop-slot-pill">
-        ${_buildDropHintInner({
-          iconClass: 'gs-drop-icon-shell--slot',
-          title: t('dropHintZone'),
-        })}
-      </div>
-    </div>
-  `
-  return zone
 }
 
 function _setFullscreenOverlayActive(isActive) {
@@ -1406,71 +1375,6 @@ function _handleDirectReleaseDrop(event) {
   } else {
     console.warn(t('warnInvalidUrl'))
   }
-}
-
-function _bindDropZoneEvents(dropZone) {
-  const onDragStart = (event) => {
-    if (_isPreviewBlockedOnThisPage()) {
-      return
-    }
-    const url = detectDraggedLink(event)
-    if (!url) {
-      return
-    }
-    _startLinkDrag(url, event)
-    setTimeout(() => {
-      dropZone.classList.add('active')
-    }, DROP_AREA_SHOW_DELAY_MS)
-  }
-
-  const onDragEnd = () => {
-    setTimeout(() => {
-      dropZone.classList.remove('active', 'hovered')
-      _clearLinkDragState()
-    }, DROP_AREA_SHOW_DELAY_MS)
-  }
-
-  document.addEventListener('dragstart', onDragStart)
-  document.addEventListener('dragend', onDragEnd)
-  _dragHandlers.push(
-    { target: document, type: 'dragstart', fn: onDragStart },
-    { target: document, type: 'dragend', fn: onDragEnd }
-  )
-
-  dropZone.addEventListener('dragenter', (event) => {
-    event.preventDefault()
-    dropZone.classList.add('hovered')
-  })
-
-  dropZone.addEventListener('dragleave', (event) => {
-    if (event.relatedTarget && !dropZone.contains(event.relatedTarget)) {
-      dropZone.classList.remove('hovered')
-    }
-  })
-
-  dropZone.addEventListener('dragover', (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    event.dataTransfer.dropEffect = 'copy'
-  })
-
-  dropZone.addEventListener('drop', (event) => {
-    if (_isPreviewBlockedOnThisPage()) {
-      _clearLinkDragState()
-      return
-    }
-    event.preventDefault()
-    event.stopPropagation()
-    dropZone.classList.remove('active', 'hovered')
-
-    const url = _getDroppedUrl(event)
-    _clearLinkDragState()
-    if (validateURL(url)) {
-      openPreview(url)
-    } else {
-      console.warn(t('warnInvalidUrl'))
-    }
-  })
 }
 
 function _bindDirectReleaseDragEvents() {
@@ -1686,11 +1590,6 @@ function reinitDropZone() {
   _removeDragHandlers()
   _setFullscreenOverlayActive(false)
 
-  const oldZone = _shadowRoot.getElementById('gs-dropzone')
-  if (oldZone) {
-    oldZone.remove()
-  }
-
   const oldFullscreen = _shadowRoot.getElementById('gs-dropzone-overlay')
   if (oldFullscreen) {
     oldFullscreen.remove()
@@ -1712,14 +1611,7 @@ function reinitDropZone() {
     return
   }
 
-  const position = _settings.dropZonePosition || 'bottom'
-  if (position === 'fullscreen') {
-    _bindFullscreenDragEvents()
-  } else {
-    const dropZone = _createDropZoneElement(position, _settings.dropZoneCustomSize)
-    _shadowRoot.appendChild(dropZone)
-    _bindDropZoneEvents(dropZone)
-  }
+  _bindFullscreenDragEvents()
 }
 
 async function initGlimpser() {
@@ -1804,14 +1696,10 @@ if (typeof exports === 'undefined') {
       }
 
       _startLinkDrag(event.data.url, null, 'frame')
-      const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
-      const fullscreen = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
-      if (zone) {
-        zone.classList.add('active')
-      }
-      if (fullscreen) {
-        fullscreen.classList.add('active')
-      }
+      setTimeout(() => {
+        _ensureFullscreenOverlay()
+        _setFullscreenOverlayActive(true)
+      }, DROP_AREA_SHOW_DELAY_MS)
     }
 
     if (event.data?.type === FRAME_DRAG_END_MESSAGE) {
@@ -1822,15 +1710,10 @@ if (typeof exports === 'undefined') {
         return
       }
 
-      const zone = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone') : null
-      const fullscreen = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
-      if (zone) {
-        zone.classList.remove('active', 'hovered')
-      }
-      if (fullscreen) {
-        fullscreen.classList.remove('active')
-      }
-      _clearLinkDragState()
+      setTimeout(() => {
+        _hideFullscreenOverlay()
+        _clearLinkDragState()
+      }, DROP_AREA_SHOW_DELAY_MS)
     }
 
     if (event.data?.type === FRAME_FOCUS_MESSAGE) {

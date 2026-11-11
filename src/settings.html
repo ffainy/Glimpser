@@ -15,16 +15,6 @@
         <h1 data-i18n="settingsTitle">Glimpser Settings</h1>
         <span class="version" id="versionBadge"></span>
       </div>
-      <div class="header-controls">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" data-i18n-aria-label="ariaToggleTheme">
-          <span class="theme-toggle-icon" id="themeIcon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span id="themeLabel" data-i18n="labelTheme">Theme</span>
-        </button>
-      </div>
     </header>
 
     <nav id="tabs" role="tablist"></nav>
@@ -68,6 +58,19 @@
         </span>
       </div>
     </footer>
+  </div>
+
+  <div class="action-bar" id="actionBar">
+    <div class="action-bar-inner">
+      <div class="save-state" role="status" aria-live="polite">
+        <span class="save-state-dot" aria-hidden="true"></span>
+        <span id="saveStateText" data-i18n="stateSaved">All changes saved</span>
+      </div>
+      <div class="action-bar-actions">
+        <button type="button" class="btn btn-secondary" id="btnReset" data-i18n="btnReset">Reset</button>
+        <button type="button" class="btn btn-primary" id="btnSave" data-i18n="btnSave">Save</button>
+      </div>
+    </div>
   </div>
 
   <div id="status-bar"></div>
