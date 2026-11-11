@@ -45,7 +45,6 @@ const FRAME_ESCAPE_MESSAGE = 'gs:frame-escape'
 const DROP_AREA_SHOW_DELAY_MS = 100
 const PREVIEW_RELEASE_ARM_DELAY_MS = 180
 const PREVIEW_RELEASE_MIN_DISTANCE_PX = 18
-const GOOGLE_FONTS_STYLESHEET = 'https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Nunito+Sans:wght@400;500;600;700;800&family=Young+Serif&display=swap'
 
 const ICON_REFRESH = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 16-5.658"/><path d="M19.5 3v4h-4m5.5 5a9 9 0 0 1-16 5.657"/><path d="M4.5 21v-4h4"/></g></svg>`
 const ICON_OPEN_CURRENT = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 4H4v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5M9 15L20 4m-5 0h5v5"/></svg>`
@@ -534,22 +533,6 @@ async function _loadCssText(nativeAPI, paths) {
       _shadowRoot.appendChild(link)
     }))
   )
-}
-
-async function _ensureDocumentStylesheet(href) {
-  const existing = document.head.querySelector(`link[rel="stylesheet"][href="${href}"]`)
-  if (existing) {
-    return
-  }
-
-  await new Promise((resolve, reject) => {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = href
-    link.addEventListener('load', resolve, { once: true })
-    link.addEventListener('error', () => reject(new Error(`Failed to load stylesheet: ${href}`)), { once: true })
-    document.head.appendChild(link)
-  })
 }
 
 function _normalizePreviewBounds(preview) {
@@ -1641,11 +1624,6 @@ async function initGlimpser() {
   _shadowRoot = _shadowHost.attachShadow({ mode: 'open' })
 
   const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
-  try {
-    await _ensureDocumentStylesheet(GOOGLE_FONTS_STYLESHEET)
-  } catch (e) {
-    console.warn('[Glimpser] Failed to load Google Fonts; using system fonts', e)
-  }
 
   try {
     await _loadCssText(nativeAPI, [

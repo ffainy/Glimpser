@@ -77,7 +77,7 @@ Language and theme changes preview immediately, but every setting is persisted o
 - `declarativeNetRequest` — removes `X-Frame-Options` and `Content-Security-Policy` response headers from sub-frame requests so that more pages can load inside the preview iframe.
 - Host access (`*://*/*`) — required for the content script that provides drag-and-drop previews and for the sub-frame header rule.
 
-Glimpser does not collect, transmit, or sell data. There is no analytics or remote service. Preview content is loaded directly by the browser from the site you choose.
+Glimpser does not collect, transmit, or sell data. There is no analytics or remote service. It does not load remote fonts or other third-party assets. Preview content is loaded directly by the browser from the site you choose.
 
 ## Project structure
 
