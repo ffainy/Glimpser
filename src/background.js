@@ -2,8 +2,10 @@
 // Registers declarativeNetRequest rules to remove X-Frame-Options and CSP headers
 // for sub_frame requests, enabling iframe previews of most websites.
 
-// 跨浏览器兼容 API 对象
-const nativeAPI = typeof browser !== 'undefined' ? browser : chrome;
+// Cross-browser API object
+const nativeAPI = typeof browser !== 'undefined'
+  ? browser
+  : (typeof chrome !== 'undefined' ? chrome : null);
 
 let _debug = false;
 
@@ -23,10 +25,11 @@ function _dlog(...args) {
 }
 
 /**
- * 注册 declarativeNetRequest 动态规则，移除 sub_frame 请求的
- * X-Frame-Options 和 Content-Security-Policy 响应头。
+ * Register a declarativeNetRequest dynamic rule that removes the
+ * X-Frame-Options and Content-Security-Policy response headers from
+ * sub_frame requests.
  *
- * @param {object} api - browser 或 chrome API 对象（默认使用 nativeAPI）
+ * @param {object} api - browser or chrome API object (defaults to nativeAPI)
  */
 async function updateHeaderRules(api = nativeAPI) {
   const rule = {
@@ -59,28 +62,29 @@ async function updateHeaderRules(api = nativeAPI) {
       _dlog('header rules verify failed', verifyErr);
     }
   } catch (error) {
-    console.error('规则注册失败: ' + error);
+    console.error('[Glimpser] Failed to register header rules:', error);
     _dlog('header rules failed', error);
   }
 }
 
-// 扩展安装或更新时注册规则
-nativeAPI.runtime.onInstalled.addListener(() => {
+// Ensure the rule and debug flag are active whenever the background context starts.
+if (nativeAPI) {
   _loadDebugFlag();
   updateHeaderRules();
-});
 
-// Load debug flag on startup (MV3 service worker restart / MV2 background load)
-nativeAPI.runtime.onStartup?.addListener(() => {
-  _loadDebugFlag();
-});
+  // Re-register on install or update.
+  nativeAPI.runtime.onInstalled.addListener(() => {
+    _loadDebugFlag();
+    updateHeaderRules();
+  });
 
-// Keep debug flag in sync with settings
-nativeAPI.storage.onChanged.addListener((changes) => {
-  if (Object.prototype.hasOwnProperty.call(changes, 'debug')) {
-    _debug = !!changes.debug.newValue;
-  }
-});
+  // Keep debug flag in sync with settings
+  nativeAPI.storage.onChanged.addListener((changes) => {
+    if (Object.prototype.hasOwnProperty.call(changes, 'debug')) {
+      _debug = !!changes.debug.newValue;
+    }
+  });
+}
 
 // Popup is declared in manifest.json — no action.onClicked needed.
 

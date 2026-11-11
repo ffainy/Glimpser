@@ -68,6 +68,7 @@ let _settings = null
 let _currentTheme = 'dark'
 let _dragHandlers = []
 let _activeTooltipTarget = null
+let _spinnerIdSeed = 0
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max)
@@ -287,7 +288,12 @@ async function loadSettings() {
     settings.blacklistDomains = _normalizeBlacklistDomains(settings.blacklistDomains)
     return settings
   } catch (e) {
-    return DEFAULT_SETTINGS
+    return {
+      ...DEFAULT_SETTINGS,
+      dropZoneCustomSize: { ...DEFAULT_SETTINGS.dropZoneCustomSize },
+      defaultWindowScale: { ...DEFAULT_SETTINGS.defaultWindowScale },
+      blacklistDomains: [],
+    }
   }
 }
 
@@ -458,7 +464,7 @@ function _hideTooltip(target = null) {
   _tooltipLayer.classList.remove('visible', 'below')
 }
 
-function _bindTooltipEvents(preview, ...buttons) {
+function _bindTooltipEvents(...buttons) {
   for (const button of buttons) {
     button.addEventListener('pointerenter', () => {
       _showTooltip(button, button.dataset.tooltip || button.getAttribute('aria-label') || '')
@@ -611,7 +617,8 @@ function _resolvePreviewPosition(width, height) {
 function _createLoadingSpinner() {
   const spinner = document.createElement('div')
   spinner.className = 'gs-preview-spinner'
-  spinner.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"><g><circle cx="12" cy="3" r="1" fill="#36aa6d"><animate id="SVGelgoqhuA" attributeName="r" begin="0;SVGSRzJybSJ.end-0.5s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="16.5" cy="4.21" r="1" fill="#36aa6d"><animate id="SVGBcQu6cCi" attributeName="r" begin="SVGelgoqhuA.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="7.5" cy="4.21" r="1" fill="#36aa6d"><animate id="SVGSRzJybSJ" attributeName="r" begin="SVGeZGzNdVZ.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="19.79" cy="7.5" r="1" fill="#36aa6d"><animate id="SVGG5Q0fe0M" attributeName="r" begin="SVGBcQu6cCi.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="4.21" cy="7.5" r="1" fill="#36aa6d"><animate id="SVGeZGzNdVZ" attributeName="r" begin="SVGUTnihcal.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="21" cy="12" r="1" fill="#36aa6d"><animate id="SVG8aQG8dpc" attributeName="r" begin="SVGG5Q0fe0M.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="3" cy="12" r="1" fill="#36aa6d"><animate id="SVGUTnihcal" attributeName="r" begin="SVGHktsvT5Q.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="19.79" cy="16.5" r="1" fill="#36aa6d"><animate id="SVGqCF3Scrd" attributeName="r" begin="SVG8aQG8dpc.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="4.21" cy="16.5" r="1" fill="#36aa6d"><animate id="SVGHktsvT5Q" attributeName="r" begin="SVGSFNCBbxb.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="16.5" cy="19.79" r="1" fill="#36aa6d"><animate id="SVGMFYo1cJN" attributeName="r" begin="SVGqCF3Scrd.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="7.5" cy="19.79" r="1" fill="#36aa6d"><animate id="SVGSFNCBbxb" attributeName="r" begin="SVGLSoLpdOI.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="12" cy="21" r="1" fill="#36aa6d"><animate id="SVGLSoLpdOI" attributeName="r" begin="SVGMFYo1cJN.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><animateTransform attributeName="transform" dur="6s" repeatCount="indefinite" type="rotate" values="360 12 12;0 12 12"/></g></svg>`
+  const markup = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"><g><circle cx="12" cy="3" r="1" fill="currentColor"><animate id="SVGelgoqhuA" attributeName="r" begin="0;SVGSRzJybSJ.end-0.5s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="16.5" cy="4.21" r="1" fill="currentColor"><animate id="SVGBcQu6cCi" attributeName="r" begin="SVGelgoqhuA.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="7.5" cy="4.21" r="1" fill="currentColor"><animate id="SVGSRzJybSJ" attributeName="r" begin="SVGeZGzNdVZ.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="19.79" cy="7.5" r="1" fill="currentColor"><animate id="SVGG5Q0fe0M" attributeName="r" begin="SVGBcQu6cCi.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="4.21" cy="7.5" r="1" fill="currentColor"><animate id="SVGeZGzNdVZ" attributeName="r" begin="SVGUTnihcal.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="21" cy="12" r="1" fill="currentColor"><animate id="SVG8aQG8dpc" attributeName="r" begin="SVGG5Q0fe0M.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="3" cy="12" r="1" fill="currentColor"><animate id="SVGUTnihcal" attributeName="r" begin="SVGHktsvT5Q.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="19.79" cy="16.5" r="1" fill="currentColor"><animate id="SVGqCF3Scrd" attributeName="r" begin="SVG8aQG8dpc.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="4.21" cy="16.5" r="1" fill="currentColor"><animate id="SVGHktsvT5Q" attributeName="r" begin="SVGSFNCBbxb.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="16.5" cy="19.79" r="1" fill="currentColor"><animate id="SVGMFYo1cJN" attributeName="r" begin="SVGqCF3Scrd.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="7.5" cy="19.79" r="1" fill="currentColor"><animate id="SVGSFNCBbxb" attributeName="r" begin="SVGLSoLpdOI.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><circle cx="12" cy="21" r="1" fill="currentColor"><animate id="SVGLSoLpdOI" attributeName="r" begin="SVGMFYo1cJN.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".27,.42,.37,.99;.53,0,.61,.73" values="1;2;1"/></circle><animateTransform attributeName="transform" dur="6s" repeatCount="indefinite" type="rotate" values="360 12 12;0 12 12"/></g></svg>`
+  spinner.innerHTML = markup.replace(/SVG/g, `SVG${++_spinnerIdSeed}_`)
   return spinner
 }
 
@@ -730,6 +737,7 @@ function _createPreviewWindow(url, settings) {
     elements: {
       root,
       header,
+      brandIcon,
       refreshButton,
       urlText,
       copyButton,
@@ -751,7 +759,6 @@ function _createPreviewWindow(url, settings) {
   _applyPreviewLayout(preview)
   _bindPreviewEvents(preview)
   _bindTooltipEvents(
-    preview,
     brandIcon,
     refreshButton,
     copyButton,
@@ -763,6 +770,15 @@ function _createPreviewWindow(url, settings) {
   )
 
   return preview
+}
+
+function _isIframeBlank(iframe) {
+  try {
+    return !iframe.contentWindow || iframe.contentWindow.location.href === 'about:blank'
+  } catch (e) {
+    // Cross-origin frames throw on location access; treat them as loaded.
+    return false
+  }
 }
 
 function _bindPreviewEvents(preview) {
@@ -800,7 +816,7 @@ function _bindPreviewEvents(preview) {
   }
 
   iframe.addEventListener('load', () => {
-    if (iframe.src === 'about:blank') {
+    if (_isIframeBlank(iframe)) {
       return
     }
     _setPreviewLoading(preview, false)
@@ -1011,10 +1027,7 @@ function _loadPreviewUrl(preview, url) {
   _setPreviewError(preview)
   preview.elements.iframe.classList.remove('loaded')
   _setPreviewLoading(preview, true)
-  preview.elements.iframe.src = 'about:blank'
-  requestAnimationFrame(() => {
-    preview.elements.iframe.src = url
-  })
+  preview.elements.iframe.src = url
 }
 
 function getActivePreview() {
@@ -1089,6 +1102,11 @@ function closePreview(id) {
     return
   }
 
+  if (preview.copyToastTimer) {
+    clearTimeout(preview.copyToastTimer)
+    preview.copyToastTimer = null
+  }
+
   preview.elements.root.remove()
   previewManager.previews.delete(id)
   _hideTooltip()
@@ -1159,10 +1177,9 @@ function reloadPreview(id) {
   }
 
   const url = preview.currentUrl
-  preview.elements.iframe.src = 'about:blank'
-  window.setTimeout(() => {
+  if (url) {
     preview.elements.iframe.src = url
-  }, 30)
+  }
 }
 
 function handlePreviewAction(id, action, buttonEl) {
@@ -1201,6 +1218,10 @@ function handlePreviewAction(id, action, buttonEl) {
       break
 
     case 'copy-url':
+      if (!navigator.clipboard?.writeText) {
+        console.error(t('errorClipboard'))
+        break
+      }
       navigator.clipboard.writeText(preview.currentUrl).then(() => {
         if (!buttonEl) {
           return
@@ -1368,17 +1389,17 @@ function _handleDirectReleaseDrop(event) {
     return
   }
 
+  if (!_isLinkReleaseIntentReady()) {
+    _clearLinkDragState()
+    _dlog('preview release ignored before drag intent threshold')
+    return
+  }
+
   event.preventDefault()
   event.stopPropagation()
 
   const url = _getDroppedUrl(event)
-  const isReady = _isLinkReleaseIntentReady()
   _clearLinkDragState()
-
-  if (!isReady) {
-    _dlog('preview release ignored before drag intent threshold')
-    return
-  }
 
   if (validateURL(url)) {
     openPreview(url)
@@ -1546,8 +1567,6 @@ function _bindFrameDragBridge() {
     }
 
     try {
-      event.preventDefault()
-      event.stopPropagation()
       window.top.postMessage({ type: FRAME_ESCAPE_MESSAGE }, '*')
     } catch (e) {
       _dlog('frame escape bridge failed', e)
@@ -1705,7 +1724,6 @@ function reinitDropZone() {
 
 async function initGlimpser() {
   if (window !== top) {
-    _settings = await loadSettings()
     _bindFrameDragBridge()
     return
   }
@@ -1730,9 +1748,14 @@ async function initGlimpser() {
   document.documentElement.appendChild(_shadowHost)
   _shadowRoot = _shadowHost.attachShadow({ mode: 'open' })
 
+  const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
   try {
-    const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
     await _ensureDocumentStylesheet(GOOGLE_FONTS_STYLESHEET)
+  } catch (e) {
+    console.warn('[Glimpser] Failed to load Google Fonts; using system fonts', e)
+  }
+
+  try {
     await _loadCssText(nativeAPI, [
       'css/foundation.css',
       'css/preview.css',
@@ -1769,7 +1792,7 @@ if (typeof exports === 'undefined') {
 
   const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
   window.addEventListener('message', (event) => {
-    if (event.source === window) {
+    if (window !== top || event.source === window) {
       return
     }
 
@@ -1825,13 +1848,11 @@ if (typeof exports === 'undefined') {
     }
   })
 
-  nativeAPI.runtime.onMessage.addListener((msg) => {
+  nativeAPI.storage.onChanged.addListener((changes) => {
     if (window !== top) {
       return
     }
-  })
 
-  nativeAPI.storage.onChanged.addListener((changes) => {
     const newSettings = {}
     for (const [key, { newValue }] of Object.entries(changes)) {
       newSettings[key] = newValue
@@ -1840,28 +1861,32 @@ if (typeof exports === 'undefined') {
     _settings = { ...(_settings || DEFAULT_SETTINGS), ...newSettings }
     _settings.blacklistDomains = _normalizeBlacklistDomains(_settings.blacklistDomains)
 
-    if (window !== top) {
-      return
-    }
-
     if (Object.prototype.hasOwnProperty.call(newSettings, 'maxPreviewWindows')) {
       _enforcePreviewWindowLimit()
     }
 
-    if (newSettings.theme || newSettings.language) {
+    if (Object.prototype.hasOwnProperty.call(newSettings, 'theme') ||
+        Object.prototype.hasOwnProperty.call(newSettings, 'language')) {
       const theme = _settings.theme || _detectSystemTheme()
       applyContentTheme(theme)
     }
 
-    if (newSettings.corners || typeof newSettings.cornerRadius === 'number') {
+    if (Object.prototype.hasOwnProperty.call(newSettings, 'corners') ||
+        Object.prototype.hasOwnProperty.call(newSettings, 'cornerRadius')) {
       applyContentCorners(_settings.corners)
     }
 
-    applyLangPref(_settings.language).then(() => {
+    const refreshUi = () => {
       _updatePreviewLabels()
       _syncAllPreviewActionVisibility()
       reinitDropZone()
-    })
+    }
+
+    if (Object.prototype.hasOwnProperty.call(newSettings, 'language')) {
+      applyLangPref(_settings.language).then(refreshUi)
+    } else {
+      refreshUi()
+    }
   })
 }
 

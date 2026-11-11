@@ -4,6 +4,7 @@
 
 let _messages = {};
 let _debug = false;
+let _debugLoaded = false;
 
 function _dlog(...args) {
   if (_debug) {
@@ -12,6 +13,11 @@ function _dlog(...args) {
 }
 
 async function _loadDebugFlag() {
+  if (_debugLoaded) {
+    return;
+  }
+  _debugLoaded = true;
+
   try {
     const nativeAPI = typeof browser !== 'undefined' ? browser : (typeof chrome !== 'undefined' ? chrome : null);
     const { debug } = nativeAPI
@@ -77,6 +83,14 @@ async function applyLangPref(pref) {
              : (pref === 'en') ? 'en'
              : _detectBrowserLang();
   await loadMessages(lang);
+}
+
+/**
+ * Returns the currently active locale code.
+ * @returns {'zh_CN'|'en'}
+ */
+function getLang() {
+  return _i18nLang;
 }
 
 /**
