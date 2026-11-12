@@ -58,6 +58,16 @@ Firefox only loads temporary add-ons unsigned. For a permanent install, the pack
 
 If a site refuses to load in a frame, open it in a new tab from the preview toolbar.
 
+## Popup
+
+Click the toolbar icon for quick controls:
+
+- **Preview** — enable previews, trigger mode, and single/multiple preview windows (up to 10).
+- **This site** — block or unblock the current hostname. Unavailable on browser-internal pages.
+- **Interface** — language and theme (System / Light / Dark).
+
+Popup changes are saved immediately. Use **Settings** for the full set of options.
+
 ## Settings
 
 Open the extension popup and choose **Settings**, or open the options page from the browser's extension manager.

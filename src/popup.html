@@ -13,11 +13,6 @@
       <span class="brand">Glimpser</span>
       <span class="version" id="versionBadge"></span>
       <div class="header-actions">
-        <button class="header-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle theme" data-i18n-title="ariaToggleTheme" data-i18n-aria-label="ariaToggleTheme">
-          <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
-            <path fill="currentColor" d="M256 104c-83.813 0-152 68.187-152 152s68.187 152 152 152s152-68.187 152-152s-68.187-152-152-152m0 272a120 120 0 1 1 120-120a120.136 120.136 0 0 1-120 120M240 16h32v48h-32zm0 432h32v48h-32zm208-208h48v32h-48zm-432 0h48v32H16zm372.687 171.314l22.627-22.627l32 32l-22.627 22.627zm-320-320l22.628-22.628l32 32l-22.628 22.628zm-.002 329.375l32-32l22.628 22.626l-32 32zm320.002-320.003l32-32l22.628 22.628l-32 32z"/>
-          </svg>
-        </button>
         <button class="header-btn" id="openSettings" title="Settings" aria-label="Settings" data-i18n-title="ariaOpenSettings" data-i18n-aria-label="ariaOpenSettings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="2"/>
@@ -27,22 +22,81 @@
       </div>
     </div>
 
-    <div class="status-row">
-      <span class="status-label" data-i18n="labelPreviewEnabled">Enable preview</span>
-      <label class="toggle">
-        <input type="checkbox" id="previewEnabled" />
-        <span class="slider"></span>
-      </label>
+    <div class="section">
+      <div class="section-label" data-i18n="tabPreview">Preview</div>
+
+      <div class="status-row">
+        <span class="status-label">
+          <span class="label-main" data-i18n="labelPreviewEnabled">Enable preview</span>
+        </span>
+        <label class="toggle">
+          <input type="checkbox" id="previewEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="status-row">
+        <span class="status-label">
+          <span class="label-main" data-i18n="labelPreviewTrigger">Trigger mode</span>
+          <span class="row-hint" id="triggerHint"></span>
+        </span>
+        <label class="toggle">
+          <input type="checkbox" id="previewTriggerMode" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="status-row">
+        <span class="status-label">
+          <span class="label-main" data-i18n="labelMultiplePreviewWindows">Multiple preview windows</span>
+          <span class="row-hint" data-i18n="hintMultipleWindowsPopup">Up to 10 windows</span>
+        </span>
+        <label class="toggle">
+          <input type="checkbox" id="multipleWindows" />
+          <span class="slider"></span>
+        </label>
+      </div>
     </div>
 
-    <div class="status-row">
-      <span class="status-label" data-i18n="labelPreviewTrigger">Trigger mode</span>
-      <select id="previewTriggerMode" class="input-xs">
-        <option value="release" data-i18n="triggerRelease">Release anywhere</option>
-        <option value="drop-area" data-i18n="triggerDropArea">Drop area</option>
-      </select>
+    <div class="section">
+      <div class="section-label" data-i18n="sectionThisSite">This site</div>
+
+      <div class="status-row">
+        <span class="status-label">
+          <span class="label-main" data-i18n="labelBlockCurrentSite">Block current site</span>
+          <span class="row-hint" id="siteHint"></span>
+        </span>
+        <label class="toggle">
+          <input type="checkbox" id="blockCurrentSite" />
+          <span class="slider"></span>
+        </label>
+      </div>
     </div>
 
+    <div class="section">
+      <div class="section-label" data-i18n="labelPreferences">Interface</div>
+
+      <div class="status-row">
+        <span class="status-label">
+          <span class="label-main" data-i18n="labelLang">Language</span>
+        </span>
+        <select id="language">
+          <option value="en" data-i18n="langEn">English</option>
+          <option value="zh_CN" data-i18n="langZh">中文</option>
+        </select>
+      </div>
+
+      <div class="status-row">
+        <span class="status-label">
+          <span class="label-main" data-i18n="labelTheme">Theme</span>
+        </span>
+        <select id="theme">
+          <option value="system" data-i18n="themeSystem">System</option>
+          <option value="light" data-i18n="themeLight">Light</option>
+          <option value="dark" data-i18n="themeDark">Dark</option>
+        </select>
+      </div>
+    </div>
   </div>
   <script src="i18n.js"></script>
   <script src="popup.js"></script>

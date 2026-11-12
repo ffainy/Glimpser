@@ -3,15 +3,41 @@ const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
 const DEFAULT_SETTINGS = {
   previewEnabled: true,
   previewTriggerMode: 'release',
+  maxPreviewWindows: 1,
+  blacklistDomains: [],
   theme: null,
   language: null,
 }
 
-const SUN_ICON = '<path fill="currentColor" d="M256 104c-83.813 0-152 68.187-152 152s68.187 152 152 152s152-68.187 152-152s-68.187-152-152-152m0 272a120 120 0 1 1 120-120a120.136 120.136 0 0 1-120 120M240 16h32v48h-32zm0 432h32v48h-32zm208-208h48v32h-48zm-432 0h48v32H16zm372.687 171.314l22.627-22.627l32 32l-22.627 22.627zm-320-320l22.628-22.628l32 32l-22.628 22.628zm-.002 329.375l32-32l22.628 22.626l-32 32zm320.002-320.003l32-32l22.628 22.628l-32 32z"/>'
-const MOON_ICON = '<path fill="currentColor" d="M268.279 496c-67.574 0-130.978-26.191-178.534-73.745S16 311.293 16 243.718A252.25 252.25 0 0 1 154.183 18.676a24.44 24.44 0 0 1 34.46 28.958a220.12 220.12 0 0 0 54.8 220.923A218.75 218.75 0 0 0 399.085 333.2a220.2 220.2 0 0 0 65.277-9.846a24.439 24.439 0 0 1 28.959 34.461A252.26 252.26 0 0 1 268.279 496M153.31 55.781A219.3 219.3 0 0 0 48 243.718C48 365.181 146.816 464 268.279 464a219.3 219.3 0 0 0 187.938-105.31a253 253 0 0 1-57.13 6.513a250.54 250.54 0 0 1-178.268-74.016a252.15 252.15 0 0 1-67.509-235.4Z"/>'
-
 function _detectSystemTheme() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function _normalizeDomainInput(value) {
+  const trimmed = String(value || '').trim().toLowerCase().replace(/\.+$/, '')
+  if (!trimmed) return ''
+  const normalizeHostname = (hostname) => {
+    const n = String(hostname || '').trim().toLowerCase().replace(/\.+$/, '')
+    if (!n) return ''
+    const labels = n.split('.')
+    if (labels.some(l => !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(l))) return ''
+    return n
+  }
+  if (!trimmed.includes('/') && !trimmed.includes(':')) return normalizeHostname(trimmed)
+  const candidates = /^[a-z][a-z\d+.-]*:\/\//i.test(trimmed) ? [trimmed] : [`https://${trimmed}`]
+  for (const c of candidates) {
+    try { return normalizeHostname(new URL(c).hostname) } catch (e) {}
+  }
+  return ''
+}
+
+function _normalizeBlacklistDomains(domains) {
+  const unique = []
+  for (const domain of Array.isArray(domains) ? domains : []) {
+    const normalized = _normalizeDomainInput(domain)
+    if (normalized && !unique.includes(normalized)) unique.push(normalized)
+  }
+  return unique
 }
 
 async function loadSettings() {
@@ -45,6 +71,18 @@ function applyI18n() {
   })
 }
 
+async function _getActiveSite() {
+  try {
+    if (!nativeAPI.tabs || typeof nativeAPI.tabs.query !== 'function') return ''
+    const tabs = await nativeAPI.tabs.query({ active: true, currentWindow: true })
+    const tab = Array.isArray(tabs) ? tabs[0] : null
+    if (!tab || !/^https?:/i.test(tab.url || '')) return ''
+    return _normalizeDomainInput(tab.url)
+  } catch {
+    return ''
+  }
+}
+
 async function initPopup() {
   const settings = await loadSettings()
 
@@ -56,34 +94,97 @@ async function initPopup() {
   document.getElementById('versionBadge').textContent = 'v' + version
 
   const previewToggle = document.getElementById('previewEnabled')
-  const triggerSelect = document.getElementById('previewTriggerMode')
-  const themeToggle = document.getElementById('themeToggle')
-  const themeIcon = document.getElementById('themeIcon')
+  const triggerToggle = document.getElementById('previewTriggerMode')
+  const triggerHint = document.getElementById('triggerHint')
+  const multipleToggle = document.getElementById('multipleWindows')
+  const blockToggle = document.getElementById('blockCurrentSite')
+  const siteHint = document.getElementById('siteHint')
+  const languageSelect = document.getElementById('language')
+  const themeSelect = document.getElementById('theme')
+  const blockRow = blockToggle.closest('.status-row')
 
   function _applyTheme(theme) {
-    const resolved = theme || _detectSystemTheme()
-    document.documentElement.dataset.theme = resolved
-    themeIcon.innerHTML = resolved === 'light' ? SUN_ICON : MOON_ICON
+    document.documentElement.dataset.theme = theme || _detectSystemTheme()
+  }
+
+  const updateTriggerHint = () => {
+    triggerHint.textContent = typeof t === 'function'
+      ? t(triggerToggle.checked ? 'triggerDropArea' : 'triggerRelease')
+      : ''
+  }
+
+  const currentSite = await _getActiveSite()
+
+  const renderSiteState = () => {
+    if (!currentSite) {
+      blockToggle.checked = false
+      blockToggle.disabled = true
+      siteHint.textContent = typeof t === 'function' ? t('blacklistCurrentDomainUnavailable') : ''
+      blockRow.classList.add('is-disabled')
+      return
+    }
+
+    blockToggle.disabled = false
+    blockToggle.checked = _normalizeBlacklistDomains(settings.blacklistDomains).includes(currentSite)
+    siteHint.textContent = currentSite
+    blockRow.classList.remove('is-disabled')
   }
 
   previewToggle.checked = settings.previewEnabled !== false
-  triggerSelect.value = settings.previewTriggerMode || 'release'
+  triggerToggle.checked = (settings.previewTriggerMode || 'release') === 'drop-area'
+  multipleToggle.checked = (settings.maxPreviewWindows || 1) > 1
+  languageSelect.value = (settings.language === 'zh_CN' || settings.language === 'zh')
+    ? 'zh_CN'
+    : (settings.language === 'en'
+      ? 'en'
+      : (typeof getLang === 'function' && getLang() === 'zh_CN' ? 'zh_CN' : 'en'))
+  themeSelect.value = settings.theme === 'light' || settings.theme === 'dark'
+    ? settings.theme
+    : 'system'
+  updateTriggerHint()
+  renderSiteState()
   _applyTheme(settings.theme)
 
   previewToggle.addEventListener('change', () => {
-    saveSettings({ previewEnabled: previewToggle.checked })
+    settings.previewEnabled = previewToggle.checked
+    saveSettings({ previewEnabled: settings.previewEnabled })
   })
 
-  triggerSelect.addEventListener('change', () => {
-    saveSettings({ previewTriggerMode: triggerSelect.value })
+  triggerToggle.addEventListener('change', () => {
+    settings.previewTriggerMode = triggerToggle.checked ? 'drop-area' : 'release'
+    updateTriggerHint()
+    saveSettings({ previewTriggerMode: settings.previewTriggerMode })
   })
 
-  themeToggle.addEventListener('click', () => {
-    const current = settings.theme || _detectSystemTheme()
-    const next = current === 'dark' ? 'light' : 'dark'
-    settings.theme = next
-    _applyTheme(next)
-    saveSettings({ theme: next })
+  multipleToggle.addEventListener('change', () => {
+    settings.maxPreviewWindows = multipleToggle.checked ? 10 : 1
+    saveSettings({ maxPreviewWindows: settings.maxPreviewWindows })
+  })
+
+  blockToggle.addEventListener('change', async () => {
+    if (!currentSite) return
+    const next = _normalizeBlacklistDomains(settings.blacklistDomains)
+    const index = next.indexOf(currentSite)
+    if (blockToggle.checked && index === -1) next.push(currentSite)
+    if (!blockToggle.checked && index !== -1) next.splice(index, 1)
+    settings.blacklistDomains = next
+    await saveSettings({ blacklistDomains: next })
+  })
+
+  languageSelect.addEventListener('change', async () => {
+    settings.language = languageSelect.value
+    await applyLangPref(settings.language)
+    document.documentElement.lang = typeof getLang === 'function' ? getLang() : 'en'
+    applyI18n()
+    updateTriggerHint()
+    renderSiteState()
+    saveSettings({ language: settings.language })
+  })
+
+  themeSelect.addEventListener('change', () => {
+    settings.theme = themeSelect.value === 'system' ? null : themeSelect.value
+    _applyTheme(settings.theme)
+    saveSettings({ theme: settings.theme })
   })
 
   document.getElementById('openSettings').addEventListener('click', () => {
