@@ -19,7 +19,7 @@ Glimpser is a Chrome and Firefox extension that opens links in a floating previe
 
 - **Chrome** 90 or newer (Manifest V3).
 - **Firefox** 113 or newer (`declarativeNetRequest` support).
-- **Node.js** 20 or newer for development and packaging.
+- **Node.js** 24 or newer for development and packaging.
 
 ## Development
 
