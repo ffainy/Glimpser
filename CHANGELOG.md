@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- popup: add quick controls for language, windows, and site blocking
+- settings: overhaul controls and save flow
+- ui: unify settings palette and localize popup controls
+- settings: redesign settings with native popup and standalone page
+
+### Changed
+- preview: remove Google Fonts dependency
+
+### Fixed
+- preview: harden iframe loading and runtime guards
+- ui: correct checkbox styling and polish settings UI
+
 ## [0.0.1] - 2026-04-27
 
 ### Added
