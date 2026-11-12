@@ -4,6 +4,7 @@
   "description": "Browser extension to preview links in a floating window via drag-and-drop",
   "type": "module",
   "private": true,
+  "license": "GPL-3.0-only",
   "homepage": "https://github.com/ffainy/glimpser",
   "repository": {
     "type": "git",
