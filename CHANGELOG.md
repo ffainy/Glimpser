@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - ui: redesign dark and light themes with a purple-gray, amber, and gold palette
+- ui: source popup colors from the shared foundation theme tokens
+
+### Fixed
+- popup: label form controls and expose a main landmark for assistive tech
 
 ## [0.1.0] - 2026-11-12
 

@@ -104,7 +104,9 @@ async function initPopup() {
   const blockRow = blockToggle.closest('.status-row')
 
   function _applyTheme(theme) {
-    document.documentElement.dataset.theme = theme || _detectSystemTheme()
+    const resolved = theme || _detectSystemTheme()
+    document.documentElement.dataset.theme = resolved
+    document.documentElement.dataset.dpTheme = resolved
   }
 
   const updateTriggerHint = () => {

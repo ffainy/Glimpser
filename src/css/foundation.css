@@ -400,7 +400,7 @@ textarea {
   --gs-settings-accent-contrast: rgb(26 21 35);
   --gs-settings-danger: rgb(var(--gs-danger-rgb));
   --gs-settings-danger-contrast: rgb(26 21 35);
-  --gs-settings-ring: rgb(var(--gs-accent-rgb) / 0.50);
+  --gs-settings-ring: rgb(var(--gs-accent-rgb) / 0.55);
   --gs-settings-rail: rgb(226 216 242 / 0.18);
   --gs-settings-badge-surface: rgb(255 255 255 / 0.08);
   --gs-settings-badge-foreground: rgb(237 232 244 / 0.70);
@@ -607,7 +607,7 @@ textarea {
   --gs-settings-accent-contrast: rgb(255 252 246);
   --gs-settings-danger: rgb(var(--gs-danger-rgb));
   --gs-settings-danger-contrast: rgb(255 252 246);
-  --gs-settings-ring: rgb(var(--gs-accent-rgb) / 0.38);
+  --gs-settings-ring: rgb(var(--gs-accent-rgb) / 0.42);
   --gs-settings-rail: rgb(62 52 74 / 0.18);
   --gs-settings-badge-surface: rgb(62 52 74 / 0.08);
   --gs-settings-badge-foreground: rgb(46 39 54 / 0.70);

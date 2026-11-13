@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-dp-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Glimpser</title>
+  <link rel="stylesheet" href="css/foundation.css" />
   <link rel="stylesheet" href="css/popup.css" />
 </head>
 <body>
-  <div id="app">
+  <main id="app">
     <div class="header">
       <span class="logo" aria-hidden="true"></span>
       <span class="brand">Glimpser</span>
@@ -30,7 +31,7 @@
           <span class="label-main" data-i18n="labelPreviewEnabled">Enable preview</span>
         </span>
         <label class="toggle">
-          <input type="checkbox" id="previewEnabled" />
+          <input type="checkbox" id="previewEnabled" data-i18n-aria-label="labelPreviewEnabled" />
           <span class="slider"></span>
         </label>
       </div>
@@ -41,7 +42,7 @@
           <span class="row-hint" id="triggerHint"></span>
         </span>
         <label class="toggle">
-          <input type="checkbox" id="previewTriggerMode" />
+          <input type="checkbox" id="previewTriggerMode" data-i18n-aria-label="labelPreviewTrigger" />
           <span class="slider"></span>
         </label>
       </div>
@@ -52,7 +53,7 @@
           <span class="row-hint" data-i18n="hintMultipleWindowsPopup">Up to 10 windows</span>
         </span>
         <label class="toggle">
-          <input type="checkbox" id="multipleWindows" />
+          <input type="checkbox" id="multipleWindows" data-i18n-aria-label="labelMultiplePreviewWindows" />
           <span class="slider"></span>
         </label>
       </div>
@@ -67,7 +68,7 @@
           <span class="row-hint" id="siteHint"></span>
         </span>
         <label class="toggle">
-          <input type="checkbox" id="blockCurrentSite" />
+          <input type="checkbox" id="blockCurrentSite" data-i18n-aria-label="labelBlockCurrentSite" />
           <span class="slider"></span>
         </label>
       </div>
@@ -80,7 +81,7 @@
         <span class="status-label">
           <span class="label-main" data-i18n="labelLang">Language</span>
         </span>
-        <select id="language">
+        <select id="language" data-i18n-aria-label="labelLang">
           <option value="en" data-i18n="langEn">English</option>
           <option value="zh_CN" data-i18n="langZh">中文</option>
         </select>
@@ -90,14 +91,14 @@
         <span class="status-label">
           <span class="label-main" data-i18n="labelTheme">Theme</span>
         </span>
-        <select id="theme">
+        <select id="theme" data-i18n-aria-label="labelTheme">
           <option value="system" data-i18n="themeSystem">System</option>
           <option value="light" data-i18n="themeLight">Light</option>
           <option value="dark" data-i18n="themeDark">Dark</option>
         </select>
       </div>
     </div>
-  </div>
+  </main>
   <script src="i18n.js"></script>
   <script src="popup.js"></script>
 </body>
