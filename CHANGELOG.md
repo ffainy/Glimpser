@@ -10,10 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2026-11-13
 
 ### Added
-- ui: polish native controls and theme accessibility
-- ui: unify popup theme with foundation tokens
-- ui: apply dusk purple-gray and amber theme palette
 - ui: refresh brand mark, icons, and accent palette
+- theme: add a palette redesign plan and standalone visual reference lab
+- test: guard theme token resolution and component color usage
+
+### Changed
+- ui: redesign dark and light themes with a purple-gray, amber, and gold palette
+- ui: source popup colors from the shared foundation theme tokens
+- ui: follow the system color scheme for native controls
+- ui: respect the reduced-motion preference
+- build: upgrade GitHub Actions to the Node 24 runtime
+- license: adopt GPL-3.0-only
+
+### Fixed
+- popup: label form controls and expose a main landmark for assistive tech
+- ui: strengthen the light-theme focus ring for non-text contrast
 
 ## [0.1.0] - 2026-11-12
 
