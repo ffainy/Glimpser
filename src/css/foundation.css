@@ -46,6 +46,18 @@ textarea {
   color: inherit;
 }
 
+/* Respect the user's reduced-motion preference across settings, popup, and preview. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ── 2. Global tokens ────────────────────────────────────────────────────── */
 /* Primitive values only. Everything else is derived from these.              */
 /* `:root` lets the same tokens reach normal documents such as settings.html. */
@@ -194,6 +206,7 @@ textarea {
 
 :host([data-dp-theme="dark"]),
 [data-dp-theme="dark"] {
+  color-scheme: dark;
   --gs-accent-rgb:         201 189 220;
   --gs-accent-strong-rgb:  239 232 248;
   --gs-support-rgb:        232 163 76;
@@ -411,6 +424,7 @@ textarea {
 
 :host([data-dp-theme="light"]),
 [data-dp-theme="light"] {
+  color-scheme: light;
   --gs-accent-rgb:         91 81 105;
   --gs-accent-strong-rgb:  61 54 73;
   --gs-support-rgb:        217 154 74;
@@ -607,7 +621,7 @@ textarea {
   --gs-settings-accent-contrast: rgb(255 252 246);
   --gs-settings-danger: rgb(var(--gs-danger-rgb));
   --gs-settings-danger-contrast: rgb(255 252 246);
-  --gs-settings-ring: rgb(var(--gs-accent-rgb) / 0.42);
+  --gs-settings-ring: rgb(var(--gs-accent-rgb) / 0.70);
   --gs-settings-rail: rgb(62 52 74 / 0.18);
   --gs-settings-badge-surface: rgb(62 52 74 / 0.08);
   --gs-settings-badge-foreground: rgb(46 39 54 / 0.70);

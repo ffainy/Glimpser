@@ -9,13 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - ui: refresh brand mark, icons, and accent palette
+- test: guard theme token resolution and component color usage
 
 ### Changed
 - ui: redesign dark and light themes with a purple-gray, amber, and gold palette
 - ui: source popup colors from the shared foundation theme tokens
+- ui: follow the system color scheme for native controls
+- ui: respect reduced-motion preferences
 
 ### Fixed
 - popup: label form controls and expose a main landmark for assistive tech
+- ui: strengthen the light-theme focus ring for non-text contrast
 
 ## [0.1.0] - 2026-11-12
 

@@ -200,7 +200,7 @@
 | `--gs-settings-halo-a` | `rgb(201 189 220 / 0.20)` | `rgb(91 81 105 / 0.07)` |
 | `--gs-settings-halo-b` | `rgb(232 163 76 / 0.14)` | `rgb(217 154 74 / 0.10)` |
 | `--gs-settings-accent-contrast` | `#1A1523` | `#FFFCF6` |
-| `--gs-settings-ring` | `rgb(201 189 220 / 0.55)` | `rgb(91 81 105 / 0.42)` |
+| `--gs-settings-ring` | `rgb(201 189 220 / 0.55)` | `rgb(91 81 105 / 0.70)` |
 | `--gs-settings-rail` | `rgb(226 216 242 / 0.18)` | `rgb(62 52 74 / 0.18)` |
 | `--gs-settings-badge-surface` | `rgb(255 255 255 / 0.08)` | `rgb(62 52 74 / 0.08)` |
 | `--gs-settings-badge-foreground` | `rgb(237 232 244 / 0.70)` | `rgb(46 39 54 / 0.70)` |
@@ -262,7 +262,7 @@ Popup 已合并到 foundation token：`popup.html` 先加载 `foundation.css`，
 
 ### 7.3 焦点与选中
 
-- 焦点环：深色 `rgb(201 189 220 / 0.55)`，浅色 `rgb(91 81 105 / 0.42)`，2–3px。
+- 焦点环：深色 `rgb(201 189 220 / 0.55)`，浅色 `rgb(91 81 105 / 0.70)`，2–3px。
 - 选中 tab：紫灰底/文字，不用金色。
 - 拖放悬停：边框转为金色，配合轻微金色光晕，表示「可以放下」。
 
@@ -382,4 +382,5 @@ Demo 只用于评审，不会被打包进扩展。
 - Phase 1（token 换血）完成：foundation 深浅主题、preview / drop / toast / tooltip / settings token 全部切换到新色板。
 - Phase 2（组件统一）完成：popup 改为加载 foundation 并消费 `--gs-*`；`--bezier`、focus ring、checkbox、select arrow 统一；金色使用范围复核完成。
 - Phase 3（验证）已做：真实 CSS 计算样式检查 + Lighthouse 深/浅色可访问性审计；Settings 与 Popup 均达到 100 分。
+- 收尾完成：主题块加入 `color-scheme`；foundation 增加 `prefers-reduced-motion` 降级；浅色 focus ring 提升到 `0.70`（对画布 ≥ 3:1）；新增 `theme-tokens` 守卫测试。
 - 尚未完成：低亮度 / 高亮度屏幕的实体显示器观感确认，以及 Chrome / Firefox 打包后的肉眼走查。
