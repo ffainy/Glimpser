@@ -26,8 +26,6 @@
   --gs-drop-overlay-panel-sheen: var(--gs-preview-drop-overlay-panel-sheen);
 
   --gs-preview-action-danger-surface: var(--gs-preview-danger-surface);
-  --gs-preview-action-bulk-surface: var(--gs-preview-warning-surface);
-  --gs-preview-action-bulk-foreground: var(--gs-preview-warning-foreground);
   --gs-preview-backdrop-fill: var(--gs-settings-overlay-fill);
   --gs-preview-backdrop-halo-a: var(--gs-settings-halo-a);
   --gs-preview-backdrop-halo-b: var(--gs-settings-halo-b);
@@ -298,12 +296,17 @@
 }
 
 .gs-preview-header {
+  /* header 有 backdrop-filter，本来就会生成层叠上下文；显式抬一层，
+     否则菜单会被后出现的 .gs-preview-body（iframe）盖住。 */
+  position: relative;
+  z-index: 2;
   min-height: 30px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: stretch;
   gap: var(--gs-space-compact);
-  padding: var(--gs-space-tight) var(--gs-space-compact);
+  /* 24px 按钮 + urlbar 上下各 1px 边框 = 26，上下各 5 才能把头部稳在 36px。 */
+  padding: 5px var(--gs-space-compact);
   border-bottom: 1px solid var(--gs-preview-header-border);
   background: var(--gs-preview-header-surface);
   font-family: var(--gs-font-family);
@@ -329,7 +332,7 @@
 .gs-preview-group {
   display: inline-flex;
   align-items: center;
-  gap: var(--gs-space-micro-tight);
+  gap: var(--gs-space-hairline);
 }
 
 .gs-preview-toolbar {
@@ -337,10 +340,10 @@
   flex-shrink: 0;
 }
 
-.gs-preview-group--danger {
-  gap: var(--gs-space-micro);
-  margin-left: var(--gs-space-divider);
-  padding-left: var(--gs-space-divider);
+.gs-preview-group--close {
+  gap: var(--gs-space-hairline);
+  margin-left: var(--gs-space-compact);
+  padding-left: var(--gs-space-compact);
   border-left: 1px solid var(--gs-preview-group-divider);
 }
 
@@ -379,8 +382,8 @@
 
 .gs-preview-action,
 .gs-pill-action {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -395,8 +398,17 @@
 
 .gs-preview-action svg,
 .gs-pill-action svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.gs-preview-action[hidden],
+.gs-pill-action[hidden],
+.gs-preview-more[hidden],
+.gs-preview-menu[hidden],
+.gs-preview-menu-item[hidden] {
+  display: none;
 }
 
 .gs-preview-window:not(.active) .gs-preview-action,
@@ -410,8 +422,13 @@
   background: var(--gs-preview-action-surface-hover);
   color: var(--gs-preview-action-foreground-hover);
   filter: var(--gs-preview-action-glow-hover);
-  transform: translateY(-1px);
   box-shadow: var(--gs-preview-action-ring-hover);
+}
+
+.gs-preview-action:focus-visible,
+.gs-pill-action:focus-visible {
+  outline: 2px solid var(--gs-preview-action-foreground-hover);
+  outline-offset: 1px;
 }
 
 .gs-preview-action:active,
@@ -432,9 +449,10 @@
   color: var(--gs-preview-action-danger-foreground);
 }
 
-.gs-preview-action-bulk-close:hover {
-  background: var(--gs-preview-action-bulk-surface);
-  color: var(--gs-preview-action-bulk-foreground);
+.gs-pill-action.is-copied,
+.gs-preview-window:not(.active) .gs-pill-action.is-copied {
+  color: var(--gs-preview-action-foreground-hover);
+  filter: var(--gs-preview-action-glow-hover);
 }
 
 .gs-preview-action.is-loading svg,
@@ -450,6 +468,80 @@
 @keyframes gs-preview-refresh-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.gs-preview-more {
+  position: relative;
+  display: inline-flex;
+}
+
+.gs-preview-menu {
+  position: absolute;
+  top: calc(100% + var(--gs-space-tight));
+  right: 0;
+  z-index: 4;
+  min-width: 196px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gs-space-hairline);
+  padding: var(--gs-space-micro);
+  border: 1px solid var(--gs-preview-tooltip-surface-border);
+  border-radius: 11px;
+  background: var(--gs-preview-tooltip-surface-bg);
+  box-shadow: var(--gs-preview-tooltip-surface-shadow);
+  color: var(--gs-preview-tooltip-foreground);
+  font-family: var(--gs-font-family);
+}
+
+.gs-preview-menu-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--gs-space-divider);
+  min-height: 30px;
+  padding: 0 var(--gs-space-compact);
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--gs-motion-fast), color var(--gs-motion-fast), box-shadow var(--gs-motion-fast);
+}
+
+.gs-preview-menu-item:hover,
+.gs-preview-menu-item:focus-visible {
+  background: var(--gs-preview-action-surface-hover);
+  color: var(--gs-preview-action-foreground-hover);
+  box-shadow: var(--gs-preview-action-ring-hover);
+  outline: none;
+}
+
+.gs-preview-menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gs-preview-menu-icon svg {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.gs-preview-menu-label {
+  white-space: nowrap;
+}
+
+.gs-preview-menu-count {
+  font-family: var(--gs-font-family-mono);
+  font-size: var(--gs-font-size-caption);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.62;
 }
 
 .gs-preview-urlbar {
@@ -638,6 +730,8 @@
 
 .gs-preview-resize-handle {
   position: absolute;
+  /* 高于 header（z-index 2），否则顶边那条抓手会被头部盖住。 */
+  z-index: 3;
   color: var(--gs-preview-resize-handle-foreground);
   opacity: 0;
   touch-action: none;
