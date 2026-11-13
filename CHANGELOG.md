@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-13
+
 ### Added
 - ui: polish native controls and theme accessibility
 - ui: unify popup theme with foundation tokens
