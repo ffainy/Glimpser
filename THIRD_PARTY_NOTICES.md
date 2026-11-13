@@ -1,8 +1,10 @@
 # Third-party notices
 
 Glimpser includes icon geometry derived from [Lucide](https://lucide.dev), used under the
-ISC license below. The bulk-close icons (`close others`, `close all`) and the Glimpser
-logo are original to this project.
+ISC license below. The refresh, copy, close and "open in current tab" glyphs are scaled or
+recomposed versions of Lucide's `rotate-cw`, `clipboard`, `x` and `square-arrow-right`;
+"close others" is a recomposed `copy-x`. The "open in new tab", "close all" and "more"
+glyphs, and the Glimpser logo, are original to this project.
 
 ## Lucide
 
