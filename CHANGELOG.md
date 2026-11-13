@@ -8,15 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- preview: add a "more close options" menu for closing other or all previews
-
-### Changed
-- preview: rebuild header icons on one 16px grid with 24px hit targets
-- preview: tint the menu hover state with the accent palette instead of danger
-
-### Fixed
-- preview: hide the bulk close actions while only one preview is open
-- preview: show the copy button in its success color while the URL is copied
+- preview: rework header icons and add a close menu
 
 ## [0.2.0] - 2026-11-13
 
