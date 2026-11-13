@@ -189,7 +189,7 @@
 | `--gs-settings-surface-card` | `rgb(255 255 255 / 0.045)` | `#FFFCF6` |
 | `--gs-settings-surface-subtle` | `rgb(255 255 255 / 0.03)` | `rgb(62 52 74 / 0.04)` |
 | `--gs-settings-surface-input` | `#1B1429` | `#FFFDF9` |
-| `--gs-settings-surface-elevated` | `#2B2440` | `#FFFFFF` |
+| `--gs-settings-surface-elevated` | `#2B2440` | `#FFFDF9` |
 | `--gs-settings-foreground` | `#EDE8F4` | `#2E2736` |
 | `--gs-settings-foreground-dim` | `#B8AFC7` | `#5F5668` |
 | `--gs-settings-foreground-muted` | `#958BA5` | `#756A80` |
@@ -200,10 +200,10 @@
 | `--gs-settings-halo-a` | `rgb(201 189 220 / 0.20)` | `rgb(91 81 105 / 0.07)` |
 | `--gs-settings-halo-b` | `rgb(232 163 76 / 0.14)` | `rgb(217 154 74 / 0.10)` |
 | `--gs-settings-accent-contrast` | `#1A1523` | `#FFFCF6` |
-| `--gs-settings-ring` | `rgb(201 189 220 / 0.50)` | `rgb(91 81 105 / 0.38)` |
+| `--gs-settings-ring` | `rgb(201 189 220 / 0.55)` | `rgb(91 81 105 / 0.42)` |
 | `--gs-settings-rail` | `rgb(226 216 242 / 0.18)` | `rgb(62 52 74 / 0.18)` |
 | `--gs-settings-badge-surface` | `rgb(255 255 255 / 0.08)` | `rgb(62 52 74 / 0.08)` |
-| `--gs-settings-badge-foreground` | `rgb(237 232 244 / 0.70)` | `rgb(46 39 54 / 0.62)` |
+| `--gs-settings-badge-foreground` | `rgb(237 232 244 / 0.70)` | `rgb(46 39 54 / 0.70)` |
 | `--gs-settings-toggle-knob` | `#1A1523` | `#FFFCF6` |
 
 ### 6.4 Preview
@@ -231,25 +231,13 @@
 
 ### 6.5 Popup
 
-`popup.css` 目前是独立硬编码。第一阶段先同步同一套色值：
+Popup 已合并到 foundation token：`popup.html` 先加载 `foundation.css`，`popup.css` 只在 `:root` 中保留一层别名映射，不再保存任何颜色值：
 
-| 变量 | 深色 | 浅色 |
-| --- | --- | --- |
-| `--bg-primary` | `#181226` | `#F8F1E4` |
-| `--bg-secondary` | `rgb(255 255 255 / 0.045)` | `#FFFCF6` |
-| `--bg-tertiary` | `rgb(255 255 255 / 0.03)` | `rgb(62 52 74 / 0.04)` |
-| `--text-primary` | `#EDE8F4` | `#2E2736` |
-| `--text-secondary` | `#B8AFC7` | `#5F5668` |
-| `--text-muted` | `#958BA5` | `#756A80` |
-| `--border-color` | `rgb(226 216 242 / 0.10)` | `rgb(62 52 74 / 0.12)` |
-| `--accent-color` | `#C9BDDC` | `#5B5169` |
-| `--accent-hover` | `#EFE8F8` | `#3D3649` |
-| `--input-bg` | `#1B1429` | `#FFFDF9` |
-| `--rail-color` | `rgb(226 216 242 / 0.18)` | `rgb(62 52 74 / 0.18)` |
-| `--badge-bg` | `rgb(255 255 255 / 0.08)` | `rgb(62 52 74 / 0.08)` |
-| `--badge-text` | `rgb(237 232 244 / 0.70)` | `rgb(46 39 54 / 0.62)` |
-
-第二阶段再考虑让 Popup 加载 `foundation.css` 并直接消费 `--gs-*`，消除双份色值。
+- 表面：`--bg-primary` → `--gs-settings-surface-page`，`--bg-secondary` → `--gs-settings-surface-card`，`--bg-tertiary` → `--gs-settings-surface-subtle`，`--input-bg` → `--gs-settings-surface-input`
+- 文字：`--text-primary` / `--text-secondary` / `--text-muted` → `--gs-settings-foreground` / `-dim` / `-muted`
+- 控件：`--accent-color`、`--accent-hover`、`--border-color`、`--rail-color`、`--badge-*`、`--toggle-knob`、`--checkmark-image`、`--select-arrow`、`--input-focus-border-color` 分别映射到对应 `--gs-settings-*`
+- 动效：`--bezier` → `--gs-ease-standard`
+- `popup.js` 同时写入 `data-theme` 与 `data-dp-theme`，避免与 Settings 的主题切换逻辑分叉。
 
 ---
 
@@ -360,7 +348,7 @@ Demo 只用于评审，不会被打包进扩展。
 1. **金色比例**：当前方案把金色控制在 5%–10%。如果你希望更「华丽」，可以把活动窗口光晕、选中 tab 的下划线也改成金色；如果希望更克制，可以只保留拖放区与品牌光晕。
 2. **浅色背景温度**：`#F8F1E4` 是偏奶油琥珀。如果希望更接近纸张白，可以改成 `#FAF4EA`；如果希望琥珀更明显，可以改成 `#F5EAD5`。
 3. **深色背景深度**：`#181226` 是「深紫灰」。如果希望更黑，可以降到 `#121019`；如果希望更紫，可以升到 `#1A1428`。
-4. **Popup 是否合并到 foundation token**：建议在 Phase 2 做，减少以后两套色值漂移。
+4. **Popup 是否合并到 foundation token**：已在 Phase 2 完成，Popup 通过别名层直接消费 `--gs-*`，不再维护第二套色值。
 5. **是否需要第三套「高对比度」主题**：本次不做，但 token 结构可以预留。
 
 ---
@@ -380,9 +368,18 @@ Demo 只用于评审，不会被打包进扩展。
 ### Light
 
 ```
-#F8F1E4  #F3EADB  #FFFCF6  #FFFFFF  #FFFDF9
+#F8F1E4  #F3EADB  #FFFCF6  #FFFDF9
 #2E2736  #5F5668  #756A80
 #5B5169  #3D3649  #FFFCF6
 #9A5612  #D99A4A  #7E440B
 #B3403F
 ```
+
+---
+
+## 13. 实施状态（2026-11-13）
+
+- Phase 1（token 换血）完成：foundation 深浅主题、preview / drop / toast / tooltip / settings token 全部切换到新色板。
+- Phase 2（组件统一）完成：popup 改为加载 foundation 并消费 `--gs-*`；`--bezier`、focus ring、checkbox、select arrow 统一；金色使用范围复核完成。
+- Phase 3（验证）已做：真实 CSS 计算样式检查 + Lighthouse 深/浅色可访问性审计；Settings 与 Popup 均达到 100 分。
+- 尚未完成：低亮度 / 高亮度屏幕的实体显示器观感确认，以及 Chrome / Firefox 打包后的肉眼走查。
