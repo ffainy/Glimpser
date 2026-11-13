@@ -1,38 +1,42 @@
 :root {
-  --bg-primary: #111114;
-  --bg-secondary: rgba(255, 255, 255, 0.055);
-  --bg-tertiary: rgba(255, 255, 255, 0.035);
-  --text-primary: #ececf1;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --accent-color: #c9b9df;
-  --accent-hover: #d9cee9;
-  --input-bg: #161618;
-  --input-focus-border-color: #c9b9df80;
-  --rail-color: rgba(255, 255, 255, 0.20);
-  --badge-bg: rgba(255, 255, 255, 0.1);
-  --badge-text: rgba(255, 255, 255, 0.7);
+  --bg-primary: #181226;
+  --bg-secondary: rgba(255, 255, 255, 0.045);
+  --bg-tertiary: rgba(255, 255, 255, 0.03);
+  --text-primary: #ede8f4;
+  --text-secondary: #b8afc7;
+  --text-muted: #958ba5;
+  --border-color: rgba(226, 216, 242, 0.10);
+  --accent-color: #c9bddc;
+  --accent-hover: #efe8f8;
+  --input-bg: #1b1429;
+  --input-focus-border-color: rgba(201, 189, 220, 0.50);
+  --rail-color: rgba(226, 216, 242, 0.18);
+  --badge-bg: rgba(255, 255, 255, 0.08);
+  --badge-text: rgba(237, 232, 244, 0.70);
+  --toggle-knob: #1a1523;
+  --checkmark-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%231a1523' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
   --bezier: cubic-bezier(.4, 0, .2, 1);
-  --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%23ececf1' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
+  --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%23ede8f4' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
 }
 
 [data-theme="light"] {
-  --bg-primary: #f0f2f5;
-  --bg-secondary: rgb(255, 255, 255, 1);
-  --bg-tertiary: rgb(3, 35, 86, 0.04);
-  --text-primary: #222;
-  --text-secondary: #666;
-  --text-muted: #999;
-  --border-color: rgba(0, 0, 0, 0.1);
-  --accent-color: #4b4457;
-  --accent-hover: #3a3445;
-  --input-bg: #fff;
-  --input-focus-border-color: #4b445780;
-  --rail-color: rgba(0, 0, 0, 0.20);
-  --badge-bg: rgba(0, 0, 0, 0.08);
-  --badge-text: rgba(0, 0, 0, 0.5);
-  --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%23222' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
+  --bg-primary: #f8f1e4;
+  --bg-secondary: #fffcf6;
+  --bg-tertiary: rgba(62, 52, 74, 0.04);
+  --text-primary: #2e2736;
+  --text-secondary: #5f5668;
+  --text-muted: #756a80;
+  --border-color: rgba(62, 52, 74, 0.12);
+  --accent-color: #5b5169;
+  --accent-hover: #3d3649;
+  --input-bg: #fffdf9;
+  --input-focus-border-color: rgba(91, 81, 105, 0.38);
+  --rail-color: rgba(62, 52, 74, 0.18);
+  --badge-bg: rgba(62, 52, 74, 0.08);
+  --badge-text: rgba(46, 39, 54, 0.70);
+  --toggle-knob: #fffcf6;
+  --checkmark-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fffcf6' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+  --select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%232e2736' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -185,7 +189,7 @@ input[type="checkbox"] {
 input[type="checkbox"]:checked {
   background-color: var(--accent-color);
   box-shadow: 0 0 0 1px var(--accent-color);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+  background-image: var(--checkmark-image);
 }
 
 /* ── Toggle switch ─────────────────────────────────────────────────── */
@@ -228,7 +232,7 @@ input[type="checkbox"]:checked {
   width: 16px;
   left: 2px;
   bottom: 2px;
-  background-color: #fff;
+  background-color: var(--toggle-knob);
   transition: transform 0.2s var(--bezier), width 0.2s var(--bezier), left 0.2s var(--bezier);
   border-radius: 50%;
 }

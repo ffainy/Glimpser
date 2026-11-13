@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ui: refresh brand mark, icons, and accent palette
 
+### Changed
+- ui: redesign dark and light themes with a purple-gray, amber, and gold palette
+
 ## [0.1.0] - 2026-11-12
 
 ### Added
