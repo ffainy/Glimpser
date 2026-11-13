@@ -139,3 +139,5 @@ Glimpser is licensed under the **GNU General Public License v3.0 only** (`GPL-3.
 Copyright (C) 2026 farfaraway.
 
 You may use, modify, and redistribute the project under the terms of the GPL. If you distribute a modified version, you must make the corresponding source code available under the same license. The GPL does not prohibit commercial distribution, but it does prohibit distributing derivative works as closed source.
+
+Third-party components and their licenses are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

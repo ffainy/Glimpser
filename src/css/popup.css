@@ -6,10 +6,10 @@
   --text-secondary: #a1a1aa;
   --text-muted: #71717a;
   --border-color: rgba(255, 255, 255, 0.08);
-  --accent-color: #7c5cfc;
-  --accent-hover: #6a4ae8;
+  --accent-color: #c9b9df;
+  --accent-hover: #d9cee9;
   --input-bg: #161618;
-  --input-focus-border-color: #7c5cfc80;
+  --input-focus-border-color: #c9b9df80;
   --rail-color: rgba(255, 255, 255, 0.20);
   --badge-bg: rgba(255, 255, 255, 0.1);
   --badge-text: rgba(255, 255, 255, 0.7);
@@ -25,10 +25,10 @@
   --text-secondary: #666;
   --text-muted: #999;
   --border-color: rgba(0, 0, 0, 0.1);
-  --accent-color: #7c5cfc;
-  --accent-hover: #6a4ae8;
+  --accent-color: #4b4457;
+  --accent-hover: #3a3445;
   --input-bg: #fff;
-  --input-focus-border-color: #7c5cfc80;
+  --input-focus-border-color: #4b445780;
   --rail-color: rgba(0, 0, 0, 0.20);
   --badge-bg: rgba(0, 0, 0, 0.08);
   --badge-text: rgba(0, 0, 0, 0.5);
@@ -59,7 +59,14 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
-.logo { flex-shrink: 0; }
+.logo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background-color: var(--accent-color);
+  -webkit-mask: url("../icons/logo.svg") center / contain no-repeat;
+  mask: url("../icons/logo.svg") center / contain no-repeat;
+}
 
 .brand {
   font-size: 14px;

@@ -194,9 +194,9 @@ textarea {
 
 :host([data-dp-theme="dark"]),
 [data-dp-theme="dark"] {
-  --gs-accent-rgb:         209 190 255;
-  --gs-accent-strong-rgb:  242 235 255;
-  --gs-support-rgb:        255 179 89;
+  --gs-accent-rgb:         201 185 223;
+  --gs-accent-strong-rgb:  240 233 248;
+  --gs-support-rgb:        232 171 82;
 
   /* Core surfaces */
   --gs-surface-card:     rgb(20 18 28 / 0.9);
@@ -408,9 +408,9 @@ textarea {
 
 :host([data-dp-theme="light"]),
 [data-dp-theme="light"] {
-  --gs-accent-rgb:         62 54 76;
-  --gs-accent-strong-rgb:  34 29 45;
-  --gs-support-rgb:        114 90 72;
+  --gs-accent-rgb:         75 68 87;
+  --gs-accent-strong-rgb:  47 42 56;
+  --gs-support-rgb:        169 118 42;
 
   /* Core surfaces */
   --gs-surface-card:     rgb(255 255 255 / 0.88);
