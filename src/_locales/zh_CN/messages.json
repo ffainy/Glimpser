@@ -5,6 +5,7 @@
   "btnClose":             { "message": "关闭预览" },
   "btnCloseOthers":       { "message": "关闭其他预览" },
   "btnCloseAll":          { "message": "关闭全部预览" },
+  "btnMoreCloses":        { "message": "更多关闭方式" },
   "btnOpenCurrent":       { "message": "在当前标签页打开" },
   "btnOpenNewTab":        { "message": "在新标签页打开" },
   "btnCopyUrl":           { "message": "复制链接" },

@@ -47,13 +47,14 @@ const PREVIEW_RELEASE_ARM_DELAY_MS = 180
 const PREVIEW_RELEASE_MIN_DISTANCE_PX = 18
 
 const ICON_REFRESH = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></g></svg>`
-const ICON_OPEN_CURRENT = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8"/><path d="m12 8 4 4-4 4"/></g></svg>`
-const ICON_OPEN_NEW_TAB = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></g></svg>`
-const ICON_COPY_URL = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></g></svg>`
-const ICON_COPY_SUCCESS = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></g></svg>`
-const ICON_CLOSE = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></g></svg>`
-const ICON_CLOSE_OTHERS = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/><path d="m12 12 6 6"/><path d="m18 12-6 6"/></g></svg>`
-const ICON_CLOSE_ALL = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M3 6h8"/><path d="M3 12h8"/><path d="M3 18h8"/><path d="m14 8 7 7"/><path d="m21 8-7 7"/></g></svg>`
+const ICON_OPEN_CURRENT = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12h7"/><path d="M12.5 8.5 16 12l-3.5 3.5"/></g></svg>`
+const ICON_OPEN_NEW_TAB = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9.5 14.5 14.5 9.5"/><path d="M9.9 9.2H14.8V14.1"/></g></svg>`
+const ICON_COPY_URL = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M15 5h2a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></g></svg>`
+const ICON_COPY_SUCCESS = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M15 5h2a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/><path d="m9.5 12.5 2 2 4-4"/></g></svg>`
+const ICON_CLOSE = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M19 5 5 19"/><path d="m5 5 14 14"/></g></svg>`
+const ICON_CLOSE_OTHERS = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M3 13V6.5A2.5 2.5 0 0 1 5.5 4H12"/><rect x="7" y="7" width="14" height="14" rx="3"/><path d="m11 11 6 6"/><path d="m17 11-6 6"/></g></svg>`
+const ICON_CLOSE_ALL = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><path d="m13.5 13.5 6 6"/><path d="m19.5 13.5-6 6"/></g></svg>`
+const ICON_MORE = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" stroke="none"><circle cx="5.4" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18.6" cy="12" r="1.6"/></g></svg>`
 const BRAND_LOGO_PATH = 'icons/logo.svg'
 
 let _shadowHost = null
@@ -321,6 +322,30 @@ function _makeIconButton(className, title, icon) {
   button.dataset.tooltip = title
   button.setAttribute('aria-label', title)
   button.innerHTML = icon
+  return button
+}
+
+function _makeMenuAction(action, label, icon) {
+  const button = document.createElement('button')
+  button.className = 'gs-preview-menu-item'
+  button.type = 'button'
+  button.dataset.action = action
+  button.setAttribute('role', 'menuitem')
+
+  const iconEl = document.createElement('span')
+  iconEl.className = 'gs-preview-menu-icon'
+  iconEl.setAttribute('aria-hidden', 'true')
+  iconEl.innerHTML = icon
+
+  const labelEl = document.createElement('span')
+  labelEl.className = 'gs-preview-menu-label'
+  labelEl.textContent = label
+
+  const countEl = document.createElement('span')
+  countEl.className = 'gs-preview-menu-count'
+  countEl.setAttribute('aria-hidden', 'true')
+
+  button.append(iconEl, labelEl, countEl)
   return button
 }
 
@@ -654,7 +679,19 @@ function _createPreviewWindow(url, settings) {
   openActions.className = 'gs-preview-group'
 
   const closeActions = document.createElement('div')
-  closeActions.className = 'gs-preview-group gs-preview-group--danger'
+  closeActions.className = 'gs-preview-group gs-preview-group--close'
+
+  const moreWrap = document.createElement('div')
+  moreWrap.className = 'gs-preview-more'
+
+  const moreButton = _makeIconButton('gs-preview-action', t('btnMoreCloses'), ICON_MORE)
+  moreButton.setAttribute('aria-haspopup', 'menu')
+  moreButton.setAttribute('aria-expanded', 'false')
+
+  const moreMenu = document.createElement('div')
+  moreMenu.className = 'gs-preview-menu'
+  moreMenu.setAttribute('role', 'menu')
+  moreMenu.hidden = true
 
   const openCurrentButton = _makeIconButton('gs-preview-action', t('btnOpenCurrent'), ICON_OPEN_CURRENT)
   openCurrentButton.dataset.action = 'open-current'
@@ -662,17 +699,17 @@ function _createPreviewWindow(url, settings) {
   const openNewTabButton = _makeIconButton('gs-preview-action', t('btnOpenNewTab'), ICON_OPEN_NEW_TAB)
   openNewTabButton.dataset.action = 'open-new-tab'
 
-  const closeOthersButton = _makeIconButton('gs-preview-action gs-preview-action-bulk-close', t('btnCloseOthers'), ICON_CLOSE_OTHERS)
-  closeOthersButton.dataset.action = 'close-others'
-
-  const closeAllButton = _makeIconButton('gs-preview-action gs-preview-action-bulk-close', t('btnCloseAll'), ICON_CLOSE_ALL)
-  closeAllButton.dataset.action = 'close-all'
+  const closeOthersButton = _makeMenuAction('close-others', t('btnCloseOthers'), ICON_CLOSE_OTHERS)
+  const closeAllButton = _makeMenuAction('close-all', t('btnCloseAll'), ICON_CLOSE_ALL)
 
   const closeButton = _makeIconButton('gs-preview-action gs-preview-action-close', t('btnClose'), ICON_CLOSE)
   closeButton.dataset.action = 'close'
 
+  moreMenu.append(closeOthersButton, closeAllButton)
+  moreWrap.append(moreButton, moreMenu)
+
   openActions.append(openCurrentButton, openNewTabButton)
-  closeActions.append(closeOthersButton, closeAllButton, closeButton)
+  closeActions.append(moreWrap, closeButton)
   rightActions.append(openActions, closeActions)
   header.append(leftActions, urlPill, rightActions)
 
@@ -724,6 +761,9 @@ function _createPreviewWindow(url, settings) {
       copyToast,
       openCurrentButton,
       openNewTabButton,
+      moreWrap,
+      moreButton,
+      moreMenu,
       closeOthersButton,
       closeAllButton,
       closeButton,
@@ -744,8 +784,7 @@ function _createPreviewWindow(url, settings) {
     copyButton,
     openCurrentButton,
     openNewTabButton,
-    closeOthersButton,
-    closeAllButton,
+    moreButton,
     closeButton
   )
 
@@ -769,7 +808,7 @@ function _bindPreviewEvents(preview) {
   })
 
   header.addEventListener('pointerdown', (event) => {
-    if (event.target.closest('button')) {
+    if (event.target.closest('button') || event.target.closest('.gs-preview-menu')) {
       return
     }
 
@@ -784,6 +823,10 @@ function _bindPreviewEvents(preview) {
       return
     }
     handlePreviewAction(preview.id, button.dataset.action, button)
+  })
+
+  preview.elements.moreButton.addEventListener('click', () => {
+    _togglePreviewMenu(preview)
   })
 
   for (const handle of resizeHandles) {
@@ -824,6 +867,7 @@ function _updatePreviewLabels() {
       urlText,
       openCurrentButton,
       openNewTabButton,
+      moreButton,
       closeOthersButton,
       closeAllButton,
       closeButton,
@@ -838,10 +882,10 @@ function _updatePreviewLabels() {
     openCurrentButton.setAttribute('aria-label', t('btnOpenCurrent'))
     openNewTabButton.dataset.tooltip = t('btnOpenNewTab')
     openNewTabButton.setAttribute('aria-label', t('btnOpenNewTab'))
-    closeOthersButton.dataset.tooltip = t('btnCloseOthers')
-    closeOthersButton.setAttribute('aria-label', t('btnCloseOthers'))
-    closeAllButton.dataset.tooltip = t('btnCloseAll')
-    closeAllButton.setAttribute('aria-label', t('btnCloseAll'))
+    moreButton.dataset.tooltip = t('btnMoreCloses')
+    moreButton.setAttribute('aria-label', t('btnMoreCloses'))
+    _setMenuLabel(closeOthersButton, t('btnCloseOthers'))
+    _setMenuLabel(closeAllButton, t('btnCloseAll'))
     closeButton.dataset.tooltip = t('btnClose')
     closeButton.setAttribute('aria-label', t('btnClose'))
 
@@ -849,15 +893,123 @@ function _updatePreviewLabels() {
   }
 }
 
+function _setMenuLabel(button, label) {
+  const labelEl = button.querySelector('.gs-preview-menu-label')
+  if (labelEl) {
+    labelEl.textContent = label
+  }
+}
+
+function _setMenuCount(button, count) {
+  const counter = button.querySelector('.gs-preview-menu-count')
+  if (!counter) {
+    return
+  }
+  counter.textContent = count > 0 ? String(count) : ''
+  counter.hidden = count <= 0
+}
+
+function _closePreviewMenu(preview) {
+  const { moreMenu, moreButton, menuDismiss, menuKeyDown, menuBlur } = preview.elements
+
+  // 监听挂在 document 上而不是 shadow root：页面上的点击根本进不了影子树。
+  if (menuDismiss) {
+    document.removeEventListener('pointerdown', menuDismiss, true)
+    preview.elements.menuDismiss = null
+  }
+  if (menuKeyDown) {
+    document.removeEventListener('keydown', menuKeyDown, true)
+    preview.elements.menuKeyDown = null
+  }
+  if (menuBlur) {
+    window.removeEventListener('blur', menuBlur)
+    preview.elements.menuBlur = null
+  }
+  if (!moreMenu || moreMenu.hidden) {
+    return
+  }
+
+  moreMenu.hidden = true
+  moreButton?.setAttribute('aria-expanded', 'false')
+}
+
+function _openPreviewMenu(preview) {
+  const { moreMenu, moreButton, moreWrap } = preview.elements
+  if (!moreMenu || !moreButton || moreButton.hidden) {
+    return
+  }
+
+  _closeOtherPreviewMenus(preview.id)
+  moreMenu.hidden = false
+  moreButton.setAttribute('aria-expanded', 'true')
+
+  const dismiss = (event) => {
+    const path = typeof event.composedPath === 'function' ? event.composedPath() : []
+    if (!path.includes(moreWrap)) {
+      _closePreviewMenu(preview)
+    }
+  }
+  const handleKey = (event) => {
+    if (event.key !== 'Escape') {
+      return
+    }
+    event.stopPropagation()
+    _closePreviewMenu(preview)
+  }
+  // 预览里的 iframe 是独立文档，点到里面的事件拿不到，只能靠失焦兜底。
+  const handleBlur = () => {
+    _closePreviewMenu(preview)
+  }
+
+  document.addEventListener('pointerdown', dismiss, true)
+  document.addEventListener('keydown', handleKey, true)
+  window.addEventListener('blur', handleBlur)
+  preview.elements.menuDismiss = dismiss
+  preview.elements.menuKeyDown = handleKey
+  preview.elements.menuBlur = handleBlur
+}
+
+function _togglePreviewMenu(preview) {
+  const { moreMenu } = preview.elements
+  if (!moreMenu) {
+    return
+  }
+  if (moreMenu.hidden) {
+    _openPreviewMenu(preview)
+  } else {
+    _closePreviewMenu(preview)
+  }
+}
+
+function _closeOtherPreviewMenus(exceptId) {
+  for (const preview of previewManager.previews.values()) {
+    if (preview.id !== exceptId) {
+      _closePreviewMenu(preview)
+    }
+  }
+}
+
 function _syncPreviewActionVisibility(preview) {
-  const { closeOthersButton, closeAllButton } = preview.elements
+  const { closeOthersButton, closeAllButton, moreButton, moreMenu } = preview.elements
   const previewCount = previewManager.previews.size
+  const showCloseOthers = _isCloseOthersButtonEnabled()
+  const showCloseAll = _isCloseAllButtonEnabled()
 
-  closeOthersButton.hidden = !_isCloseOthersButtonEnabled()
-  closeOthersButton.disabled = closeOthersButton.hidden || previewCount <= 1
+  closeOthersButton.hidden = !showCloseOthers
+  closeAllButton.hidden = !showCloseAll
 
-  closeAllButton.hidden = !_isCloseAllButtonEnabled()
-  closeAllButton.disabled = closeAllButton.hidden || previewCount <= 0
+  _setMenuCount(closeOthersButton, previewCount - 1)
+  _setMenuCount(closeAllButton, previewCount)
+
+  // 一个窗口的时候，两个批量关闭都等于「关掉自己」，⋯ 留在这里没有意义。
+  if ((showCloseOthers || showCloseAll) && previewCount > 1) {
+    moreButton.hidden = false
+    moreButton.setAttribute('aria-expanded', String(!moreMenu.hidden))
+    return
+  }
+
+  moreButton.hidden = true
+  _closePreviewMenu(preview)
 }
 
 function _syncAllPreviewActionVisibility() {
@@ -1087,6 +1239,7 @@ function closePreview(id) {
     preview.copyToastTimer = null
   }
 
+  _closePreviewMenu(preview)
   preview.elements.root.remove()
   previewManager.previews.delete(id)
   _hideTooltip()
@@ -1178,10 +1331,12 @@ function handlePreviewAction(id, action, buttonEl) {
       break
 
     case 'close-others':
+      _closePreviewMenu(preview)
       closeAllPreviews(id)
       break
 
     case 'close-all':
+      _closePreviewMenu(preview)
       closeAllPreviews()
       break
 
@@ -1207,10 +1362,12 @@ function handlePreviewAction(id, action, buttonEl) {
           return
         }
         buttonEl.innerHTML = ICON_COPY_SUCCESS
+        buttonEl.classList.add('is-copied')
         _hideTooltip()
         _showCopyToast(preview, t('toastCopySuccess'))
         setTimeout(() => {
           buttonEl.innerHTML = ICON_COPY_URL
+          buttonEl.classList.remove('is-copied')
         }, 1200)
       }).catch((err) => {
         console.error(t('errorClipboard'), err)
