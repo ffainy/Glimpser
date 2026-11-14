@@ -281,12 +281,9 @@
   border-radius: var(--gs-window-radius, var(--gs-radius-control));
   border: 1px solid var(--gs-preview-window-surface-border);
   background: var(--gs-preview-window-surface-bg);
-  backdrop-filter: blur(var(--gs-blur-md)) saturate(0.92);
-  -webkit-backdrop-filter: blur(var(--gs-blur-md)) saturate(0.92);
   box-shadow: var(--gs-preview-window-surface-shadow);
   transition: box-shadow var(--gs-motion-base), border-color var(--gs-motion-fast);
   user-select: none;
-  isolation: isolate;
   font-family: var(--gs-font-family);
 }
 
@@ -309,6 +306,8 @@
   padding: 5px var(--gs-space-compact);
   border-bottom: 1px solid var(--gs-preview-header-border);
   background: var(--gs-preview-header-surface);
+  backdrop-filter: blur(18px) saturate(var(--gs-preview-header-saturate));
+  -webkit-backdrop-filter: blur(18px) saturate(var(--gs-preview-header-saturate));
   font-family: var(--gs-font-family);
   box-shadow:
     0 1px 0 var(--gs-preview-header-highlight) inset,
@@ -427,8 +426,8 @@
 
 .gs-preview-action:focus-visible,
 .gs-pill-action:focus-visible {
-  outline: 2px solid var(--gs-preview-action-foreground-hover);
-  outline-offset: 1px;
+  outline: 2px solid var(--gs-settings-ring);
+  outline-offset: 2px;
 }
 
 .gs-preview-action:active,
@@ -552,7 +551,7 @@
   gap: var(--gs-space-hairline);
   padding: 0 var(--gs-space-micro);
   min-height: 24px;
-  border-radius: var(--gs-window-radius, var(--gs-radius-control));
+  border-radius: 8px;
   border: 1px solid var(--gs-preview-urlbar-border);
   background: var(--gs-preview-urlbar-surface);
   font-family: var(--gs-font-family);
@@ -642,20 +641,14 @@
   cursor: grab;
 }
 
-.gs-preview-header {
-  backdrop-filter: blur(calc(var(--gs-blur-sm) * 1.25)) saturate(1.08);
-  -webkit-backdrop-filter: blur(calc(var(--gs-blur-sm) * 1.25)) saturate(1.08);
-}
-
-.gs-preview-urlbar,
-.gs-preview-error {
-  backdrop-filter: blur(var(--gs-blur-sm));
-  -webkit-backdrop-filter: blur(var(--gs-blur-sm));
-}
-
 .gs-preview-urlbar {
   backdrop-filter: blur(calc(var(--gs-blur-sm) * 1.15)) saturate(1.02);
   -webkit-backdrop-filter: blur(calc(var(--gs-blur-sm) * 1.15)) saturate(1.02);
+}
+
+.gs-preview-error {
+  backdrop-filter: blur(var(--gs-blur-sm));
+  -webkit-backdrop-filter: blur(var(--gs-blur-sm));
 }
 
 .gs-toast {
@@ -800,11 +793,12 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 2;
+  color: var(--gs-preview-spinner-foreground);
   filter: var(--gs-shadow-filter-float);
 }
 
 .gs-preview-spinner svg { display: block; }
-.gs-preview-spinner svg circle { fill: var(--gs-accent); }
+.gs-preview-spinner svg circle { fill: currentColor; }
 
 /* ── Error message ───────────────────────────────────────────────────────── */
 
