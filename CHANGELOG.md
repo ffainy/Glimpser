@@ -8,20 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- settings: refresh settings page visuals and icon system (#3)
 - preview: rework header icons and add a close menu
-
-### Changed
-- settings: split general settings into extension status and language/theme cards
-- settings: replace native language and theme selects with segmented controls
-- settings: clarify preview section titles and turn About/footer values into gold links
-- settings: add card hover glow, a stronger frosted action bar, and clearer card text hierarchy
-- settings: simplify the footer and pin it above the action bar
-- settings: enlarge the type scale for clearer, more readable text
-- settings: add icons and a raised active pill to the tab bar
-- settings: replace tab and card icons with a consistent Lucide icon set
-- settings: add Lucide icons to the About version, author, and homepage rows
-- settings: keep slider rows readable on narrow screens
-- settings: enrich the About card with a hero block and gold pill links
 
 ## [0.2.0] - 2026-11-13
 
