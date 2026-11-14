@@ -327,9 +327,8 @@ textarea {
     radial-gradient(58% 72% at 50% 45%,
       rgb(12 11 16 / 0) 0%, rgb(12 11 16 / 0.10) 42%, rgb(12 11 16 / 0.90) 100%),
     rgb(12 11 16 / 0.55);
-  /* Halftone dot-grid decoration — kept faint so it reads as texture */
-  --gs-preview-drop-dots-coarse: rgb(var(--gs-preview-accent) / 0.08);
-  --gs-preview-drop-dots-fine: rgb(var(--gs-preview-accent) / 0.05);
+  /* Halftone dot-grid decoration — one ink tone; the ramp comes from dot size */
+  --gs-preview-drop-dots: rgb(var(--gs-preview-accent) / 0.12);
   /* Preview floating feedback surfaces */
   --gs-preview-tooltip-surface-bg: rgb(33 30 39 / 0.96);
   --gs-preview-tooltip-surface-shadow:
@@ -564,9 +563,8 @@ textarea {
     radial-gradient(58% 72% at 50% 45%,
       rgb(243 234 219 / 0) 0%, rgb(243 234 219 / 0.10) 42%, rgb(243 234 219 / 0.90) 100%),
     rgb(243 234 219 / 0.55);
-  /* Halftone dot-grid decoration — kept faint so it reads as texture */
-  --gs-preview-drop-dots-coarse: rgb(var(--gs-preview-accent) / 0.16);
-  --gs-preview-drop-dots-fine: rgb(var(--gs-preview-accent) / 0.09);
+  /* Halftone dot-grid decoration — one ink tone; the ramp comes from dot size */
+  --gs-preview-drop-dots: rgb(var(--gs-preview-accent) / 0.14);
   /* Preview floating feedback surfaces */
   --gs-preview-tooltip-surface-bg: rgb(255 252 246 / 0.97);
   --gs-preview-tooltip-surface-shadow:

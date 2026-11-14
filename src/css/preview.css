@@ -19,8 +19,7 @@
   --gs-drop-icon-shadow-hover: var(--gs-preview-drop-icon-shadow-hover);
   --gs-drop-overlay-bg: var(--gs-preview-drop-overlay-bg);
   --gs-drop-overlay-bg-hover: var(--gs-preview-drop-overlay-bg-hover);
-  --gs-drop-dots-coarse: var(--gs-preview-drop-dots-coarse);
-  --gs-drop-dots-fine: var(--gs-preview-drop-dots-fine);
+  --gs-drop-dots: var(--gs-preview-drop-dots);
 
   --gs-preview-action-danger-surface: var(--gs-preview-danger-surface);
   --gs-preview-backdrop-fill: var(--gs-settings-overlay-fill);
@@ -103,22 +102,26 @@
   transform: scale(1) translateY(0);
 }
 
-/* Halftone dot-grid: two offset grids + a diagonal mask ⇒ size-graded
-   halftone fading toward the bottom-right, matching the corner-halo direction */
+/* Halftone dot-grid: a single square screen whose dots swell from a hairline in
+   the middle band out to a merged wash at both edges — a vignette built from dot
+   size instead of opacity, so the hint text always sits on clean ground.
+   CSS repeating gradients can only repeat one dot size, so the ramp is baked into
+   a one-cell-wide SVG strip: with `mask-size: auto 100%` the strip is scaled by the
+   viewport height (keeping the dots round) and tiled across x. Pitch is 13 units at
+   a 1000-unit reference height; the dots never exceed ~0.58 of the pitch, so only
+   the outermost rows knit together. */
 #gs-dropzone-overlay::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image:
-    radial-gradient(circle, var(--gs-drop-dots-coarse) 1.6px, transparent 2.4px),
-    radial-gradient(circle, var(--gs-drop-dots-fine) 0.9px, transparent 1.5px);
-  background-size: 10px 10px, 6px 6px;
-  background-position: 0 0, 3px 4px;
-  -webkit-mask-image: radial-gradient(130% 130% at 0% 0%,
-    var(--gs-mask-opaque) 0%, var(--gs-mask-soft) 34%, transparent 70%);
-  mask-image: radial-gradient(130% 130% at 0% 0%,
-    var(--gs-mask-opaque) 0%, var(--gs-mask-soft) 34%, transparent 70%);
+  background-color: var(--gs-drop-dots);
+  -webkit-mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='13' height='1000' viewBox='0 0 13 1000'><g fill='white'><circle cx='6.5' cy='6.50' r='7.42'/><circle cx='6.5' cy='19.50' r='7.17'/><circle cx='6.5' cy='32.50' r='6.93'/><circle cx='6.5' cy='45.50' r='6.68'/><circle cx='6.5' cy='58.50' r='6.44'/><circle cx='6.5' cy='71.50' r='6.20'/><circle cx='6.5' cy='84.50' r='5.96'/><circle cx='6.5' cy='97.50' r='5.72'/><circle cx='6.5' cy='110.50' r='5.48'/><circle cx='6.5' cy='123.50' r='5.24'/><circle cx='6.5' cy='136.50' r='5.01'/><circle cx='6.5' cy='149.50' r='4.78'/><circle cx='6.5' cy='162.50' r='4.54'/><circle cx='6.5' cy='175.50' r='4.31'/><circle cx='6.5' cy='188.50' r='4.09'/><circle cx='6.5' cy='201.50' r='3.86'/><circle cx='6.5' cy='214.50' r='3.64'/><circle cx='6.5' cy='227.50' r='3.41'/><circle cx='6.5' cy='240.50' r='3.19'/><circle cx='6.5' cy='253.50' r='2.97'/><circle cx='6.5' cy='266.50' r='2.76'/><circle cx='6.5' cy='279.50' r='2.54'/><circle cx='6.5' cy='292.50' r='2.33'/><circle cx='6.5' cy='305.50' r='2.12'/><circle cx='6.5' cy='318.50' r='1.92'/><circle cx='6.5' cy='331.50' r='1.72'/><circle cx='6.5' cy='344.50' r='1.52'/><circle cx='6.5' cy='357.50' r='1.32'/><circle cx='6.5' cy='370.50' r='1.13'/><circle cx='6.5' cy='383.50' r='0.95'/><circle cx='6.5' cy='396.50' r='0.77'/><circle cx='6.5' cy='409.50' r='0.60'/><circle cx='6.5' cy='422.50' r='0.44'/><circle cx='6.5' cy='435.50' r='0.30'/><circle cx='6.5' cy='448.50' r='0.26'/><circle cx='6.5' cy='461.50' r='0.26'/><circle cx='6.5' cy='474.50' r='0.26'/><circle cx='6.5' cy='487.50' r='0.26'/><circle cx='6.5' cy='500.50' r='0.26'/><circle cx='6.5' cy='513.50' r='0.26'/><circle cx='6.5' cy='526.50' r='0.26'/><circle cx='6.5' cy='539.50' r='0.26'/><circle cx='6.5' cy='552.50' r='0.26'/><circle cx='6.5' cy='565.50' r='0.31'/><circle cx='6.5' cy='578.50' r='0.45'/><circle cx='6.5' cy='591.50' r='0.61'/><circle cx='6.5' cy='604.50' r='0.78'/><circle cx='6.5' cy='617.50' r='0.96'/><circle cx='6.5' cy='630.50' r='1.15'/><circle cx='6.5' cy='643.50' r='1.34'/><circle cx='6.5' cy='656.50' r='1.53'/><circle cx='6.5' cy='669.50' r='1.73'/><circle cx='6.5' cy='682.50' r='1.93'/><circle cx='6.5' cy='695.50' r='2.14'/><circle cx='6.5' cy='708.50' r='2.35'/><circle cx='6.5' cy='721.50' r='2.56'/><circle cx='6.5' cy='734.50' r='2.77'/><circle cx='6.5' cy='747.50' r='2.99'/><circle cx='6.5' cy='760.50' r='3.21'/><circle cx='6.5' cy='773.50' r='3.43'/><circle cx='6.5' cy='786.50' r='3.65'/><circle cx='6.5' cy='799.50' r='3.88'/><circle cx='6.5' cy='812.50' r='4.10'/><circle cx='6.5' cy='825.50' r='4.33'/><circle cx='6.5' cy='838.50' r='4.56'/><circle cx='6.5' cy='851.50' r='4.79'/><circle cx='6.5' cy='864.50' r='5.03'/><circle cx='6.5' cy='877.50' r='5.26'/><circle cx='6.5' cy='890.50' r='5.50'/><circle cx='6.5' cy='903.50' r='5.74'/><circle cx='6.5' cy='916.50' r='5.98'/><circle cx='6.5' cy='929.50' r='6.22'/><circle cx='6.5' cy='942.50' r='6.46'/><circle cx='6.5' cy='955.50' r='6.70'/><circle cx='6.5' cy='968.50' r='6.94'/><circle cx='6.5' cy='981.50' r='7.19'/><circle cx='6.5' cy='994.50' r='7.44'/></g></svg>");
+  mask-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='13' height='1000' viewBox='0 0 13 1000'><g fill='white'><circle cx='6.5' cy='6.50' r='7.42'/><circle cx='6.5' cy='19.50' r='7.17'/><circle cx='6.5' cy='32.50' r='6.93'/><circle cx='6.5' cy='45.50' r='6.68'/><circle cx='6.5' cy='58.50' r='6.44'/><circle cx='6.5' cy='71.50' r='6.20'/><circle cx='6.5' cy='84.50' r='5.96'/><circle cx='6.5' cy='97.50' r='5.72'/><circle cx='6.5' cy='110.50' r='5.48'/><circle cx='6.5' cy='123.50' r='5.24'/><circle cx='6.5' cy='136.50' r='5.01'/><circle cx='6.5' cy='149.50' r='4.78'/><circle cx='6.5' cy='162.50' r='4.54'/><circle cx='6.5' cy='175.50' r='4.31'/><circle cx='6.5' cy='188.50' r='4.09'/><circle cx='6.5' cy='201.50' r='3.86'/><circle cx='6.5' cy='214.50' r='3.64'/><circle cx='6.5' cy='227.50' r='3.41'/><circle cx='6.5' cy='240.50' r='3.19'/><circle cx='6.5' cy='253.50' r='2.97'/><circle cx='6.5' cy='266.50' r='2.76'/><circle cx='6.5' cy='279.50' r='2.54'/><circle cx='6.5' cy='292.50' r='2.33'/><circle cx='6.5' cy='305.50' r='2.12'/><circle cx='6.5' cy='318.50' r='1.92'/><circle cx='6.5' cy='331.50' r='1.72'/><circle cx='6.5' cy='344.50' r='1.52'/><circle cx='6.5' cy='357.50' r='1.32'/><circle cx='6.5' cy='370.50' r='1.13'/><circle cx='6.5' cy='383.50' r='0.95'/><circle cx='6.5' cy='396.50' r='0.77'/><circle cx='6.5' cy='409.50' r='0.60'/><circle cx='6.5' cy='422.50' r='0.44'/><circle cx='6.5' cy='435.50' r='0.30'/><circle cx='6.5' cy='448.50' r='0.26'/><circle cx='6.5' cy='461.50' r='0.26'/><circle cx='6.5' cy='474.50' r='0.26'/><circle cx='6.5' cy='487.50' r='0.26'/><circle cx='6.5' cy='500.50' r='0.26'/><circle cx='6.5' cy='513.50' r='0.26'/><circle cx='6.5' cy='526.50' r='0.26'/><circle cx='6.5' cy='539.50' r='0.26'/><circle cx='6.5' cy='552.50' r='0.26'/><circle cx='6.5' cy='565.50' r='0.31'/><circle cx='6.5' cy='578.50' r='0.45'/><circle cx='6.5' cy='591.50' r='0.61'/><circle cx='6.5' cy='604.50' r='0.78'/><circle cx='6.5' cy='617.50' r='0.96'/><circle cx='6.5' cy='630.50' r='1.15'/><circle cx='6.5' cy='643.50' r='1.34'/><circle cx='6.5' cy='656.50' r='1.53'/><circle cx='6.5' cy='669.50' r='1.73'/><circle cx='6.5' cy='682.50' r='1.93'/><circle cx='6.5' cy='695.50' r='2.14'/><circle cx='6.5' cy='708.50' r='2.35'/><circle cx='6.5' cy='721.50' r='2.56'/><circle cx='6.5' cy='734.50' r='2.77'/><circle cx='6.5' cy='747.50' r='2.99'/><circle cx='6.5' cy='760.50' r='3.21'/><circle cx='6.5' cy='773.50' r='3.43'/><circle cx='6.5' cy='786.50' r='3.65'/><circle cx='6.5' cy='799.50' r='3.88'/><circle cx='6.5' cy='812.50' r='4.10'/><circle cx='6.5' cy='825.50' r='4.33'/><circle cx='6.5' cy='838.50' r='4.56'/><circle cx='6.5' cy='851.50' r='4.79'/><circle cx='6.5' cy='864.50' r='5.03'/><circle cx='6.5' cy='877.50' r='5.26'/><circle cx='6.5' cy='890.50' r='5.50'/><circle cx='6.5' cy='903.50' r='5.74'/><circle cx='6.5' cy='916.50' r='5.98'/><circle cx='6.5' cy='929.50' r='6.22'/><circle cx='6.5' cy='942.50' r='6.46'/><circle cx='6.5' cy='955.50' r='6.70'/><circle cx='6.5' cy='968.50' r='6.94'/><circle cx='6.5' cy='981.50' r='7.19'/><circle cx='6.5' cy='994.50' r='7.44'/></g></svg>");
+  -webkit-mask-size: auto 100%;
+  mask-size: auto 100%;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
   animation: gs-drop-dots-breathe 9s ease-in-out infinite alternate;
 }
 
