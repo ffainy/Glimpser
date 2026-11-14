@@ -22,7 +22,9 @@ body {
   font-family: var(--gs-font-family);
   font-size: var(--fs-body);
   line-height: var(--gs-line-height-body);
-  background: var(--bg-primary);
+  /* 与预览遮罩、popup 共用同一组光晕；渐变固定为氛围光，底色随页面滚动 */
+  background: var(--gs-settings-halo-image), var(--bg-primary);
+  background-attachment: fixed, fixed;
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;

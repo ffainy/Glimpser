@@ -397,9 +397,25 @@ textarea {
   --gs-preview-warning-foreground: var(--gs-warning-text);
 
   /* Settings theme — shared shell atmosphere */
+  /* 光晕：设置页 / popup / 预览遮罩三个表面共用同一几何 ——
+     左上 accent 略小、右下 support 更大，圆心略出画、单段长淡出；
+     强度按「表面 × 主题」解耦，各自独立调参。 */
   --gs-settings-overlay-fill: rgb(10 8 16 / 0.68);
-  --gs-settings-halo-a: rgb(var(--gs-accent-rgb) / 0.20);
-  --gs-settings-halo-b: rgb(var(--gs-support-rgb) / 0.14);
+  --gs-settings-halo-image:
+    radial-gradient(46% 40% at 7% 5%,
+      rgb(var(--gs-accent-rgb) / 0.05), rgb(var(--gs-accent-rgb) / 0) 76%),
+    radial-gradient(84% 72% at 96% 102%,
+      rgb(var(--gs-support-rgb) / 0.05), rgb(var(--gs-support-rgb) / 0) 82%);
+  --gs-popup-halo-image:
+    radial-gradient(46% 40% at 7% 5%,
+      rgb(var(--gs-accent-rgb) / 0.05), rgb(var(--gs-accent-rgb) / 0) 76%),
+    radial-gradient(84% 72% at 96% 102%,
+      rgb(var(--gs-support-rgb) / 0.05), rgb(var(--gs-support-rgb) / 0) 82%);
+  --gs-preview-backdrop-halo-image:
+    radial-gradient(46% 40% at 7% 5%,
+      rgb(var(--gs-accent-rgb) / 0.10), rgb(var(--gs-accent-rgb) / 0) 76%),
+    radial-gradient(84% 72% at 96% 102%,
+      rgb(var(--gs-support-rgb) / 0.10), rgb(var(--gs-support-rgb) / 0) 82%);
 
   /* Settings page surfaces */
   --gs-settings-surface-page: #181226;
@@ -616,8 +632,21 @@ textarea {
 
   /* Settings theme — shared shell atmosphere */
   --gs-settings-overlay-fill: rgb(243 234 219 / 0.55);
-  --gs-settings-halo-a: rgb(var(--gs-accent-rgb) / 0.07);
-  --gs-settings-halo-b: rgb(var(--gs-support-rgb) / 0.10);
+  --gs-settings-halo-image:
+    radial-gradient(46% 40% at 7% 5%,
+      rgb(var(--gs-accent-rgb) / 0.20), rgb(var(--gs-accent-rgb) / 0) 76%),
+    radial-gradient(84% 72% at 96% 102%,
+      rgb(var(--gs-support-rgb) / 0.20), rgb(var(--gs-support-rgb) / 0) 82%);
+  --gs-popup-halo-image:
+    radial-gradient(46% 40% at 7% 5%,
+      rgb(var(--gs-accent-rgb) / 0.10), rgb(var(--gs-accent-rgb) / 0) 76%),
+    radial-gradient(84% 72% at 96% 102%,
+      rgb(var(--gs-support-rgb) / 0.10), rgb(var(--gs-support-rgb) / 0) 82%);
+  --gs-preview-backdrop-halo-image:
+    radial-gradient(46% 40% at 7% 5%,
+      rgb(var(--gs-accent-rgb) / 0.20), rgb(var(--gs-accent-rgb) / 0) 76%),
+    radial-gradient(84% 72% at 96% 102%,
+      rgb(var(--gs-support-rgb) / 0.20), rgb(var(--gs-support-rgb) / 0) 82%);
 
   /* Settings page surfaces */
   --gs-settings-surface-page: #f8f1e4;

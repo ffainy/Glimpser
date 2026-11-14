@@ -7,7 +7,9 @@ body {
   font-family: var(--gs-font-family);
   font-size: var(--gs-font-size-body);
   line-height: var(--gs-line-height-body);
-  background: var(--bg-primary);
+  /* 与设置页、预览遮罩同一几何的光晕，强度按 popup 场景独立调参 */
+  background: var(--gs-popup-halo-image), var(--bg-primary);
+  background-attachment: fixed, fixed;
   color: var(--text-primary);
   overflow: hidden;
   user-select: none;
