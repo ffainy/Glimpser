@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- popup: align popup visuals with settings page (#4)
 - settings: refresh settings page visuals and icon system (#3)
 - preview: rework header icons and add a close menu
 
