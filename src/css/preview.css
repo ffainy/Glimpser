@@ -12,6 +12,7 @@
   --gs-drop-title-foreground: var(--gs-preview-drop-title-foreground);
   --gs-drop-icon-foreground: var(--gs-preview-drop-icon-foreground);
   --gs-drop-icon-surface: var(--gs-preview-drop-icon-surface);
+  --gs-drop-icon-surface-fallback: var(--gs-preview-drop-icon-surface-fallback);
   --gs-drop-icon-border: var(--gs-preview-drop-icon-border);
   --gs-drop-icon-backdrop: var(--gs-preview-drop-icon-backdrop);
   --gs-drop-icon-shadow: var(--gs-preview-drop-icon-shadow);
@@ -32,7 +33,7 @@
 /* ── Dropzone tokens scoped from theme ───────────────────────────────────── */
 :host([data-dp-theme="dark"]),
 [data-dp-theme="dark"] {
-  --gs-preview-brand-opacity: 0.74;
+  --gs-preview-brand-opacity: 0.72;
   --gs-preview-action-danger-foreground: var(--gs-preview-danger-foreground);
   --gs-tooltip-surface-border: var(--gs-preview-tooltip-surface-border);
   --gs-tooltip-foreground: var(--gs-preview-tooltip-foreground);
@@ -42,7 +43,7 @@
 
 :host([data-dp-theme="light"]),
 [data-dp-theme="light"] {
-  --gs-preview-brand-opacity: 0.8;
+  --gs-preview-brand-opacity: 0.72;
   --gs-preview-action-danger-foreground: var(--gs-preview-danger-foreground);
   --gs-tooltip-surface-border: var(--gs-preview-tooltip-surface-border);
   --gs-tooltip-foreground: var(--gs-preview-tooltip-foreground);
@@ -115,9 +116,9 @@
   background-size: 10px 10px, 6px 6px;
   background-position: 0 0, 3px 4px;
   -webkit-mask-image: radial-gradient(130% 130% at 0% 0%,
-    rgb(0 0 0 / 1) 0%, rgb(0 0 0 / 0.45) 34%, transparent 70%);
+    var(--gs-mask-opaque) 0%, var(--gs-mask-soft) 34%, transparent 70%);
   mask-image: radial-gradient(130% 130% at 0% 0%,
-    rgb(0 0 0 / 1) 0%, rgb(0 0 0 / 0.45) 34%, transparent 70%);
+    var(--gs-mask-opaque) 0%, var(--gs-mask-soft) 34%, transparent 70%);
   animation: gs-drop-dots-breathe 9s ease-in-out infinite alternate;
 }
 
@@ -214,11 +215,11 @@
 
 @supports not (backdrop-filter: blur(1px)) {
   .gs-drop-icon-shell--overlay {
-    background: rgb(29 23 43 / 0.86);
+    background: var(--gs-drop-icon-surface-fallback);
   }
 
   [data-dp-theme="light"] .gs-drop-icon-shell--overlay {
-    background: rgb(255 251 244 / 0.92);
+    background: var(--gs-drop-icon-surface-fallback);
   }
 }
 
@@ -394,15 +395,14 @@
   width: 20px;
   height: 20px;
   display: block;
-  background-color: currentColor;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
   pointer-events: none;
   user-select: none;
+}
+
+.gs-preview-brand-logo > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .gs-preview-action,

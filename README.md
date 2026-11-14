@@ -101,6 +101,8 @@ src/
   i18n.js                  Runtime locale loader
   popup.html / popup.js    Toolbar popup
   settings.html / settings.js  Options page
+  icons.js                 Shared inline SVG icon set (Lucide-based + brand mark)
+  icons/                   Generated icon16/32/48/64/128.png
   css/                     Shared and per-surface styles
   _locales/                English and Simplified Chinese messages
 scripts/
@@ -108,6 +110,8 @@ scripts/
   changelog-lib.mjs        Changelog parsing helpers
   update-changelog.mjs     Release changelog generation
   sign-crx.cjs             Chrome CRX signing
+  icons.js                 Renders icon PNGs from assets/logo-icon.svg
+  assets/logo-icon.svg     App icon source (rounded tile + card stack)
 tests/
   changelog-lib.test.mjs   Changelog helper tests
 ```
@@ -119,6 +123,7 @@ tests/
 | `npm test` | Run the Vitest suite once. |
 | `npm run test:watch` | Run Vitest in watch mode. |
 | `npm run build` | Build and package Chrome and Firefox. |
+| `npm run icons` | Regenerate `src/icons/icon{16,32,48,64,128}.png` from `scripts/assets/logo-icon.svg` (needs ImageMagick `magick`). |
 | `node scripts/update-changelog.mjs --mode unreleased` | Refresh the Unreleased changelog from commits. |
 | `node scripts/update-changelog.mjs --mode release --tag vX.Y.Z` | Generate the version section and release notes. |
 

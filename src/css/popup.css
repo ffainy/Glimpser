@@ -28,9 +28,14 @@ body {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  background-color: var(--accent-color);
-  -webkit-mask: url("../icons/logo.svg") center / contain no-repeat;
-  mask: url("../icons/logo.svg") center / contain no-repeat;
+  display: block;
+  color: var(--accent-color);
+}
+
+.logo > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .brand {

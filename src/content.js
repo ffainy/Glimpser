@@ -60,7 +60,12 @@ const ICON_CLOSE = _lucideIcon('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>')
 const ICON_CLOSE_OTHERS = _lucideIcon('<path d="M14 3h1"/><path d="m16 16 5 5"/><path d="M19 3a2 2 0 012 2"/><path d="m21 16-5 5"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M3 9v1"/><path d="M5 21a2 2 0 01-2-2"/><path d="M5 3a2 2 0 00-2 2"/><path d="M9 21h1"/><path d="M9 3h1"/>')
 const ICON_CLOSE_ALL = _lucideIcon('<path d="M12 3v17a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1H3"/><path d="m16.5 16.5 5 5"/><path d="m16.5 21.5 5-5"/>')
 const ICON_MORE = _lucideIcon('<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>')
-const BRAND_LOGO_PATH = 'icons/logo.svg'
+// Brand mark: the app icon's cards and gold band, without its rounded tile.
+const _BRAND_MARK = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+  '<path fill="currentColor" fill-opacity="0.55" d="M0.94 4.3A2.52 2.52 0 0 1 3.46 1.78H13.54A2.52 2.52 0 0 1 16.06 4.3V7.1H7.38A3.92 3.92 0 0 0 3.46 11.02V13.54A2.52 2.52 0 0 1 0.94 11.02Z"/>' +
+  '<rect x="5.14" y="8.78" width="17.92" height="13.44" rx="3.08" fill="currentColor"/>' +
+  '<path fill="rgb(var(--gs-support-rgb, 232 163 76))" d="M5.14 12.7V11.86A3.08 3.08 0 0 1 8.22 8.78H19.98A3.08 3.08 0 0 1 23.06 11.86V12.7Z"/>' +
+  '</svg>'
 
 let _shadowHost = null
 let _shadowRoot = null
@@ -352,11 +357,6 @@ function _makeMenuAction(action, label, icon) {
 
   button.append(iconEl, labelEl, countEl)
   return button
-}
-
-function _runtimeUrl(path) {
-  const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
-  return nativeAPI.runtime.getURL(path)
 }
 
 function _isCloseOthersButtonEnabled() {
@@ -655,9 +655,7 @@ function _createPreviewWindow(url, settings) {
   const brandLogo = document.createElement('span')
   brandLogo.className = 'gs-preview-brand-logo'
   brandLogo.setAttribute('aria-hidden', 'true')
-  const brandLogoMask = `url("${_runtimeUrl(BRAND_LOGO_PATH)}")`
-  brandLogo.style.setProperty('-webkit-mask-image', brandLogoMask)
-  brandLogo.style.setProperty('mask-image', brandLogoMask)
+  brandLogo.innerHTML = _BRAND_MARK
   brandIcon.appendChild(brandLogo)
 
   const refreshButton = _makeIconButton('gs-pill-action', t('btnRefresh'), ICON_REFRESH)

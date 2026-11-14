@@ -27,7 +27,16 @@ function _icon(paths, size = 18) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`
 }
 
+// Brand mark: the app icon's two cards and gold band with its rounded tile
+// removed, so the mark can sit on any surface without an opaque plate.
+const _BRAND_MARK = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+  '<path fill="currentColor" fill-opacity="0.55" d="M0.94 4.3A2.52 2.52 0 0 1 3.46 1.78H13.54A2.52 2.52 0 0 1 16.06 4.3V7.1H7.38A3.92 3.92 0 0 0 3.46 11.02V13.54A2.52 2.52 0 0 1 0.94 11.02Z"/>' +
+  '<rect x="5.14" y="8.78" width="17.92" height="13.44" rx="3.08" fill="currentColor"/>' +
+  '<path fill="rgb(var(--gs-support-rgb, 232 163 76))" d="M5.14 12.7V11.86A3.08 3.08 0 0 1 8.22 8.78H19.98A3.08 3.08 0 0 1 23.06 11.86V12.7Z"/>' +
+  '</svg>'
+
 const ICONS = {
+  brandMark: _BRAND_MARK,
   // Settings tabs
   general: _icon(_LUCIDE.settings),
   preview: _icon(_LUCIDE.eye),

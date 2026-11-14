@@ -623,9 +623,13 @@ function _renderAboutTab() {
 
   const hero = document.createElement('div')
   hero.className = 'about-hero'
-  const logo = document.createElement('span')
+  const logo = document.createElement('img')
   logo.className = 'about-logo'
   logo.setAttribute('aria-hidden', 'true')
+  logo.setAttribute('alt', '')
+  logo.width = 128
+  logo.height = 128
+  logo.src = 'icons/icon128.png'
 
   const heroText = document.createElement('div')
   heroText.className = 'about-hero-text'
@@ -749,6 +753,7 @@ async function init() {
   await applyLangPref(_settings.language)
   document.documentElement.lang = _currentLang()
   _applyStaticI18n()
+  _applyIcons()
 
   const version = nativeAPI.runtime.getManifest().version || '0.0.0'
   document.getElementById('versionBadge').textContent = 'v' + version

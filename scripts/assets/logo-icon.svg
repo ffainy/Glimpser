@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-  <!-- Source for the 16/48/128 px browser icons. Regenerate with:
-       magick -background none -density 768 scripts/assets/logo-icon.svg -resize 16x16 -depth 8 -strip src/icons/icon16.png
-       (repeat for 48 and 128) -->
-  <rect x="1.5" y="1.5" width="21" height="21" rx="5" fill="#d9d4e0"/>
-  <rect x="4.5" y="5.5" width="10.5" height="8.5" rx="1.8" stroke="#4b4457" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
-  <rect x="9" y="10" width="10.5" height="8.5" rx="1.8" stroke="#4b4457" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Source for the browser icons. Regenerate with: npm run icons -->
+  <rect x="8" y="8" width="112" height="112" rx="27" fill="#1B1920"/>
+  <rect x="28" y="24" width="54" height="42" rx="9" fill="#A99EBF"/>
+  <rect x="37" y="43" width="76" height="60" rx="14" fill="#1B1920"/>
+  <rect x="43" y="49" width="64" height="48" rx="11" fill="#E8E2F1"/>
+  <path d="M43 63 V60 A11 11 0 0 1 54 49 H96 A11 11 0 0 1 107 60 V63 Z" fill="#E8A34C"/>
 </svg>

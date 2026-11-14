@@ -19,7 +19,8 @@
   "scripts": {
     "test": "vitest --run",
     "test:watch": "vitest",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "icons": "node scripts/icons.js"
   },
   "devDependencies": {
     "archiver": "^8.0.0",

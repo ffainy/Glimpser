@@ -62,9 +62,14 @@ header {
   width: 32px;
   height: 32px;
   flex-shrink: 0;
-  background-color: var(--accent-color);
-  -webkit-mask: url("../icons/logo.svg") center / contain no-repeat;
-  mask: url("../icons/logo.svg") center / contain no-repeat;
+  display: block;
+  color: var(--accent-color);
+}
+
+.logo-img > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 header h1 {
@@ -535,26 +540,13 @@ input[type="range"]::-moz-range-thumb {
   padding-bottom: 20px;
 }
 
+/* The About tab shows the shipped app icon itself, so the product face here
+   always matches the toolbar and store listing. */
 .about-logo {
-  position: relative;
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
+  width: 54px;
+  height: 54px;
   border-radius: 13px;
-  background: color-mix(in srgb, var(--link-color) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--link-color) 30%, transparent);
-  box-shadow:
-    0 0 0 4px color-mix(in srgb, var(--link-color) 6%, transparent),
-    var(--gs-shadow-inset-highlight-soft);
-}
-
-.about-logo::before {
-  content: "";
-  position: absolute;
-  inset: 11px;
-  background: var(--link-color);
-  -webkit-mask: url("../icons/logo.svg") center / contain no-repeat;
-  mask: url("../icons/logo.svg") center / contain no-repeat;
 }
 
 .about-hero-text {
