@@ -417,6 +417,14 @@ textarea {
   --gs-settings-rail: rgb(226 216 242 / 0.18);
   --gs-settings-badge-surface: rgb(255 255 255 / 0.08);
   --gs-settings-badge-foreground: rgb(237 232 244 / 0.70);
+  --gs-settings-link: rgb(var(--gs-support-text-rgb));
+  --gs-settings-card-glow: 0 0 26px rgb(var(--gs-accent-rgb) / 0.05);
+  --gs-settings-card-glow-hover: 0 0 30px rgb(var(--gs-accent-rgb) / 0.13);
+  --gs-settings-action-bar-surface: rgb(18 13 30 / 0.88);
+  --gs-settings-action-bar-border: rgb(226 216 242 / 0.14);
+  --gs-settings-action-bar-shadow:
+    0 -12px 28px rgb(4 2 10 / 0.36),
+    inset 0 1px 0 rgb(255 255 255 / 0.05);
   --gs-settings-toggle-knob: rgb(26 21 35);
   --gs-settings-checkmark: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%231a1523' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
   --gs-settings-select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%23ede8f4' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
@@ -625,6 +633,14 @@ textarea {
   --gs-settings-rail: rgb(62 52 74 / 0.18);
   --gs-settings-badge-surface: rgb(62 52 74 / 0.08);
   --gs-settings-badge-foreground: rgb(46 39 54 / 0.70);
+  --gs-settings-link: rgb(var(--gs-support-text-rgb));
+  --gs-settings-card-glow: 0 0 24px rgb(var(--gs-accent-rgb) / 0.04);
+  --gs-settings-card-glow-hover: 0 0 30px rgb(var(--gs-accent-rgb) / 0.10);
+  --gs-settings-action-bar-surface: rgb(241 231 214 / 0.90);
+  --gs-settings-action-bar-border: rgb(62 52 74 / 0.14);
+  --gs-settings-action-bar-shadow:
+    0 -12px 28px rgb(82 61 38 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.72);
   --gs-settings-toggle-knob: rgb(255 252 246);
   --gs-settings-checkmark: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fffcf6' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
   --gs-settings-select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%232e2736' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
