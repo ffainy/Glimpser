@@ -5,101 +5,119 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Glimpser</title>
   <link rel="stylesheet" href="css/foundation.css" />
+  <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/popup.css" />
 </head>
 <body>
   <main id="app">
     <div class="header">
       <span class="logo" aria-hidden="true"></span>
-      <span class="brand">Glimpser</span>
+      <span class="brand brand-accent">Glimpser</span>
       <span class="version" id="versionBadge"></span>
       <div class="header-actions">
-        <button class="header-btn" id="openSettings" title="Settings" aria-label="Settings" data-i18n-title="ariaOpenSettings" data-i18n-aria-label="ariaOpenSettings">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+        <div class="theme-switch" role="radiogroup" data-i18n-aria-label="labelTheme">
+          <button class="theme-btn" type="button" role="radio" aria-checked="false" tabindex="-1" data-theme-value="system" data-icon="system" data-i18n-title="themeSystem" data-i18n-aria-label="themeSystem"></button>
+          <button class="theme-btn" type="button" role="radio" aria-checked="false" tabindex="-1" data-theme-value="light" data-icon="light" data-i18n-title="themeLight" data-i18n-aria-label="themeLight"></button>
+          <button class="theme-btn" type="button" role="radio" aria-checked="false" tabindex="-1" data-theme-value="dark" data-icon="dark" data-i18n-title="themeDark" data-i18n-aria-label="themeDark"></button>
+        </div>
+        <button class="icon-btn" id="openSettings" type="button" data-icon="settings" data-i18n-title="ariaOpenSettings" data-i18n-aria-label="ariaOpenSettings"></button>
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-label" data-i18n="tabPreview">Preview</div>
+    <div class="popup-body">
+      <section class="section-body">
+        <div class="section-title">
+          <span class="section-icon" data-icon="preview" aria-hidden="true"></span>
+          <span data-i18n="tabPreview">Preview</span>
+        </div>
 
-      <div class="status-row">
-        <span class="status-label">
-          <span class="label-main" data-i18n="labelPreviewEnabled">Enable preview</span>
-        </span>
-        <label class="toggle">
-          <input type="checkbox" id="previewEnabled" data-i18n-aria-label="labelPreviewEnabled" />
-          <span class="slider"></span>
-        </label>
-      </div>
+        <div class="setting-row">
+          <span class="setting-label">
+            <span class="label-main" data-i18n="labelPreviewEnabled">Enable preview</span>
+          </span>
+          <span class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="previewEnabled" data-i18n-aria-label="labelPreviewEnabled" />
+              <span class="slider"></span>
+            </label>
+          </span>
+        </div>
 
-      <div class="status-row">
-        <span class="status-label">
-          <span class="label-main" data-i18n="labelPreviewTrigger">Trigger mode</span>
-          <span class="row-hint" id="triggerHint"></span>
-        </span>
-        <label class="toggle">
-          <input type="checkbox" id="previewTriggerMode" data-i18n-aria-label="labelPreviewTrigger" />
-          <span class="slider"></span>
-        </label>
-      </div>
+        <div class="setting-row">
+          <span class="setting-label">
+            <span class="label-main" data-i18n="labelPreviewTrigger">Trigger mode</span>
+            <span class="label-hint" id="triggerHint"></span>
+          </span>
+          <span class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="previewTriggerMode" data-i18n-aria-label="labelPreviewTrigger" />
+              <span class="slider"></span>
+            </label>
+          </span>
+        </div>
 
-      <div class="status-row">
-        <span class="status-label">
-          <span class="label-main" data-i18n="labelMultiplePreviewWindows">Multiple preview windows</span>
-          <span class="row-hint" data-i18n="hintMultipleWindowsPopup">Up to 10 windows</span>
-        </span>
-        <label class="toggle">
-          <input type="checkbox" id="multipleWindows" data-i18n-aria-label="labelMultiplePreviewWindows" />
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
+        <div class="setting-row">
+          <span class="setting-label">
+            <span class="label-main" data-i18n="labelMultiplePreviewWindows">Multiple preview windows</span>
+            <span class="label-hint" data-i18n="hintMultipleWindowsPopup">Up to 10 windows</span>
+          </span>
+          <span class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="multipleWindows" data-i18n-aria-label="labelMultiplePreviewWindows" />
+              <span class="slider"></span>
+            </label>
+          </span>
+        </div>
+      </section>
 
-    <div class="section">
-      <div class="section-label" data-i18n="sectionThisSite">This site</div>
+      <section class="section-body">
+        <div class="section-title">
+          <span class="section-icon" data-icon="homepage" aria-hidden="true"></span>
+          <span data-i18n="sectionThisSite">This site</span>
+        </div>
 
-      <div class="status-row">
-        <span class="status-label">
-          <span class="label-main" data-i18n="labelBlockCurrentSite">Block current site</span>
-          <span class="row-hint" id="siteHint"></span>
-        </span>
-        <label class="toggle">
-          <input type="checkbox" id="blockCurrentSite" data-i18n-aria-label="labelBlockCurrentSite" />
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
+        <div class="setting-row">
+          <span class="setting-label">
+            <span class="label-main" data-i18n="labelBlockCurrentSite">Block current site</span>
+            <span class="label-hint" id="siteHint"></span>
+          </span>
+          <span class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="blockCurrentSite" data-i18n-aria-label="labelBlockCurrentSite" />
+              <span class="slider"></span>
+            </label>
+          </span>
+        </div>
+      </section>
 
-    <div class="section">
-      <div class="section-label" data-i18n="labelPreferences">Interface</div>
+      <section class="section-body">
+        <div class="section-title">
+          <span class="section-icon" data-icon="languageTheme" aria-hidden="true"></span>
+          <span data-i18n="labelPreferences">Interface</span>
+        </div>
 
-      <div class="status-row">
-        <span class="status-label">
-          <span class="label-main" data-i18n="labelLang">Language</span>
-        </span>
-        <select id="language" data-i18n-aria-label="labelLang">
-          <option value="en" data-i18n="langEn">English</option>
-          <option value="zh_CN" data-i18n="langZh">中文</option>
-        </select>
-      </div>
-
-      <div class="status-row">
-        <span class="status-label">
-          <span class="label-main" data-i18n="labelTheme">Theme</span>
-        </span>
-        <select id="theme" data-i18n-aria-label="labelTheme">
-          <option value="system" data-i18n="themeSystem">System</option>
-          <option value="light" data-i18n="themeLight">Light</option>
-          <option value="dark" data-i18n="themeDark">Dark</option>
-        </select>
-      </div>
+        <div class="setting-row has-segmented">
+          <span class="setting-label">
+            <span class="label-main" data-i18n="labelLang">Language</span>
+          </span>
+          <span class="setting-control">
+            <span class="segmented-control" role="radiogroup" data-i18n-aria-label="labelLang">
+              <label class="segmented-option">
+                <input type="radio" name="language" value="en" />
+                <span data-i18n="langEn">English</span>
+              </label>
+              <label class="segmented-option">
+                <input type="radio" name="language" value="zh_CN" />
+                <span data-i18n="langZh">中文</span>
+              </label>
+            </span>
+          </span>
+        </div>
+      </section>
     </div>
   </main>
   <script src="i18n.js"></script>
+  <script src="icons.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

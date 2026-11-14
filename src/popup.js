@@ -86,6 +86,7 @@ async function _getActiveSite() {
 async function initPopup() {
   const settings = await loadSettings()
 
+  _applyIcons()
   await applyLangPref(settings.language)
   applyI18n()
   document.documentElement.lang = typeof getLang === 'function' ? getLang() : 'en'
@@ -99,14 +100,28 @@ async function initPopup() {
   const multipleToggle = document.getElementById('multipleWindows')
   const blockToggle = document.getElementById('blockCurrentSite')
   const siteHint = document.getElementById('siteHint')
-  const languageSelect = document.getElementById('language')
-  const themeSelect = document.getElementById('theme')
-  const blockRow = blockToggle.closest('.status-row')
+  const languageInputs = [...document.querySelectorAll('input[name="language"]')]
+  const themeButtons = [...document.querySelectorAll('.theme-btn')]
+  const blockRow = blockToggle.closest('.setting-row')
 
   function _applyTheme(theme) {
-    const resolved = theme || _detectSystemTheme()
+    const resolved = theme === 'light' || theme === 'dark' ? theme : _detectSystemTheme()
     document.documentElement.dataset.theme = resolved
     document.documentElement.dataset.dpTheme = resolved
+  }
+
+  function _selectedThemeMode() {
+    return settings.theme === 'light' || settings.theme === 'dark' ? settings.theme : 'system'
+  }
+
+  function _renderThemeState() {
+    const mode = _selectedThemeMode()
+    themeButtons.forEach((button) => {
+      const active = button.dataset.themeValue === mode
+      button.classList.toggle('active', active)
+      button.setAttribute('aria-checked', String(active))
+      button.tabIndex = active ? 0 : -1
+    })
   }
 
   const updateTriggerHint = () => {
@@ -135,14 +150,17 @@ async function initPopup() {
   previewToggle.checked = settings.previewEnabled !== false
   triggerToggle.checked = (settings.previewTriggerMode || 'release') === 'drop-area'
   multipleToggle.checked = (settings.maxPreviewWindows || 1) > 1
-  languageSelect.value = (settings.language === 'zh_CN' || settings.language === 'zh')
+
+  const languageValue = (settings.language === 'zh_CN' || settings.language === 'zh')
     ? 'zh_CN'
     : (settings.language === 'en'
       ? 'en'
       : (typeof getLang === 'function' && getLang() === 'zh_CN' ? 'zh_CN' : 'en'))
-  themeSelect.value = settings.theme === 'light' || settings.theme === 'dark'
-    ? settings.theme
-    : 'system'
+  languageInputs.forEach((input) => {
+    input.checked = input.value === languageValue
+  })
+
+  _renderThemeState()
   updateTriggerHint()
   renderSiteState()
   _applyTheme(settings.theme)
@@ -173,21 +191,51 @@ async function initPopup() {
     await saveSettings({ blacklistDomains: next })
   })
 
-  languageSelect.addEventListener('change', async () => {
-    settings.language = languageSelect.value
-    await applyLangPref(settings.language)
-    document.documentElement.lang = typeof getLang === 'function' ? getLang() : 'en'
-    applyI18n()
-    updateTriggerHint()
-    renderSiteState()
-    saveSettings({ language: settings.language })
+  languageInputs.forEach((input) => {
+    input.addEventListener('change', async () => {
+      if (!input.checked) return
+      settings.language = input.value
+      await applyLangPref(settings.language)
+      document.documentElement.lang = typeof getLang === 'function' ? getLang() : 'en'
+      applyI18n()
+      updateTriggerHint()
+      renderSiteState()
+      saveSettings({ language: settings.language })
+    })
   })
 
-  themeSelect.addEventListener('change', () => {
-    settings.theme = themeSelect.value === 'system' ? null : themeSelect.value
-    _applyTheme(settings.theme)
-    saveSettings({ theme: settings.theme })
+  const moveThemeFocus = (event, index) => {
+    let next = null
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % themeButtons.length
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + themeButtons.length) % themeButtons.length
+    if (event.key === 'Home') next = 0
+    if (event.key === 'End') next = themeButtons.length - 1
+    if (next === null) return
+    event.preventDefault()
+    themeButtons[next].focus()
+    themeButtons[next].click()
+  }
+
+  themeButtons.forEach((button, index) => {
+    button.addEventListener('click', () => {
+      const value = button.dataset.themeValue
+      settings.theme = value === 'system' ? null : value
+      _applyTheme(settings.theme)
+      _renderThemeState()
+      saveSettings({ theme: settings.theme })
+    })
+    button.addEventListener('keydown', (event) => moveThemeFocus(event, index))
   })
+
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+  const onSystemThemeChange = () => {
+    if (_selectedThemeMode() === 'system') _applyTheme(settings.theme)
+  }
+  if (typeof systemTheme.addEventListener === 'function') {
+    systemTheme.addEventListener('change', onSystemThemeChange)
+  } else if (typeof systemTheme.addListener === 'function') {
+    systemTheme.addListener(onSystemThemeChange)
+  }
 
   document.getElementById('openSettings').addEventListener('click', () => {
     nativeAPI.runtime.openOptionsPage()

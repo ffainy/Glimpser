@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 const CSS_DIR = new URL('../src/css/', import.meta.url)
-const COMPONENT_FILES = ['settings.css', 'preview.css', 'popup.css']
+const COMPONENT_FILES = ['components.css', 'settings.css', 'preview.css', 'popup.css']
 const ALL_FILES = ['foundation.css', ...COMPONENT_FILES]
 
 const readCss = (file) => readFileSync(new URL(file, CSS_DIR), 'utf8')
@@ -84,12 +84,37 @@ describe('theme tokens', () => {
     }
   })
 
-  it('loads foundation before popup overrides', () => {
-    const html = readFileSync(new URL('../src/popup.html', import.meta.url), 'utf8')
-    const foundation = html.indexOf('css/foundation.css')
-    const popup = html.indexOf('css/popup.css')
+  it('loads shared layers before page overrides', () => {
+    const cases = [
+      ['popup.html', 'css/popup.css'],
+      ['settings.html', 'css/settings.css'],
+    ]
 
-    expect(foundation).toBeGreaterThanOrEqual(0)
-    expect(popup).toBeGreaterThan(foundation)
+    for (const [file, pageFile] of cases) {
+      const html = readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8')
+      const foundation = html.indexOf('css/foundation.css')
+      const components = html.indexOf('css/components.css')
+      const page = html.indexOf(pageFile)
+
+      expect(foundation, file).toBeGreaterThanOrEqual(0)
+      expect(components, file).toBeGreaterThan(foundation)
+      expect(page, file).toBeGreaterThan(components)
+    }
+  })
+
+  it('loads shared icons before page scripts', () => {
+    const cases = [
+      ['popup.html', 'popup.js'],
+      ['settings.html', 'settings.js'],
+    ]
+
+    for (const [file, script] of cases) {
+      const html = readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8')
+      const icons = html.indexOf('icons.js')
+      const page = html.indexOf(script)
+
+      expect(icons, file).toBeGreaterThanOrEqual(0)
+      expect(page, file).toBeGreaterThan(icons)
+    }
   })
 })
