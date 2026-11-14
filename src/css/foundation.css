@@ -255,9 +255,10 @@ textarea {
   --gs-preview-accent-strong: var(--gs-accent-strong-rgb);
   --gs-preview-support: var(--gs-support-rgb);
   --gs-preview-support-text: var(--gs-support-text-rgb);
+  --gs-preview-spinner-foreground: rgb(var(--gs-preview-accent));
   /* Preview surfaces */
   /* Preview window chrome */
-  --gs-preview-window-surface-bg: linear-gradient(to bottom, rgb(29 23 43 / 0.95), rgb(24 18 38 / 0.92));
+  --gs-preview-window-surface-bg: transparent;
   --gs-preview-window-surface-border: rgb(226 216 242 / 0.12);
   --gs-preview-window-surface-border-active: rgb(var(--gs-accent-rgb) / 0.34);
   --gs-preview-window-surface-shadow:
@@ -267,12 +268,13 @@ textarea {
     0 34px 92px rgb(4 2 10 / 0.66),
     0 0 42px rgb(var(--gs-preview-accent) / 0.14),
     0 0 24px rgb(var(--gs-preview-support) / 0.08);
-  --gs-preview-header-surface: rgb(29 23 43 / 0.66);
-  --gs-preview-header-surface-active: rgb(34 27 49 / 0.74);
-  --gs-preview-header-surface-inactive: rgb(24 18 38 / 0.58);
-  --gs-preview-urlbar-surface: rgb(27 20 41 / 0.76);
-  --gs-preview-urlbar-surface-active: rgb(32 25 45 / 0.84);
-  --gs-preview-urlbar-surface-inactive: rgb(24 18 38 / 0.60);
+  --gs-preview-header-surface: rgb(29 23 43 / 0.72);
+  --gs-preview-header-surface-active: rgb(29 23 43 / 0.72);
+  --gs-preview-header-surface-inactive: rgb(24 18 38 / 0.62);
+  --gs-preview-header-saturate: 1.15;
+  --gs-preview-urlbar-surface: rgb(16 11 26 / 0.30);
+  --gs-preview-urlbar-surface-active: rgb(16 11 26 / 0.30);
+  --gs-preview-urlbar-surface-inactive: rgb(16 11 26 / 0.24);
   --gs-preview-header-elevation-shadow: 0 10px 24px rgb(4 2 10 / 0.18);
   /* Preview dropzone surfaces */
   --gs-preview-drop-icon-surface: rgb(var(--gs-preview-accent) / 0.10);
@@ -370,7 +372,7 @@ textarea {
   --gs-preview-action-foreground: rgb(237 232 244 / 0.78);
   --gs-preview-action-foreground-inactive: rgb(206 197 220 / 0.40);
   --gs-preview-action-foreground-hover: rgb(var(--gs-preview-accent-strong) / 0.98);
-  --gs-preview-action-surface-hover: linear-gradient(135deg, rgb(var(--gs-preview-accent) / 0.18), rgb(var(--gs-preview-support) / 0.10));
+  --gs-preview-action-surface-hover: rgb(var(--gs-preview-accent) / 0.16);
   --gs-preview-action-glow:
     drop-shadow(0 0 0.55px rgb(237 232 244 / 0.22))
     drop-shadow(0 0 2px rgb(var(--gs-preview-accent) / 0.08));
@@ -480,9 +482,10 @@ textarea {
   --gs-preview-accent-strong: var(--gs-accent-strong-rgb);
   --gs-preview-support: var(--gs-support-rgb);
   --gs-preview-support-text: var(--gs-support-text-rgb);
+  --gs-preview-spinner-foreground: rgb(var(--gs-preview-support));
   /* Preview surfaces */
   /* Preview window chrome */
-  --gs-preview-window-surface-bg: linear-gradient(to bottom, rgb(255 252 246 / 0.96), rgb(251 244 232 / 0.92));
+  --gs-preview-window-surface-bg: transparent;
   --gs-preview-window-surface-border: rgb(62 52 74 / 0.14);
   --gs-preview-window-surface-border-active: rgb(var(--gs-accent-rgb) / 0.30);
   --gs-preview-window-surface-shadow:
@@ -491,12 +494,13 @@ textarea {
   --gs-preview-window-surface-shadow-active:
     0 28px 64px rgb(82 61 38 / 0.20),
     0 0 30px rgb(var(--gs-preview-support) / 0.10);
-  --gs-preview-header-surface: rgb(255 252 246 / 0.76);
-  --gs-preview-header-surface-active: rgb(255 255 255 / 0.86);
-  --gs-preview-header-surface-inactive: rgb(248 241 228 / 0.60);
-  --gs-preview-urlbar-surface: rgb(243 234 219 / 0.82);
-  --gs-preview-urlbar-surface-active: rgb(248 241 228 / 0.90);
-  --gs-preview-urlbar-surface-inactive: rgb(245 237 225 / 0.56);
+  --gs-preview-header-surface: rgb(255 252 246 / 0.82);
+  --gs-preview-header-surface-active: rgb(255 252 246 / 0.82);
+  --gs-preview-header-surface-inactive: rgb(248 241 228 / 0.68);
+  --gs-preview-header-saturate: 1.1;
+  --gs-preview-urlbar-surface: rgb(231 220 202 / 0.34);
+  --gs-preview-urlbar-surface-active: rgb(231 220 202 / 0.34);
+  --gs-preview-urlbar-surface-inactive: rgb(231 220 202 / 0.28);
   --gs-preview-header-elevation-shadow: 0 10px 24px rgb(82 61 38 / 0.08);
   /* Preview dropzone surfaces */
   --gs-preview-drop-icon-surface: rgb(var(--gs-preview-support) / 0.14);
@@ -590,7 +594,7 @@ textarea {
   --gs-preview-action-foreground: rgb(62 52 74 / 0.70);
   --gs-preview-action-foreground-inactive: rgb(78 72 89 / 0.38);
   --gs-preview-action-foreground-hover: rgb(var(--gs-preview-accent-strong) / 0.90);
-  --gs-preview-action-surface-hover: linear-gradient(135deg, rgb(var(--gs-preview-accent) / 0.08), rgb(var(--gs-preview-support) / 0.06));
+  --gs-preview-action-surface-hover: rgb(var(--gs-preview-accent) / 0.08);
   --gs-preview-action-glow: drop-shadow(0 0 0.45px rgb(62 52 74 / 0.12));
   --gs-preview-action-glow-inactive: drop-shadow(0 0 0.4px rgb(62 52 74 / 0.08));
   --gs-preview-action-glow-hover: drop-shadow(0 0 0.6px rgb(var(--gs-preview-accent) / 0.10));
