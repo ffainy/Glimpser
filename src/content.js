@@ -1439,6 +1439,7 @@ function _setFullscreenOverlayActive(isActive) {
   const overlay = _shadowRoot ? _shadowRoot.getElementById('gs-dropzone-overlay') : null
   if (overlay) {
     overlay.classList.toggle('active', isActive)
+    overlay.classList.remove('drag-over')
     overlay.setAttribute('data-dp-theme', _currentTheme)
   }
 
@@ -1653,7 +1654,7 @@ function _ensureFullscreenOverlay() {
   overlay.setAttribute('data-dp-theme', _currentTheme)
   overlay.innerHTML = `
     <div class="gs-drop-overlay-stage">
-      <div class="gs-drop-surface gs-drop-surface--overlay">
+      <div class="gs-drop-float">
         ${_buildDropHintInner({
           iconClass: 'gs-drop-icon-shell--overlay',
           title: t('dropHintFullscreen'),
@@ -1696,6 +1697,7 @@ function _bindFullscreenDragEvents() {
     if (state.draggedLink) {
       event.preventDefault()
       event.stopPropagation()
+      overlay.classList.add('drag-over')
       if (event.dataTransfer) {
         event.dataTransfer.dropEffect = 'copy'
       }
