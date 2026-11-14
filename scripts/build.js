@@ -14,6 +14,7 @@ const SRC  = path.join(ROOT, 'src')
 // Source files to include in each browser package
 const SOURCE_FILES = [
   'i18n.js',
+  'icons.js',
   'background.js',
   'content.js',
   'settings.html',

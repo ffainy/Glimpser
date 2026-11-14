@@ -91,6 +91,15 @@ textarea {
   --gs-font-size-kicker:           var(--gs-font-size-caption);
   --gs-font-size-body:             calc(var(--gs-font-size-base) - 1px);   /* 13px */
   --gs-font-size-tab-label:        calc(var(--gs-font-size-base) + 2px);   /* 16px */
+  /* Shared page type scale — used by Settings cards and Popup rows.
+     caption 12 · small 13 · control 14 · body 15 · section 16 · hero 19 · page 22 */
+  --fs-caption:                    12px;
+  --fs-small:                      13px;
+  --fs-control:                    14px;
+  --fs-body:                       15px;
+  --fs-section-title:              16px;
+  --fs-hero:                       19px;
+  --fs-page-title:                 22px;
   /* Line height scale
      tight: compact single-line UI text, chips, and dense metadata.
      title: tighter display and heading text.
