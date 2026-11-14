@@ -18,17 +18,46 @@ const DEFAULT_SETTINGS = {
 }
 
 const TABS = ['general', 'preview', 'blacklist', 'about']
+const PROJECT_URL = 'https://github.com/ffainy/glimpser'
+const RELEASES_URL = `${PROJECT_URL}/releases`
+const AUTHOR_URL = 'https://github.com/ffainy'
+
 let _settings = {}
 let _activeTab = 'general'
 let _savedSnapshot = null
 let _isSaving = false
 let _resetPending = false
+let _segmentedId = 0
+
+function _icon(paths) {
+  return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`
+}
 
 const ICONS = {
-  general: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  preview: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  blacklist: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  about: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  // Tabs
+  general: _icon('<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>'),
+  preview: _icon('<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>'),
+  blacklist: _icon('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m4.243 5.21 14.39 12.472"/>'),
+  about: _icon('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'),
+
+  // About meta rows
+  version: _icon('<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>'),
+  author: _icon('<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>'),
+  homepage: _icon('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>'),
+
+  // General sections
+  extensionStatus: _icon('<path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/>'),
+  languageTheme: _icon('<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>'),
+
+  // Preview sections
+  openBehavior: _icon('<path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/>'),
+  windowLayout: _icon('<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v4"/><path d="M2 8h20"/><path d="M6 4v4"/>'),
+  windowAppearance: _icon('<path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>'),
+  previewBehavior: _icon('<path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/>'),
+  toolbarButtons: _icon('<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/>'),
+
+  // Blacklist section
+  addDomain: _icon('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M9 12h6"/><path d="M12 9v6"/>'),
 }
 
 function _t(key) {
@@ -45,6 +74,78 @@ function _applyStaticI18n() {
   document.querySelectorAll('[data-i18n-title]').forEach((el) => {
     el.setAttribute('title', _t(el.dataset.i18nTitle))
   })
+  _renderFooterAuthor()
+}
+
+function _safeHref(value) {
+  if (typeof value !== 'string' || !value.trim()) return ''
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : ''
+  } catch (e) {
+    return ''
+  }
+}
+
+function _externalLink(text, href) {
+  const label = String(text || '')
+  const safeHref = _safeHref(href)
+  if (!safeHref) {
+    const span = document.createElement('span')
+    span.textContent = label
+    return span
+  }
+  const link = document.createElement('a')
+  link.className = 'text-link'
+  link.href = safeHref
+  link.target = '_blank'
+  link.rel = 'noopener noreferrer'
+  link.textContent = label
+  return link
+}
+
+function _externalLinkPill(text, href) {
+  const link = _externalLink(text, href)
+  if (link.tagName !== 'A') return link
+
+  const label = link.textContent
+  link.className = 'about-pill'
+  link.title = href
+  link.replaceChildren()
+
+  const textEl = document.createElement('span')
+  textEl.className = 'about-pill-text'
+  textEl.textContent = label
+
+  const icon = document.createElement('span')
+  icon.className = 'about-pill-icon'
+  icon.setAttribute('aria-hidden', 'true')
+  icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+
+  link.append(textEl, icon)
+  return link
+}
+
+function _renderFooterAuthor() {
+  const host = document.getElementById('footerAuthorText')
+  if (!host) return
+
+  const template = _t('footerAuthor')
+  const author = nativeAPI.runtime.getManifest().author || 'farfaraway'
+  const token = '{author}'
+  const index = template.indexOf(token)
+
+  host.replaceChildren()
+  if (index === -1) {
+    host.append(document.createTextNode(template))
+    return
+  }
+
+  const before = template.slice(0, index)
+  const after = template.slice(index + token.length)
+  if (before) host.append(document.createTextNode(before))
+  host.append(_externalLink(author, AUTHOR_URL))
+  if (after) host.append(document.createTextNode(after))
 }
 
 function _clamp(value, min, max) {
@@ -177,7 +278,11 @@ function _settingRow(labelKey, hintKey, controlFn) {
 
   const control = document.createElement('div')
   control.className = 'setting-control'
-  control.appendChild(controlFn())
+  const controlEl = controlFn()
+  if (controlEl.classList.contains('segmented-control')) {
+    row.classList.add('has-segmented')
+  }
+  control.appendChild(controlEl)
   row.appendChild(control)
 
   return row
@@ -197,17 +302,36 @@ function _makeToggle(value, onChange) {
   return wrap
 }
 
-function _makeSelect(options, currentValue, onChange) {
-  const sel = document.createElement('select')
+function _makeSegmented(options, currentValue, onChange, ariaLabelKey) {
+  const group = document.createElement('div')
+  group.className = 'segmented-control'
+  group.setAttribute('role', 'radiogroup')
+  if (ariaLabelKey) group.setAttribute('aria-label', _t(ariaLabelKey))
+
+  _segmentedId += 1
+  const name = `segmented-${_segmentedId}`
+
   options.forEach(({ value, labelKey }) => {
-    const opt = document.createElement('option')
-    opt.value = value
-    opt.textContent = _t(labelKey)
-    if (value === currentValue) opt.selected = true
-    sel.appendChild(opt)
+    const option = document.createElement('label')
+    option.className = 'segmented-option'
+
+    const input = document.createElement('input')
+    input.type = 'radio'
+    input.name = name
+    input.value = value
+    input.checked = value === currentValue
+    input.addEventListener('change', () => {
+      if (input.checked) onChange(value)
+    })
+
+    const text = document.createElement('span')
+    text.textContent = _t(labelKey)
+
+    option.append(input, text)
+    group.appendChild(option)
   })
-  sel.addEventListener('change', () => onChange(sel.value))
-  return sel
+
+  return group
 }
 
 function _makeSlider(min, max, value, onChange) {
@@ -260,10 +384,18 @@ function _sliderRow(labelKey, value, unit, controlEl, hintKey) {
 function _renderGeneralTab() {
   const wrap = document.createDocumentFragment()
 
-  const body1 = _sectionBody(ICONS.general, 'labelPreferences', () => {
+  wrap.appendChild(_sectionBody(ICONS.extensionStatus, 'sectionExtension', () => {
+    const inner = document.createDocumentFragment()
+    inner.appendChild(_settingRow('labelEnableExtension', 'hintEnableExtension', () =>
+      _makeToggle(_settings.previewEnabled !== false, v => { _settings.previewEnabled = v })
+    ))
+    return inner
+  }))
+
+  wrap.appendChild(_sectionBody(ICONS.languageTheme, 'sectionLanguageTheme', () => {
     const inner = document.createDocumentFragment()
     inner.appendChild(_settingRow('labelLang', 'hintLanguage', () =>
-      _makeSelect(
+      _makeSegmented(
         [{ value: 'en', labelKey: 'langEn' }, { value: 'zh_CN', labelKey: 'langZh' }],
         _settings.language || _currentLang(),
         v => {
@@ -275,11 +407,12 @@ function _renderGeneralTab() {
             _resetPending = false
             _updateDirtyState()
           })
-        }
+        },
+        'labelLang'
       )
     ))
     inner.appendChild(_settingRow('labelTheme', 'hintTheme', () =>
-      _makeSelect(
+      _makeSegmented(
         [
           { value: 'system', labelKey: 'themeSystem' },
           { value: 'light', labelKey: 'themeLight' },
@@ -289,15 +422,12 @@ function _renderGeneralTab() {
         v => {
           _settings.theme = v === 'system' ? null : v
           _applyTheme(_resolveTheme())
-        }
+        },
+        'labelTheme'
       )
     ))
-    inner.appendChild(_settingRow('labelPreviewEnabled', null, () =>
-      _makeToggle(_settings.previewEnabled !== false, v => { _settings.previewEnabled = v })
-    ))
     return inner
-  })
-  wrap.appendChild(body1)
+  }))
 
   return wrap
 }
@@ -313,7 +443,7 @@ function _resolveTheme(theme = _settings.theme) {
 function _renderPreviewTab() {
   const wrap = document.createDocumentFragment()
 
-  wrap.appendChild(_sectionBody(ICONS.preview, 'labelPreviewTrigger', () => {
+  wrap.appendChild(_sectionBody(ICONS.openBehavior, 'sectionPreviewOpenBehavior', () => {
     const inner = document.createDocumentFragment()
 
     let triggerHint = null
@@ -338,7 +468,7 @@ function _renderPreviewTab() {
     return inner
   }))
 
-  wrap.appendChild(_sectionBody(ICONS.preview, 'labelWindowDefaults', () => {
+  wrap.appendChild(_sectionBody(ICONS.windowLayout, 'sectionPreviewWindowLayout', () => {
     const inner = document.createDocumentFragment()
     inner.appendChild(_settingRow('labelMultiplePreviewWindows', 'hintMaxPreviewWindows', () =>
       _makeToggle((_settings.maxPreviewWindows || 1) > 1, v => {
@@ -362,7 +492,7 @@ function _renderPreviewTab() {
     return inner
   }))
 
-  wrap.appendChild(_sectionBody(ICONS.preview, 'labelPreferences', () => {
+  wrap.appendChild(_sectionBody(ICONS.windowAppearance, 'sectionPreviewWindowAppearance', () => {
     const inner = document.createDocumentFragment()
 
     let radiusRow = null
@@ -377,7 +507,7 @@ function _renderPreviewTab() {
       }
     }
 
-    inner.appendChild(_settingRow('labelCorners', 'hintCorners', () =>
+    inner.appendChild(_settingRow('labelRoundedCorners', 'hintCorners', () =>
       _makeToggle(_settings.corners !== 'square', v => {
         _settings.corners = v ? 'rounded' : 'square'
         syncCorners()
@@ -392,7 +522,7 @@ function _renderPreviewTab() {
     return inner
   }))
 
-  wrap.appendChild(_sectionBody(ICONS.preview, 'labelAdvancedPreview', () => {
+  wrap.appendChild(_sectionBody(ICONS.previewBehavior, 'sectionPreviewBehavior', () => {
     const inner = document.createDocumentFragment()
     inner.appendChild(_settingRow('labelClosePreviewOnOpenNewTab', 'hintClosePreviewOnOpenNewTab', () =>
       _makeToggle(_settings.closePreviewOnOpenNewTab !== false, v => { _settings.closePreviewOnOpenNewTab = v })
@@ -400,7 +530,7 @@ function _renderPreviewTab() {
     return inner
   }))
 
-  wrap.appendChild(_sectionBody(ICONS.preview, 'labelHeaderActions', () => {
+  wrap.appendChild(_sectionBody(ICONS.toolbarButtons, 'labelHeaderActions', () => {
     const inner = document.createDocumentFragment()
     inner.appendChild(_settingRow('labelShowCloseOthersButton', 'hintShowCloseOthersButton', () =>
       _makeToggle(_settings.showCloseOthersButton !== false, v => { _settings.showCloseOthersButton = v })
@@ -417,7 +547,7 @@ function _renderPreviewTab() {
 function _renderBlacklistTab() {
   const wrap = document.createDocumentFragment()
 
-  wrap.appendChild(_sectionBody(ICONS.blacklist, 'labelBlacklistControls', () => {
+  wrap.appendChild(_sectionBody(ICONS.addDomain, 'labelBlacklistControls', () => {
     const inner = document.createDocumentFragment()
 
     const inputRow = document.createElement('div')
@@ -475,7 +605,6 @@ function _renderBlacklistTab() {
 
     const listEl = document.createElement('div')
     listEl.className = 'blacklist-list'
-    listEl.style.marginTop = '10px'
 
     function _renderBlacklistItems(container) {
       container.replaceChildren()
@@ -523,23 +652,54 @@ function _renderAboutTab() {
   const section = document.createElement('div')
   section.className = 'about-section'
 
+  const hero = document.createElement('div')
+  hero.className = 'about-hero'
+  const logo = document.createElement('span')
+  logo.className = 'about-logo'
+  logo.setAttribute('aria-hidden', 'true')
+
+  const heroText = document.createElement('div')
+  heroText.className = 'about-hero-text'
+  const name = document.createElement('div')
+  name.className = 'about-name'
+  name.textContent = 'Glimpser'
+  const tagline = document.createElement('p')
+  tagline.className = 'about-tagline'
+  tagline.textContent = _t('aboutDescText')
+  heroText.append(name, tagline)
+  hero.append(logo, heroText)
+  section.appendChild(hero)
+
   const meta = document.createElement('div')
   meta.className = 'about-meta'
-  const addMeta = (label, value) => {
-    const l = document.createElement('span'); l.className = 'about-meta-label'; l.textContent = label
-    const v = document.createElement('span'); v.className = 'about-meta-value'; v.textContent = value
-    meta.append(l, v)
+  const addMeta = (iconSvg, label, valueEl) => {
+    const row = document.createElement('div')
+    row.className = 'about-meta-row'
+    const l = document.createElement('span')
+    l.className = 'about-meta-label'
+
+    const icon = document.createElement('span')
+    icon.className = 'about-meta-icon'
+    icon.setAttribute('aria-hidden', 'true')
+    icon.innerHTML = iconSvg
+
+    const text = document.createElement('span')
+    text.textContent = label
+    l.append(icon, text)
+
+    const v = document.createElement('span')
+    v.className = 'about-meta-value'
+    v.appendChild(valueEl)
+    row.append(l, v)
+    meta.appendChild(row)
   }
   const manifest = nativeAPI.runtime.getManifest()
-  addMeta(_t('aboutVersion'), manifest.version || '0.0.0')
-  addMeta(_t('aboutAuthor'), manifest.author || '')
-  addMeta(_t('aboutHomepage'), manifest.homepage_url || '')
+  const version = manifest.version || '0.0.0'
+  const homepage = manifest.homepage_url || PROJECT_URL
+  addMeta(ICONS.version, _t('aboutVersion'), _externalLinkPill(`v${version}`, RELEASES_URL))
+  addMeta(ICONS.author, _t('aboutAuthor'), _externalLinkPill(manifest.author || 'farfaraway', AUTHOR_URL))
+  addMeta(ICONS.homepage, _t('aboutHomepage'), _externalLinkPill(homepage.replace(/^https?:\/\//, ''), homepage))
   section.appendChild(meta)
-
-  const desc = document.createElement('div')
-  desc.className = 'about-desc'
-  desc.textContent = _t('aboutDescText')
-  section.appendChild(desc)
 
   wrap.appendChild(section)
   return wrap
@@ -623,7 +783,6 @@ async function init() {
 
   const version = nativeAPI.runtime.getManifest().version || '0.0.0'
   document.getElementById('versionBadge').textContent = 'v' + version
-  document.getElementById('footerVersion').textContent = 'v' + version
 
   _renderTabsAndContent()
   _applyTheme(_resolveTheme())
@@ -663,11 +822,29 @@ function _renderTabsAndContent() {
   nav.innerHTML = ''
   const tabKeys = ['tabGeneral', 'tabPreview', 'tabBlacklist', 'tabAbout']
   TABS.forEach((key, i) => {
+    const label = _t(tabKeys[i])
     const btn = document.createElement('button')
+    btn.type = 'button'
     btn.className = 'tab-btn' + (key === _activeTab ? ' active' : '')
     btn.dataset.tab = key
-    btn.textContent = _t(tabKeys[i])
+    btn.id = `tab-btn-${key}`
+    btn.setAttribute('role', 'tab')
+    btn.setAttribute('aria-selected', String(key === _activeTab))
+    btn.setAttribute('aria-controls', `tab-${key}`)
+    btn.setAttribute('aria-label', label)
+    btn.title = label
+    btn.tabIndex = key === _activeTab ? 0 : -1
+
+    const icon = document.createElement('span')
+    icon.className = 'tab-icon'
+    icon.innerHTML = ICONS[key]
+    const text = document.createElement('span')
+    text.className = 'tab-label'
+    text.textContent = label
+    btn.append(icon, text)
+
     btn.addEventListener('click', () => _switchTab(key))
+    btn.addEventListener('keydown', _tabKeydown)
     nav.appendChild(btn)
   })
 
@@ -678,15 +855,39 @@ function _renderTabsAndContent() {
     const wrap = document.createElement('div')
     wrap.id = `tab-${TABS[i]}`
     wrap.className = 'tab-section' + (TABS[i] === _activeTab ? ' active' : '')
+    wrap.setAttribute('role', 'tabpanel')
+    wrap.setAttribute('aria-labelledby', `tab-btn-${TABS[i]}`)
     wrap.appendChild(fn())
     content.appendChild(wrap)
   })
 }
 
-function _switchTab(tabKey) {
+function _tabKeydown(event) {
+  const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End']
+  if (!keys.includes(event.key)) return
+
+  event.preventDefault()
+  const current = TABS.indexOf(_activeTab)
+  let next = current
+  if (event.key === 'ArrowLeft') next = (current - 1 + TABS.length) % TABS.length
+  if (event.key === 'ArrowRight') next = (current + 1) % TABS.length
+  if (event.key === 'Home') next = 0
+  if (event.key === 'End') next = TABS.length - 1
+  _switchTab(TABS[next], true)
+}
+
+function _switchTab(tabKey, focusTab = false) {
   _activeTab = tabKey
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabKey))
-  document.querySelectorAll('.tab-section').forEach(s => s.classList.toggle('active', s.id === `tab-${tabKey}`))
+  document.querySelectorAll('.tab-btn').forEach((btn) => {
+    const active = btn.dataset.tab === tabKey
+    btn.classList.toggle('active', active)
+    btn.setAttribute('aria-selected', String(active))
+    btn.tabIndex = active ? 0 : -1
+    if (active && focusTab) btn.focus()
+  })
+  document.querySelectorAll('.tab-section').forEach((section) => {
+    section.classList.toggle('active', section.id === `tab-${tabKey}`)
+  })
 }
 
 document.addEventListener('DOMContentLoaded', init)
