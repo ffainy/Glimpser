@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-14
+
 ### Added
+- preview: swap the dot grid for a halftone vignette
+- branding: replace app icon with card-stack mark
+- theme: desaturate dark surfaces toward violet-grey
+- preview: redesign fullscreen dropzone as spotlight stage
+- ui: unify corner halo across settings, popup, and preview
 - preview: refresh preview window visuals (#5)
 - popup: align popup visuals with settings page (#4)
 - settings: refresh settings page visuals and icon system (#3)
