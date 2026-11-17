@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-17
+
 ### Added
 - unify the preview overlay and the gatekeeper drop dock (#7)
 - retint the dark theme to deep forest green (#6)
