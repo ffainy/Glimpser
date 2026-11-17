@@ -17,6 +17,9 @@
 
   "dropHintFullscreen":   { "message": "在任意位置松开即可打开预览" },
 
+  "dropHintOutside":      { "message": "松开将取消" },
+  "dropHintInside":       { "message": "松开即可打开预览" },
+
   "errorLoadFailed":      { "message": "无法在预览中打开这个页面，请尝试在新标签页中打开。" },
   "warnInvalidUrl":       { "message": "这个链接无法打开。" },
   "warnBlockedUrl":       { "message": "已阻止不安全链接: " },
@@ -46,8 +49,8 @@
   "labelPreviewTrigger":  { "message": "触发模式" },
   "triggerRelease":       { "message": "任意位置松开" },
   "triggerDropArea":      { "message": "拖放区域" },
-  "hintPreviewTriggerRelease": { "message": "拖动一小段后，在页面任意位置松开即可打开预览，不显示全屏投放提示。" },
-  "hintPreviewTriggerDropArea": { "message": "拖动链接时显示全屏投放提示，在页面任意位置松开即可打开预览。" },
+  "hintPreviewTriggerRelease": { "message": "拖动一小段后，页面会亮起全屏投放提示，在任意位置松开即可打开预览。" },
+  "hintPreviewTriggerDropArea": { "message": "拖动链接时，屏幕下方会浮出投放坞；把链接松开到坞内才算成功，松开在坞外则取消。" },
   "labelWindowDefaults":  { "message": "预览窗口" },
   "labelWindowWidth":     { "message": "宽度" },
   "labelWindowHeight":    { "message": "高度" },

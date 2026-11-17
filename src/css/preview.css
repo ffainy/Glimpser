@@ -851,3 +851,150 @@
   pointer-events: none;
   z-index: 2;
 }
+
+/* ── Drop dock (drop-area trigger): the bottom berth a dragged link must reach ── */
+
+#gs-drop-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 48px;
+  z-index: var(--gs-z-backdrop);
+  transform: translate(-50%, 220%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.34s var(--gs-ease-standard),
+    opacity 0.34s var(--gs-ease-standard);
+}
+
+#gs-drop-dock.active {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+#gs-drop-dock.out {
+  transform: translate(-50%, 160%);
+  opacity: 0;
+}
+
+#gs-drop-dock .gs-drop-dock-board {
+  position: relative;
+  /* The container is click-through; the berth itself must catch the drop,
+     or the pointer falls straight through into a preview window underneath. */
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: min(560px, 100vw - 48px);
+  min-height: 112px;
+  padding: 0 28px;
+  border-radius: var(--gs-radius-lg);
+  border: 1px solid var(--gs-preview-drop-dock-border);
+  background:
+    radial-gradient(120% 150% at 8% 0%, var(--gs-preview-drop-dock-glow-accent), transparent 55%),
+    radial-gradient(110% 150% at 92% 100%, var(--gs-preview-drop-dock-glow-support), transparent 52%),
+    var(--gs-settings-surface-elevated);
+  box-shadow: var(--gs-shadow-elevation-float), 0 0 0 1px var(--gs-preview-drop-dock-border);
+  transition:
+    border-color 0.25s var(--gs-ease-standard),
+    box-shadow 0.25s var(--gs-ease-standard),
+    transform 0.4s var(--gs-ease-standard),
+    opacity 0.4s var(--gs-ease-standard);
+}
+
+/* Same halftone weave as the fullscreen overlay, laid horizontally across the berth */
+#gs-drop-dock .gs-drop-dock-board::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-color: var(--gs-preview-drop-dock-dots);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'1000'%20height%3D'13'%20viewBox%3D'0%200%201000%2013'%3E%3Cg%20fill%3D'white'%3E%3Ccircle%20cx%3D'6.50'%20cy%3D'6.5'%20r%3D'0.28'%2F%3E%3Ccircle%20cx%3D'19.50'%20cy%3D'6.5'%20r%3D'0.35'%2F%3E%3Ccircle%20cx%3D'32.50'%20cy%3D'6.5'%20r%3D'0.44'%2F%3E%3Ccircle%20cx%3D'45.50'%20cy%3D'6.5'%20r%3D'0.54'%2F%3E%3Ccircle%20cx%3D'58.50'%20cy%3D'6.5'%20r%3D'0.66'%2F%3E%3Ccircle%20cx%3D'71.50'%20cy%3D'6.5'%20r%3D'0.78'%2F%3E%3Ccircle%20cx%3D'84.50'%20cy%3D'6.5'%20r%3D'0.91'%2F%3E%3Ccircle%20cx%3D'97.50'%20cy%3D'6.5'%20r%3D'1.05'%2F%3E%3Ccircle%20cx%3D'110.50'%20cy%3D'6.5'%20r%3D'1.19'%2F%3E%3Ccircle%20cx%3D'123.50'%20cy%3D'6.5'%20r%3D'1.34'%2F%3E%3Ccircle%20cx%3D'136.50'%20cy%3D'6.5'%20r%3D'1.50'%2F%3E%3Ccircle%20cx%3D'149.50'%20cy%3D'6.5'%20r%3D'1.66'%2F%3E%3Ccircle%20cx%3D'162.50'%20cy%3D'6.5'%20r%3D'1.83'%2F%3E%3Ccircle%20cx%3D'175.50'%20cy%3D'6.5'%20r%3D'2.00'%2F%3E%3Ccircle%20cx%3D'188.50'%20cy%3D'6.5'%20r%3D'2.18'%2F%3E%3Ccircle%20cx%3D'201.50'%20cy%3D'6.5'%20r%3D'2.36'%2F%3E%3Ccircle%20cx%3D'214.50'%20cy%3D'6.5'%20r%3D'2.54'%2F%3E%3Ccircle%20cx%3D'227.50'%20cy%3D'6.5'%20r%3D'2.73'%2F%3E%3Ccircle%20cx%3D'240.50'%20cy%3D'6.5'%20r%3D'2.93'%2F%3E%3Ccircle%20cx%3D'253.50'%20cy%3D'6.5'%20r%3D'3.12'%2F%3E%3Ccircle%20cx%3D'266.50'%20cy%3D'6.5'%20r%3D'3.32'%2F%3E%3Ccircle%20cx%3D'279.50'%20cy%3D'6.5'%20r%3D'3.53'%2F%3E%3Ccircle%20cx%3D'292.50'%20cy%3D'6.5'%20r%3D'3.73'%2F%3E%3Ccircle%20cx%3D'305.50'%20cy%3D'6.5'%20r%3D'3.94'%2F%3E%3Ccircle%20cx%3D'318.50'%20cy%3D'6.5'%20r%3D'4.15'%2F%3E%3Ccircle%20cx%3D'331.50'%20cy%3D'6.5'%20r%3D'4.37'%2F%3E%3Ccircle%20cx%3D'344.50'%20cy%3D'6.5'%20r%3D'4.59'%2F%3E%3Ccircle%20cx%3D'357.50'%20cy%3D'6.5'%20r%3D'4.81'%2F%3E%3Ccircle%20cx%3D'370.50'%20cy%3D'6.5'%20r%3D'5.04'%2F%3E%3Ccircle%20cx%3D'383.50'%20cy%3D'6.5'%20r%3D'5.26'%2F%3E%3Ccircle%20cx%3D'396.50'%20cy%3D'6.5'%20r%3D'5.50'%2F%3E%3Ccircle%20cx%3D'409.50'%20cy%3D'6.5'%20r%3D'5.73'%2F%3E%3Ccircle%20cx%3D'422.50'%20cy%3D'6.5'%20r%3D'5.96'%2F%3E%3Ccircle%20cx%3D'435.50'%20cy%3D'6.5'%20r%3D'6.20'%2F%3E%3Ccircle%20cx%3D'448.50'%20cy%3D'6.5'%20r%3D'6.44'%2F%3E%3Ccircle%20cx%3D'461.50'%20cy%3D'6.5'%20r%3D'6.69'%2F%3E%3Ccircle%20cx%3D'474.50'%20cy%3D'6.5'%20r%3D'6.93'%2F%3E%3Ccircle%20cx%3D'487.50'%20cy%3D'6.5'%20r%3D'7.18'%2F%3E%3Ccircle%20cx%3D'500.50'%20cy%3D'6.5'%20r%3D'7.41'%2F%3E%3Ccircle%20cx%3D'513.50'%20cy%3D'6.5'%20r%3D'7.16'%2F%3E%3Ccircle%20cx%3D'526.50'%20cy%3D'6.5'%20r%3D'6.91'%2F%3E%3Ccircle%20cx%3D'539.50'%20cy%3D'6.5'%20r%3D'6.67'%2F%3E%3Ccircle%20cx%3D'552.50'%20cy%3D'6.5'%20r%3D'6.42'%2F%3E%3Ccircle%20cx%3D'565.50'%20cy%3D'6.5'%20r%3D'6.18'%2F%3E%3Ccircle%20cx%3D'578.50'%20cy%3D'6.5'%20r%3D'5.95'%2F%3E%3Ccircle%20cx%3D'591.50'%20cy%3D'6.5'%20r%3D'5.71'%2F%3E%3Ccircle%20cx%3D'604.50'%20cy%3D'6.5'%20r%3D'5.48'%2F%3E%3Ccircle%20cx%3D'617.50'%20cy%3D'6.5'%20r%3D'5.25'%2F%3E%3Ccircle%20cx%3D'630.50'%20cy%3D'6.5'%20r%3D'5.02'%2F%3E%3Ccircle%20cx%3D'643.50'%20cy%3D'6.5'%20r%3D'4.80'%2F%3E%3Ccircle%20cx%3D'656.50'%20cy%3D'6.5'%20r%3D'4.57'%2F%3E%3Ccircle%20cx%3D'669.50'%20cy%3D'6.5'%20r%3D'4.35'%2F%3E%3Ccircle%20cx%3D'682.50'%20cy%3D'6.5'%20r%3D'4.14'%2F%3E%3Ccircle%20cx%3D'695.50'%20cy%3D'6.5'%20r%3D'3.93'%2F%3E%3Ccircle%20cx%3D'708.50'%20cy%3D'6.5'%20r%3D'3.72'%2F%3E%3Ccircle%20cx%3D'721.50'%20cy%3D'6.5'%20r%3D'3.51'%2F%3E%3Ccircle%20cx%3D'734.50'%20cy%3D'6.5'%20r%3D'3.31'%2F%3E%3Ccircle%20cx%3D'747.50'%20cy%3D'6.5'%20r%3D'3.11'%2F%3E%3Ccircle%20cx%3D'760.50'%20cy%3D'6.5'%20r%3D'2.91'%2F%3E%3Ccircle%20cx%3D'773.50'%20cy%3D'6.5'%20r%3D'2.72'%2F%3E%3Ccircle%20cx%3D'786.50'%20cy%3D'6.5'%20r%3D'2.53'%2F%3E%3Ccircle%20cx%3D'799.50'%20cy%3D'6.5'%20r%3D'2.35'%2F%3E%3Ccircle%20cx%3D'812.50'%20cy%3D'6.5'%20r%3D'2.16'%2F%3E%3Ccircle%20cx%3D'825.50'%20cy%3D'6.5'%20r%3D'1.99'%2F%3E%3Ccircle%20cx%3D'838.50'%20cy%3D'6.5'%20r%3D'1.82'%2F%3E%3Ccircle%20cx%3D'851.50'%20cy%3D'6.5'%20r%3D'1.65'%2F%3E%3Ccircle%20cx%3D'864.50'%20cy%3D'6.5'%20r%3D'1.49'%2F%3E%3Ccircle%20cx%3D'877.50'%20cy%3D'6.5'%20r%3D'1.33'%2F%3E%3Ccircle%20cx%3D'890.50'%20cy%3D'6.5'%20r%3D'1.18'%2F%3E%3Ccircle%20cx%3D'903.50'%20cy%3D'6.5'%20r%3D'1.04'%2F%3E%3Ccircle%20cx%3D'916.50'%20cy%3D'6.5'%20r%3D'0.90'%2F%3E%3Ccircle%20cx%3D'929.50'%20cy%3D'6.5'%20r%3D'0.77'%2F%3E%3Ccircle%20cx%3D'942.50'%20cy%3D'6.5'%20r%3D'0.65'%2F%3E%3Ccircle%20cx%3D'955.50'%20cy%3D'6.5'%20r%3D'0.53'%2F%3E%3Ccircle%20cx%3D'968.50'%20cy%3D'6.5'%20r%3D'0.43'%2F%3E%3Ccircle%20cx%3D'981.50'%20cy%3D'6.5'%20r%3D'0.34'%2F%3E%3Ccircle%20cx%3D'994.50'%20cy%3D'6.5'%20r%3D'0.28'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'1000'%20height%3D'13'%20viewBox%3D'0%200%201000%2013'%3E%3Cg%20fill%3D'white'%3E%3Ccircle%20cx%3D'6.50'%20cy%3D'6.5'%20r%3D'0.28'%2F%3E%3Ccircle%20cx%3D'19.50'%20cy%3D'6.5'%20r%3D'0.35'%2F%3E%3Ccircle%20cx%3D'32.50'%20cy%3D'6.5'%20r%3D'0.44'%2F%3E%3Ccircle%20cx%3D'45.50'%20cy%3D'6.5'%20r%3D'0.54'%2F%3E%3Ccircle%20cx%3D'58.50'%20cy%3D'6.5'%20r%3D'0.66'%2F%3E%3Ccircle%20cx%3D'71.50'%20cy%3D'6.5'%20r%3D'0.78'%2F%3E%3Ccircle%20cx%3D'84.50'%20cy%3D'6.5'%20r%3D'0.91'%2F%3E%3Ccircle%20cx%3D'97.50'%20cy%3D'6.5'%20r%3D'1.05'%2F%3E%3Ccircle%20cx%3D'110.50'%20cy%3D'6.5'%20r%3D'1.19'%2F%3E%3Ccircle%20cx%3D'123.50'%20cy%3D'6.5'%20r%3D'1.34'%2F%3E%3Ccircle%20cx%3D'136.50'%20cy%3D'6.5'%20r%3D'1.50'%2F%3E%3Ccircle%20cx%3D'149.50'%20cy%3D'6.5'%20r%3D'1.66'%2F%3E%3Ccircle%20cx%3D'162.50'%20cy%3D'6.5'%20r%3D'1.83'%2F%3E%3Ccircle%20cx%3D'175.50'%20cy%3D'6.5'%20r%3D'2.00'%2F%3E%3Ccircle%20cx%3D'188.50'%20cy%3D'6.5'%20r%3D'2.18'%2F%3E%3Ccircle%20cx%3D'201.50'%20cy%3D'6.5'%20r%3D'2.36'%2F%3E%3Ccircle%20cx%3D'214.50'%20cy%3D'6.5'%20r%3D'2.54'%2F%3E%3Ccircle%20cx%3D'227.50'%20cy%3D'6.5'%20r%3D'2.73'%2F%3E%3Ccircle%20cx%3D'240.50'%20cy%3D'6.5'%20r%3D'2.93'%2F%3E%3Ccircle%20cx%3D'253.50'%20cy%3D'6.5'%20r%3D'3.12'%2F%3E%3Ccircle%20cx%3D'266.50'%20cy%3D'6.5'%20r%3D'3.32'%2F%3E%3Ccircle%20cx%3D'279.50'%20cy%3D'6.5'%20r%3D'3.53'%2F%3E%3Ccircle%20cx%3D'292.50'%20cy%3D'6.5'%20r%3D'3.73'%2F%3E%3Ccircle%20cx%3D'305.50'%20cy%3D'6.5'%20r%3D'3.94'%2F%3E%3Ccircle%20cx%3D'318.50'%20cy%3D'6.5'%20r%3D'4.15'%2F%3E%3Ccircle%20cx%3D'331.50'%20cy%3D'6.5'%20r%3D'4.37'%2F%3E%3Ccircle%20cx%3D'344.50'%20cy%3D'6.5'%20r%3D'4.59'%2F%3E%3Ccircle%20cx%3D'357.50'%20cy%3D'6.5'%20r%3D'4.81'%2F%3E%3Ccircle%20cx%3D'370.50'%20cy%3D'6.5'%20r%3D'5.04'%2F%3E%3Ccircle%20cx%3D'383.50'%20cy%3D'6.5'%20r%3D'5.26'%2F%3E%3Ccircle%20cx%3D'396.50'%20cy%3D'6.5'%20r%3D'5.50'%2F%3E%3Ccircle%20cx%3D'409.50'%20cy%3D'6.5'%20r%3D'5.73'%2F%3E%3Ccircle%20cx%3D'422.50'%20cy%3D'6.5'%20r%3D'5.96'%2F%3E%3Ccircle%20cx%3D'435.50'%20cy%3D'6.5'%20r%3D'6.20'%2F%3E%3Ccircle%20cx%3D'448.50'%20cy%3D'6.5'%20r%3D'6.44'%2F%3E%3Ccircle%20cx%3D'461.50'%20cy%3D'6.5'%20r%3D'6.69'%2F%3E%3Ccircle%20cx%3D'474.50'%20cy%3D'6.5'%20r%3D'6.93'%2F%3E%3Ccircle%20cx%3D'487.50'%20cy%3D'6.5'%20r%3D'7.18'%2F%3E%3Ccircle%20cx%3D'500.50'%20cy%3D'6.5'%20r%3D'7.41'%2F%3E%3Ccircle%20cx%3D'513.50'%20cy%3D'6.5'%20r%3D'7.16'%2F%3E%3Ccircle%20cx%3D'526.50'%20cy%3D'6.5'%20r%3D'6.91'%2F%3E%3Ccircle%20cx%3D'539.50'%20cy%3D'6.5'%20r%3D'6.67'%2F%3E%3Ccircle%20cx%3D'552.50'%20cy%3D'6.5'%20r%3D'6.42'%2F%3E%3Ccircle%20cx%3D'565.50'%20cy%3D'6.5'%20r%3D'6.18'%2F%3E%3Ccircle%20cx%3D'578.50'%20cy%3D'6.5'%20r%3D'5.95'%2F%3E%3Ccircle%20cx%3D'591.50'%20cy%3D'6.5'%20r%3D'5.71'%2F%3E%3Ccircle%20cx%3D'604.50'%20cy%3D'6.5'%20r%3D'5.48'%2F%3E%3Ccircle%20cx%3D'617.50'%20cy%3D'6.5'%20r%3D'5.25'%2F%3E%3Ccircle%20cx%3D'630.50'%20cy%3D'6.5'%20r%3D'5.02'%2F%3E%3Ccircle%20cx%3D'643.50'%20cy%3D'6.5'%20r%3D'4.80'%2F%3E%3Ccircle%20cx%3D'656.50'%20cy%3D'6.5'%20r%3D'4.57'%2F%3E%3Ccircle%20cx%3D'669.50'%20cy%3D'6.5'%20r%3D'4.35'%2F%3E%3Ccircle%20cx%3D'682.50'%20cy%3D'6.5'%20r%3D'4.14'%2F%3E%3Ccircle%20cx%3D'695.50'%20cy%3D'6.5'%20r%3D'3.93'%2F%3E%3Ccircle%20cx%3D'708.50'%20cy%3D'6.5'%20r%3D'3.72'%2F%3E%3Ccircle%20cx%3D'721.50'%20cy%3D'6.5'%20r%3D'3.51'%2F%3E%3Ccircle%20cx%3D'734.50'%20cy%3D'6.5'%20r%3D'3.31'%2F%3E%3Ccircle%20cx%3D'747.50'%20cy%3D'6.5'%20r%3D'3.11'%2F%3E%3Ccircle%20cx%3D'760.50'%20cy%3D'6.5'%20r%3D'2.91'%2F%3E%3Ccircle%20cx%3D'773.50'%20cy%3D'6.5'%20r%3D'2.72'%2F%3E%3Ccircle%20cx%3D'786.50'%20cy%3D'6.5'%20r%3D'2.53'%2F%3E%3Ccircle%20cx%3D'799.50'%20cy%3D'6.5'%20r%3D'2.35'%2F%3E%3Ccircle%20cx%3D'812.50'%20cy%3D'6.5'%20r%3D'2.16'%2F%3E%3Ccircle%20cx%3D'825.50'%20cy%3D'6.5'%20r%3D'1.99'%2F%3E%3Ccircle%20cx%3D'838.50'%20cy%3D'6.5'%20r%3D'1.82'%2F%3E%3Ccircle%20cx%3D'851.50'%20cy%3D'6.5'%20r%3D'1.65'%2F%3E%3Ccircle%20cx%3D'864.50'%20cy%3D'6.5'%20r%3D'1.49'%2F%3E%3Ccircle%20cx%3D'877.50'%20cy%3D'6.5'%20r%3D'1.33'%2F%3E%3Ccircle%20cx%3D'890.50'%20cy%3D'6.5'%20r%3D'1.18'%2F%3E%3Ccircle%20cx%3D'903.50'%20cy%3D'6.5'%20r%3D'1.04'%2F%3E%3Ccircle%20cx%3D'916.50'%20cy%3D'6.5'%20r%3D'0.90'%2F%3E%3Ccircle%20cx%3D'929.50'%20cy%3D'6.5'%20r%3D'0.77'%2F%3E%3Ccircle%20cx%3D'942.50'%20cy%3D'6.5'%20r%3D'0.65'%2F%3E%3Ccircle%20cx%3D'955.50'%20cy%3D'6.5'%20r%3D'0.53'%2F%3E%3Ccircle%20cx%3D'968.50'%20cy%3D'6.5'%20r%3D'0.43'%2F%3E%3Ccircle%20cx%3D'981.50'%20cy%3D'6.5'%20r%3D'0.34'%2F%3E%3Ccircle%20cx%3D'994.50'%20cy%3D'6.5'%20r%3D'0.28'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  -webkit-mask-size: 100% auto;
+  mask-size: 100% auto;
+  -webkit-mask-repeat: repeat-y;
+  mask-repeat: repeat-y;
+  animation: gs-drop-dots-breathe 9s ease-in-out infinite alternate;
+}
+
+/* Hover state is JS-driven: the dragged link is over the berth */
+#gs-drop-dock.hover .gs-drop-dock-board {
+  border-color: var(--gs-preview-drop-dock-border-hover);
+  box-shadow: var(--gs-shadow-elevation-float), 0 0 0 1px var(--gs-preview-drop-dock-border-hover);
+}
+
+#gs-drop-dock .gs-drop-icon-shell {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: var(--gs-radius-round);
+  backdrop-filter: var(--gs-drop-icon-backdrop);
+  -webkit-backdrop-filter: var(--gs-drop-icon-backdrop);
+  box-shadow: var(--gs-drop-icon-shadow);
+  transition:
+    box-shadow 0.35s var(--gs-ease-standard),
+    transform 0.35s var(--gs-ease-standard);
+  animation: gs-drop-icon-bob 5s ease-in-out infinite;
+}
+
+#gs-drop-dock.hover .gs-drop-icon-shell {
+  transform: scale(1.06);
+  box-shadow: var(--gs-drop-icon-shadow-hover);
+}
+
+#gs-drop-dock .gs-drop-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+#gs-drop-dock .gs-drop-kicker {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+#gs-drop-dock .gs-drop-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-strong);
+  transition: color 0.25s var(--gs-ease-standard);
+}
+
+#gs-drop-dock.hover .gs-drop-title {
+  color: var(--gs-preview-drop-dock-title-hover);
+}
+
+/* Reward: the berth lights up as the link lands inside */
+#gs-drop-dock.success .gs-drop-dock-board {
+  border-color: var(--gs-preview-drop-dock-border-success);
+  box-shadow:
+    var(--gs-shadow-elevation-float),
+    0 0 0 2px var(--gs-preview-drop-dock-ring-success);
+}
+
+#gs-drop-dock.success .gs-drop-icon-shell {
+  transform: scale(1.12);
+}
+
+#gs-drop-dock.success.out .gs-drop-dock-board {
+  transform: scale(0.94) translateY(-14px);
+  opacity: 0;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  #gs-drop-dock .gs-drop-icon-shell {
+    background: var(--gs-drop-icon-surface-fallback);
+  }
+
+  [data-dp-theme="light"] #gs-drop-dock .gs-drop-icon-shell {
+    background: var(--gs-drop-icon-surface-fallback);
+  }
+}

@@ -2,7 +2,7 @@ const nativeAPI = typeof browser !== 'undefined' ? browser : chrome
 
 const DEFAULT_SETTINGS = {
   previewEnabled: true,
-  previewTriggerMode: 'release',
+  previewTriggerMode: 'drop-area',
   maxPreviewWindows: 1,
   blacklistDomains: [],
   theme: null,
@@ -148,7 +148,7 @@ async function initPopup() {
   }
 
   previewToggle.checked = settings.previewEnabled !== false
-  triggerToggle.checked = (settings.previewTriggerMode || 'release') === 'drop-area'
+  triggerToggle.checked = (settings.previewTriggerMode || 'drop-area') === 'drop-area'
   multipleToggle.checked = (settings.maxPreviewWindows || 1) > 1
 
   const languageValue = (settings.language === 'zh_CN' || settings.language === 'zh')
