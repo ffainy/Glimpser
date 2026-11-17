@@ -220,20 +220,20 @@ textarea {
 :host([data-dp-theme="dark"]),
 [data-dp-theme="dark"] {
   color-scheme: dark;
-  --gs-accent-rgb:         201 189 220;
-  --gs-accent-strong-rgb:  239 232 248;
-  --gs-support-rgb:        232 163 76;
-  --gs-support-text-rgb:   245 194 124;
+  --gs-accent-rgb:         192 217 204;
+  --gs-accent-strong-rgb:  234 246 240;
+  --gs-support-rgb:        227 174 81;
+  --gs-support-text-rgb:   241 200 128;
 
   /* Core surfaces */
-  --gs-surface-card:     rgb(38 35 48 / 0.92);
-  --gs-preview-surface:  #1B1920;
+  --gs-surface-card:     rgb(36 47 41 / 0.92);
+  --gs-preview-surface:  #1A1F1C;
 
   /* Core text */
-  --text:        rgb(237 232 244 / 0.94);
-  --text-dim:    rgb(184 175 199 / 0.86);
-  --text-strong: rgb(247 243 252 / 0.98);
-  --text-muted:  #958ba5;
+  --text:        rgb(233 243 238 / 0.94);
+  --text-dim:    rgb(178 196 186 / 0.86);
+  --text-strong: rgb(244 251 247 / 0.98);
+  --text-muted:  #8EA297;
 
   /* Core accents */
   --gs-accent: rgb(var(--gs-accent-rgb));
@@ -263,34 +263,34 @@ textarea {
   /* Preview surfaces */
   /* Preview window chrome */
   --gs-preview-window-surface-bg: transparent;
-  --gs-preview-window-surface-border: rgb(226 216 242 / 0.12);
+  --gs-preview-window-surface-border: rgb(219 239 228 / 0.12);
   --gs-preview-window-surface-border-active: rgb(var(--gs-accent-rgb) / 0.34);
   --gs-preview-window-surface-shadow:
-    0 24px 60px rgb(6 5 9 / 0.52),
-    0 6px 18px rgb(6 5 9 / 0.24);
+    0 24px 60px rgb(5 9 7 / 0.52),
+    0 6px 18px rgb(5 9 7 / 0.24);
   --gs-preview-window-surface-shadow-active:
-    0 34px 92px rgb(6 5 9 / 0.66),
+    0 34px 92px rgb(5 9 7 / 0.66),
     0 0 42px rgb(var(--gs-preview-accent) / 0.14),
     0 0 24px rgb(var(--gs-preview-support) / 0.08);
-  --gs-preview-header-surface: rgb(33 30 39 / 0.72);
-  --gs-preview-header-surface-active: rgb(33 30 39 / 0.72);
-  --gs-preview-header-surface-inactive: rgb(27 25 32 / 0.62);
+  --gs-preview-header-surface: rgb(31 38 34 / 0.72);
+  --gs-preview-header-surface-active: rgb(31 38 34 / 0.72);
+  --gs-preview-header-surface-inactive: rgb(26 31 28 / 0.62);
   --gs-preview-header-saturate: 1.15;
-  --gs-preview-urlbar-surface: rgb(21 19 26 / 0.30);
-  --gs-preview-urlbar-surface-active: rgb(21 19 26 / 0.30);
-  --gs-preview-urlbar-surface-inactive: rgb(21 19 26 / 0.24);
-  --gs-preview-header-elevation-shadow: 0 10px 24px rgb(6 5 9 / 0.18);
+  --gs-preview-urlbar-surface: rgb(20 25 22 / 0.30);
+  --gs-preview-urlbar-surface-active: rgb(20 25 22 / 0.30);
+  --gs-preview-urlbar-surface-inactive: rgb(20 25 22 / 0.24);
+  --gs-preview-header-elevation-shadow: 0 10px 24px rgb(5 9 7 / 0.18);
   /* Preview dropzone surfaces */
   --gs-preview-drop-icon-surface: linear-gradient(180deg, rgb(var(--gs-preview-accent) / 0.32), rgb(var(--gs-preview-accent) / 0.14));
-  --gs-preview-drop-icon-surface-fallback: rgb(33 30 39 / 0.86);
-  --gs-preview-drop-icon-border: rgb(226 216 242 / 0.28);
+  --gs-preview-drop-icon-surface-fallback: rgb(31 38 34 / 0.86);
+  --gs-preview-drop-icon-border: rgb(219 239 228 / 0.28);
   --gs-preview-drop-slot-pill-bg: rgb(255 255 255 / 0.055);
-  --gs-preview-drop-slot-pill-border: rgb(226 216 242 / 0.08);
+  --gs-preview-drop-slot-pill-border: rgb(219 239 228 / 0.08);
   --gs-preview-drop-slot-pill-hover-bg: rgb(255 255 255 / 0.08);
   --gs-preview-drop-slot-pill-hover-border: rgb(var(--gs-preview-support) / 0.24);
   --gs-preview-drop-pill-shadow: var(--gs-shadow-inset-highlight-soft);
   --gs-preview-drop-pill-shadow-hover:
-    0 18px 34px rgb(6 5 9 / 0.30),
+    0 18px 34px rgb(5 9 7 / 0.30),
     0 0 0 1px rgb(var(--gs-preview-support) / 0.10) inset;
   --gs-preview-drop-kicker: rgb(var(--gs-preview-support-text));
   --gs-preview-drop-slot-glow:
@@ -299,15 +299,15 @@ textarea {
     linear-gradient(120deg, transparent 16%, rgb(255 255 255 / 0.16) 50%, transparent 84%);
   --gs-preview-drop-slot-sheen-blend: screen;
   --gs-preview-drop-slot-sheen-opacity: 0.72;
-  --gs-preview-drop-title-foreground: rgb(247 243 252 / 0.96);
+  --gs-preview-drop-title-foreground: rgb(244 251 247 / 0.96);
   --gs-preview-drop-icon-foreground: rgb(var(--gs-preview-accent-strong));
   --gs-preview-drop-icon-backdrop: blur(14px) saturate(1.4);
   --gs-preview-drop-icon-shadow:
-    0 8px 28px rgb(5 4 7 / 0.35),
+    0 8px 28px rgb(4 7 5 / 0.35),
     0 0 40px rgb(var(--gs-preview-accent) / 0.22),
     inset 0 1px 0 rgb(255 255 255 / 0.22);
   --gs-preview-drop-icon-shadow-hover:
-    0 8px 28px rgb(5 4 7 / 0.38),
+    0 8px 28px rgb(4 7 5 / 0.38),
     0 0 56px rgb(var(--gs-preview-support) / 0.30),
     inset 0 1px 0 rgb(255 255 255 / 0.24);
   /* Preview drop overlay surfaces — 「聚光」: transparent clearing center with
@@ -318,25 +318,25 @@ textarea {
     radial-gradient(circle at top left, rgb(var(--gs-preview-accent) / 0.14), rgb(var(--gs-preview-accent) / 0) 34%),
     radial-gradient(circle at bottom right, rgb(var(--gs-preview-support) / 0.12), rgb(var(--gs-preview-support) / 0) 30%),
     radial-gradient(48% 60% at 50% 45%,
-      rgb(12 11 16 / 0) 0%, rgb(12 11 16 / 0.12) 36%, rgb(12 11 16 / 0.90) 100%),
-    rgb(12 11 16 / 0.55);
+      rgb(12 15 13 / 0) 0%, rgb(12 15 13 / 0.12) 36%, rgb(12 15 13 / 0.90) 100%),
+    rgb(12 15 13 / 0.55);
   --gs-preview-drop-overlay-bg-hover:
     radial-gradient(26% 32% at 50% 45%, rgb(var(--gs-preview-accent) / 0.10), rgb(var(--gs-preview-accent) / 0) 72%),
     radial-gradient(circle at top left, rgb(var(--gs-preview-accent) / 0.14), rgb(var(--gs-preview-accent) / 0) 34%),
     radial-gradient(circle at bottom right, rgb(var(--gs-preview-support) / 0.12), rgb(var(--gs-preview-support) / 0) 30%),
     radial-gradient(58% 72% at 50% 45%,
-      rgb(12 11 16 / 0) 0%, rgb(12 11 16 / 0.10) 42%, rgb(12 11 16 / 0.90) 100%),
-    rgb(12 11 16 / 0.55);
+      rgb(12 15 13 / 0) 0%, rgb(12 15 13 / 0.10) 42%, rgb(12 15 13 / 0.90) 100%),
+    rgb(12 15 13 / 0.55);
   /* Halftone dot-grid decoration — one ink tone; the ramp comes from dot size */
   --gs-preview-drop-dots: rgb(var(--gs-preview-accent) / 0.12);
   /* Preview floating feedback surfaces */
-  --gs-preview-tooltip-surface-bg: rgb(33 30 39 / 0.96);
+  --gs-preview-tooltip-surface-bg: rgb(31 38 34 / 0.96);
   --gs-preview-tooltip-surface-shadow:
-    0 20px 40px rgb(5 4 7 / 0.42),
+    0 20px 40px rgb(4 7 5 / 0.42),
     0 0 20px rgb(var(--gs-preview-accent) / 0.10);
-  --gs-preview-toast-surface-bg: rgb(38 35 48 / 0.97);
+  --gs-preview-toast-surface-bg: rgb(36 47 41 / 0.97);
   --gs-preview-toast-surface-shadow:
-    0 18px 38px rgb(5 4 7 / 0.42),
+    0 18px 38px rgb(4 7 5 / 0.42),
     0 0 20px rgb(var(--gs-preview-support) / 0.16),
     0 0 0 1px rgb(255 255 255 / 0.05) inset;
   /* Preview foregrounds */
@@ -344,16 +344,16 @@ textarea {
   --gs-preview-text: var(--text);
   --gs-preview-text-strong: var(--text-strong);
   --gs-preview-text-dim: var(--text-dim);
-  --gs-preview-group-divider: rgb(226 216 242 / 0.12);
-  --gs-preview-brand-foreground: rgb(237 232 244 / 0.92);
+  --gs-preview-group-divider: rgb(219 239 228 / 0.12);
+  --gs-preview-brand-foreground: rgb(233 243 238 / 0.92);
   --gs-preview-brand-foreground-active: rgb(var(--gs-preview-accent));
-  --gs-preview-header-border: rgb(226 216 242 / 0.08);
-  --gs-preview-header-border-active: rgb(226 216 242 / 0.12);
-  --gs-preview-header-border-inactive: rgb(226 216 242 / 0.05);
+  --gs-preview-header-border: rgb(219 239 228 / 0.08);
+  --gs-preview-header-border-active: rgb(219 239 228 / 0.12);
+  --gs-preview-header-border-inactive: rgb(219 239 228 / 0.05);
   --gs-preview-header-highlight: rgb(255 255 255 / 0.03);
-  --gs-preview-urlbar-border: rgb(226 216 242 / 0.08);
-  --gs-preview-urlbar-border-active: rgb(226 216 242 / 0.12);
-  --gs-preview-urlbar-border-inactive: rgb(226 216 242 / 0.05);
+  --gs-preview-urlbar-border: rgb(219 239 228 / 0.08);
+  --gs-preview-urlbar-border-active: rgb(219 239 228 / 0.12);
+  --gs-preview-urlbar-border-inactive: rgb(219 239 228 / 0.05);
   --gs-preview-urlbar-highlight: rgb(255 255 255 / 0.03);
   --gs-preview-urlbar-highlight-active: rgb(255 255 255 / 0.04);
   --gs-preview-url-foreground: var(--gs-preview-text);
@@ -361,27 +361,27 @@ textarea {
   --gs-preview-url-foreground-inactive: var(--gs-preview-text-dim);
   /* Preview brand and action foregrounds */
   --gs-preview-brand-glow:
-    drop-shadow(0 0 0.6px rgb(237 232 244 / 0.28))
+    drop-shadow(0 0 0.6px rgb(233 243 238 / 0.28))
     drop-shadow(0 0 2px rgb(var(--gs-preview-accent) / 0.10));
   --gs-preview-brand-glow-active:
     drop-shadow(0 0 0.9px rgb(var(--gs-preview-accent) / 0.34))
     drop-shadow(0 0 10px rgb(var(--gs-preview-accent) / 0.32));
-  --gs-preview-action-foreground: rgb(237 232 244 / 0.78);
-  --gs-preview-action-foreground-inactive: rgb(206 197 220 / 0.40);
+  --gs-preview-action-foreground: rgb(233 243 238 / 0.78);
+  --gs-preview-action-foreground-inactive: rgb(200 217 208 / 0.40);
   --gs-preview-action-foreground-hover: rgb(var(--gs-preview-accent-strong) / 0.98);
   --gs-preview-action-surface-hover: rgb(var(--gs-preview-accent) / 0.16);
   --gs-preview-action-glow:
-    drop-shadow(0 0 0.55px rgb(237 232 244 / 0.22))
+    drop-shadow(0 0 0.55px rgb(233 243 238 / 0.22))
     drop-shadow(0 0 2px rgb(var(--gs-preview-accent) / 0.08));
-  --gs-preview-action-glow-inactive: drop-shadow(0 0 0.45px rgb(237 232 244 / 0.12));
+  --gs-preview-action-glow-inactive: drop-shadow(0 0 0.45px rgb(233 243 238 / 0.12));
   --gs-preview-action-glow-hover:
     drop-shadow(0 0 0.9px rgb(var(--gs-preview-accent) / 0.28))
     drop-shadow(0 0 8px rgb(var(--gs-preview-accent) / 0.20));
-  --gs-preview-tooltip-surface-border: rgb(226 216 242 / 0.10);
+  --gs-preview-tooltip-surface-border: rgb(219 239 228 / 0.10);
   --gs-preview-tooltip-foreground: var(--gs-preview-text-strong);
   --gs-preview-toast-surface-border: rgb(var(--gs-preview-support) / 0.34);
   --gs-preview-toast-foreground: rgb(var(--gs-preview-support-text) / 0.98);
-  --gs-preview-resize-handle-foreground: rgb(226 216 242 / 0.34);
+  --gs-preview-resize-handle-foreground: rgb(219 239 228 / 0.34);
   --gs-preview-resize-handle-foreground-active: rgb(var(--gs-preview-accent) / 0.66);
   /* Preview interaction state */
   /* Preview semantic states */
@@ -397,61 +397,62 @@ textarea {
   /* 光晕：设置页 / popup / 预览遮罩三个表面共用同一几何 ——
      左上 accent 略小、右下 support 更大，圆心略出画、单段长淡出；
      强度按「表面 × 主题」解耦，各自独立调参。 */
-  --gs-settings-overlay-fill: rgb(12 11 16 / 0.68);
+  --gs-settings-overlay-fill: rgb(12 15 13 / 0.68);
   --gs-settings-halo-image:
     radial-gradient(46% 40% at 7% 5%,
-      rgb(var(--gs-accent-rgb) / 0.05), rgb(var(--gs-accent-rgb) / 0) 76%),
+      rgb(var(--gs-accent-strong-rgb) / 0.06), rgb(var(--gs-accent-strong-rgb) / 0) 76%),
     radial-gradient(84% 72% at 96% 102%,
-      rgb(var(--gs-support-rgb) / 0.05), rgb(var(--gs-support-rgb) / 0) 82%);
+      rgb(var(--gs-support-rgb) / 0.09), rgb(var(--gs-support-rgb) / 0) 82%);
   --gs-popup-halo-image:
     radial-gradient(46% 40% at 7% 5%,
-      rgb(var(--gs-accent-rgb) / 0.05), rgb(var(--gs-accent-rgb) / 0) 76%),
+      rgb(var(--gs-accent-strong-rgb) / 0.06), rgb(var(--gs-accent-strong-rgb) / 0) 76%),
     radial-gradient(84% 72% at 96% 102%,
-      rgb(var(--gs-support-rgb) / 0.05), rgb(var(--gs-support-rgb) / 0) 82%);
+      rgb(var(--gs-support-rgb) / 0.09), rgb(var(--gs-support-rgb) / 0) 82%);
   --gs-preview-backdrop-halo-image:
     radial-gradient(46% 40% at 7% 5%,
-      rgb(var(--gs-accent-rgb) / 0.10), rgb(var(--gs-accent-rgb) / 0) 76%),
+      rgb(var(--gs-accent-strong-rgb) / 0.10), rgb(var(--gs-accent-strong-rgb) / 0) 76%),
     radial-gradient(84% 72% at 96% 102%,
       rgb(var(--gs-support-rgb) / 0.10), rgb(var(--gs-support-rgb) / 0) 82%);
+  --gs-settings-dots: rgb(var(--gs-accent-rgb) / 0.045);
 
   /* Settings page surfaces */
-  --gs-settings-surface-page: #1B1920;
+  --gs-settings-surface-page: #1A1F1C;
   --gs-settings-surface-card: rgb(255 255 255 / 0.045);
   --gs-settings-surface-subtle: rgb(255 255 255 / 0.03);
-  --gs-settings-surface-input: #1E1C24;
-  --gs-settings-surface-elevated: #2E2B38;
+  --gs-settings-surface-input: #1D2320;
+  --gs-settings-surface-elevated: #2C3731;
 
   /* Settings page text */
-  --gs-settings-foreground: rgb(237 232 244 / 0.96);
-  --gs-settings-foreground-dim: rgb(184 175 199 / 0.92);
-  --gs-settings-foreground-muted: rgb(149 139 165);
+  --gs-settings-foreground: rgb(233 243 238 / 0.96);
+  --gs-settings-foreground-dim: rgb(178 196 186 / 0.92);
+  --gs-settings-foreground-muted: rgb(142 162 151);
 
   /* Settings page lines and depth */
-  --gs-settings-border: rgb(226 216 242 / 0.10);
-  --gs-settings-border-subtle: rgb(226 216 242 / 0.05);
-  --gs-settings-shadow-section: rgb(6 5 9 / 0.30);
+  --gs-settings-border: rgb(219 239 228 / 0.10);
+  --gs-settings-border-subtle: rgb(219 239 228 / 0.05);
+  --gs-settings-shadow-section: rgb(5 9 7 / 0.30);
 
   /* Settings page controls */
   --gs-settings-accent: var(--gs-accent);
   --gs-settings-accent-hover: rgb(var(--gs-accent-strong-rgb));
-  --gs-settings-accent-contrast: rgb(26 21 35);
+  --gs-settings-accent-contrast: rgb(23 33 28);
   --gs-settings-danger: rgb(var(--gs-danger-rgb));
-  --gs-settings-danger-contrast: rgb(26 21 35);
+  --gs-settings-danger-contrast: rgb(23 33 28);
   --gs-settings-ring: rgb(var(--gs-accent-rgb) / 0.55);
-  --gs-settings-rail: rgb(226 216 242 / 0.18);
+  --gs-settings-rail: rgb(219 239 228 / 0.18);
   --gs-settings-badge-surface: rgb(255 255 255 / 0.08);
-  --gs-settings-badge-foreground: rgb(237 232 244 / 0.70);
+  --gs-settings-badge-foreground: rgb(233 243 238 / 0.70);
   --gs-settings-link: rgb(var(--gs-support-text-rgb));
   --gs-settings-card-glow: 0 0 26px rgb(var(--gs-accent-rgb) / 0.05);
   --gs-settings-card-glow-hover: 0 0 30px rgb(var(--gs-accent-rgb) / 0.13);
-  --gs-settings-action-bar-surface: rgb(22 20 27 / 0.88);
-  --gs-settings-action-bar-border: rgb(226 216 242 / 0.14);
+  --gs-settings-action-bar-surface: rgb(21 26 23 / 0.88);
+  --gs-settings-action-bar-border: rgb(219 239 228 / 0.14);
   --gs-settings-action-bar-shadow:
-    0 -12px 28px rgb(6 5 9 / 0.36),
+    0 -12px 28px rgb(5 9 7 / 0.36),
     inset 0 1px 0 rgb(255 255 255 / 0.05);
-  --gs-settings-toggle-knob: rgb(26 21 35);
-  --gs-settings-checkmark: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%231a1523' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
-  --gs-settings-select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%23ede8f4' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
+  --gs-settings-toggle-knob: rgb(23 33 28);
+  --gs-settings-checkmark: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%2317211c' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+  --gs-settings-select-arrow: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='none' stroke='%23e9f3ee' stroke-opacity='0.4' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
 }
 
 :host([data-dp-theme="light"]),
@@ -637,6 +638,7 @@ textarea {
       rgb(var(--gs-accent-rgb) / 0.20), rgb(var(--gs-accent-rgb) / 0) 76%),
     radial-gradient(84% 72% at 96% 102%,
       rgb(var(--gs-support-rgb) / 0.20), rgb(var(--gs-support-rgb) / 0) 82%);
+  --gs-settings-dots: rgb(var(--gs-accent-rgb) / 0.045);
 
   /* Settings page surfaces */
   --gs-settings-surface-page: #f8f1e4;

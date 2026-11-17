@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
   <!-- Source for the browser icons. Regenerate with: npm run icons -->
-  <rect x="8" y="8" width="112" height="112" rx="27" fill="#1B1920"/>
-  <rect x="28" y="24" width="54" height="42" rx="9" fill="#A99EBF"/>
-  <rect x="37" y="43" width="76" height="60" rx="14" fill="#1B1920"/>
-  <rect x="43" y="49" width="64" height="48" rx="11" fill="#E8E2F1"/>
-  <path d="M43 63 V60 A11 11 0 0 1 54 49 H96 A11 11 0 0 1 107 60 V63 Z" fill="#E8A34C"/>
+  <rect x="8" y="8" width="112" height="112" rx="27" fill="#1A1F1C"/>
+  <rect x="28" y="24" width="54" height="42" rx="9" fill="#A2BBAD"/>
+  <rect x="37" y="43" width="76" height="60" rx="14" fill="#1A1F1C"/>
+  <rect x="43" y="49" width="64" height="48" rx="11" fill="#E4EFE9"/>
+  <path d="M43 63 V60 A11 11 0 0 1 54 49 H96 A11 11 0 0 1 107 60 V63 Z" fill="#E3AE51"/>
 </svg>

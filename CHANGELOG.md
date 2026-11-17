@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- theme: retint the dark palette from violet-grey to deep forest green
+- branding: recolor the logo icon from violet-grey to forest green
+- settings: weave a halftone dot grid into the page backdrop
+
 ## [0.3.0] - 2026-11-14
 
 ### Added
