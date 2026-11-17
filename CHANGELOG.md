@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- theme: retint the dark palette from violet-grey to deep forest green
+
 ## [0.3.0] - 2026-11-14
 
 ### Added
