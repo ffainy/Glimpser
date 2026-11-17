@@ -17,6 +17,9 @@
 
   "dropHintFullscreen":   { "message": "Release anywhere to open a preview" },
 
+  "dropHintOutside":      { "message": "Release to cancel" },
+  "dropHintInside":       { "message": "Release to open the preview" },
+
   "errorLoadFailed":      { "message": "Couldn't open this page in the preview. Try opening it in a new tab." },
   "warnInvalidUrl":       { "message": "This link can't be opened." },
   "warnBlockedUrl":       { "message": "Blocked unsafe link: " },
@@ -46,8 +49,8 @@
   "labelPreviewTrigger":  { "message": "Trigger mode" },
   "triggerRelease":       { "message": "Release anywhere" },
   "triggerDropArea":      { "message": "Drop area" },
-  "hintPreviewTriggerRelease": { "message": "After a deliberate drag, release anywhere on the page to open a preview without showing the fullscreen drop hint." },
-  "hintPreviewTriggerDropArea": { "message": "Show a fullscreen drop hint while dragging. Release anywhere on the page to open a preview." },
+  "hintPreviewTriggerRelease": { "message": "After a deliberate drag, the fullscreen drop hint appears. Release anywhere to open a preview." },
+  "hintPreviewTriggerDropArea": { "message": "A drop dock rises from the bottom of the screen while dragging. Release inside it to open a preview; releasing outside cancels." },
   "labelWindowDefaults":  { "message": "Preview windows" },
   "labelWindowWidth":     { "message": "Width" },
   "labelWindowHeight":    { "message": "Height" },

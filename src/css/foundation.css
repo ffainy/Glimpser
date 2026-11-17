@@ -310,6 +310,15 @@ textarea {
     0 8px 28px rgb(4 7 5 / 0.38),
     0 0 56px rgb(var(--gs-preview-support) / 0.30),
     inset 0 1px 0 rgb(255 255 255 / 0.24);
+  /* Preview drop dock (gatekeeper berth) */
+  --gs-preview-drop-dock-border: rgb(var(--gs-preview-accent) / 0.14);
+  --gs-preview-drop-dock-border-hover: rgb(var(--gs-preview-accent) / 0.55);
+  --gs-preview-drop-dock-border-success: rgb(var(--gs-preview-accent) / 0.8);
+  --gs-preview-drop-dock-ring-success: rgb(var(--gs-preview-accent) / 0.35);
+  --gs-preview-drop-dock-glow-accent: rgb(var(--gs-preview-accent) / 0.10);
+  --gs-preview-drop-dock-glow-support: rgb(var(--gs-preview-support) / 0.09);
+  --gs-preview-drop-dock-dots: rgb(var(--gs-preview-accent) / 0.10);
+  --gs-preview-drop-dock-title-hover: rgb(var(--gs-preview-accent-strong));
   /* Preview drop overlay surfaces — 「聚光」: transparent clearing center with
      corner halos painted ABOVE the clearing edge (whose rim alone is 0.90
      opaque and would otherwise bury them), then the flat dim base */
@@ -547,6 +556,15 @@ textarea {
     0 8px 24px rgb(82 61 38 / 0.20),
     0 0 30px rgb(var(--gs-preview-support) / 0.24),
     inset 0 1px 0 rgb(255 255 255 / 0.32);
+  /* Preview drop dock (gatekeeper berth) */
+  --gs-preview-drop-dock-border: rgb(var(--gs-preview-support) / 0.35);
+  --gs-preview-drop-dock-border-hover: rgb(var(--gs-preview-support) / 0.6);
+  --gs-preview-drop-dock-border-success: rgb(var(--gs-preview-support) / 0.8);
+  --gs-preview-drop-dock-ring-success: rgb(var(--gs-preview-support) / 0.3);
+  --gs-preview-drop-dock-glow-accent: rgb(var(--gs-preview-accent) / 0.14);
+  --gs-preview-drop-dock-glow-support: rgb(var(--gs-preview-support) / 0.10);
+  --gs-preview-drop-dock-dots: rgb(var(--gs-preview-support) / 0.14);
+  --gs-preview-drop-dock-title-hover: rgb(var(--gs-preview-accent-strong));
   /* Preview drop overlay surfaces — same structure as dark: transparent
      clearing center; contrast comes from the amber glass badge, corner halos
      painted above the clearing edge, then the flat dim base */

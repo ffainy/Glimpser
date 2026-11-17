@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - settings: default the preview trigger mode to the drop area
+- preview: rework the drop-area trigger into a gatekeeper dock
+- preview: dress the release-anywhere drop with the fullscreen hint
 
 ## [0.3.0] - 2026-11-14
 

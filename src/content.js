@@ -48,6 +48,8 @@ const FRAME_DRAG_END_MESSAGE = 'gs:frame-drag-end'
 const FRAME_FOCUS_MESSAGE = 'gs:frame-focus'
 const FRAME_ESCAPE_MESSAGE = 'gs:frame-escape'
 const DROP_AREA_SHOW_DELAY_MS = 100
+const DROP_DOCK_SUCCESS_DELAY_MS = 500
+const DROP_DOCK_RESET_DELAY_MS = 400
 const PREVIEW_RELEASE_ARM_DELAY_MS = 180
 const PREVIEW_RELEASE_MIN_DISTANCE_PX = 18
 
@@ -1480,7 +1482,10 @@ function _maybeActivateDirectReleaseLayer(event) {
   _updateLinkDragPoint(event)
   const isReady = _isLinkReleaseIntentReady()
   if (isReady) {
-    _setDirectReleaseLayerActive(true)
+    // Release mode borrows the fullscreen overlay as its visual: the page dims
+    // and the landing hint appears once the drag intent is confirmed.
+    _ensureFullscreenOverlay()
+    _setFullscreenOverlayActive(true)
   }
   return isReady
 }
@@ -1556,7 +1561,8 @@ function _bindDirectReleaseDragEvents() {
 
   const onDragEnd = () => {
     setTimeout(() => {
-      _clearLinkDragState()
+      // Drop the fullscreen visual along with the drag state.
+      _hideFullscreenOverlay()
     }, DROP_AREA_SHOW_DELAY_MS)
   }
 
@@ -1621,7 +1627,19 @@ function _bindFrameDragBridge() {
     }
   }
 
+  const onDrop = () => {
+    // A drop inside the frame may navigate it and kill the dragend event,
+    // so announce the drag end from the drop itself. The top side treats
+    // repeated FRAME_DRAG_END messages idempotently.
+    try {
+      window.top.postMessage({ type: FRAME_DRAG_END_MESSAGE }, '*')
+    } catch (e) {
+      _dlog('frame drop bridge failed', e)
+    }
+  }
+
   document.addEventListener('dragstart', onDragStart)
+  document.addEventListener('drop', onDrop)
   document.addEventListener('dragend', onDragEnd)
   document.addEventListener('pointerdown', onPointerDown)
   document.addEventListener('keydown', onKeyDown, true)
@@ -1666,28 +1684,7 @@ function _ensureFullscreenOverlay() {
   return overlay
 }
 
-function _bindFullscreenDragEvents() {
-  const onDragStart = (event) => {
-    if (_isPreviewBlockedOnThisPage()) {
-      return
-    }
-    const url = detectDraggedLink(event)
-    if (!url) {
-      return
-    }
-    _startLinkDrag(url, event)
-    setTimeout(() => {
-      _ensureFullscreenOverlay()
-      _setFullscreenOverlayActive(true)
-    }, DROP_AREA_SHOW_DELAY_MS)
-  }
-
-  const onDragEnd = () => {
-    setTimeout(() => {
-      _hideFullscreenOverlay()
-    }, DROP_AREA_SHOW_DELAY_MS)
-  }
-
+function _bindOverlayInteraction() {
   const onOverlayDragOver = (event) => {
     if (_isPreviewBlockedOnThisPage()) {
       return
@@ -1721,16 +1718,186 @@ function _bindFullscreenDragEvents() {
   overlay.addEventListener('dragover', onOverlayDragOver)
   overlay.addEventListener('drop', onOverlayDrop)
 
-  document.addEventListener('dragstart', onDragStart)
-  document.addEventListener('dragend', onDragEnd)
   _dragHandlers.push(
-    { target: document, type: 'dragstart', fn: onDragStart },
-    { target: document, type: 'dragend', fn: onDragEnd },
     { target: overlay, type: 'dragover', fn: onOverlayDragOver },
     { target: overlay, type: 'drop', fn: onOverlayDrop }
   )
 }
 
+function _ensureDropDock() {
+  let dock = _shadowRoot.getElementById('gs-drop-dock')
+  if (dock) {
+    dock.setAttribute('data-dp-theme', _currentTheme)
+    return dock
+  }
+
+  dock = document.createElement('div')
+  dock.id = 'gs-drop-dock'
+  dock.setAttribute('data-dp-theme', _currentTheme)
+  dock.innerHTML = `
+    <div class="gs-drop-dock-board">
+      ${_buildDropHintInner({ iconClass: '', title: t('dropHintOutside'), kicker: 'Glimpser' })}
+    </div>
+  `
+  _shadowRoot.appendChild(dock)
+  return dock
+}
+
+function _setDropDockActive(isActive) {
+  const dock = _shadowRoot ? _shadowRoot.getElementById('gs-drop-dock') : null
+  if (isActive) {
+    if (!dock) {
+      return
+    }
+    dock.classList.remove('out')
+    dock.classList.add('active')
+    dock.setAttribute('data-dp-theme', _currentTheme)
+  } else if (dock) {
+    dock.classList.remove('active')
+    dock.classList.add('out')
+    dock.setAttribute('data-dp-theme', _currentTheme)
+    setTimeout(() => {
+      dock.classList.remove('out', 'hover', 'success')
+    }, DROP_DOCK_RESET_DELAY_MS)
+  }
+
+  document.body.classList.toggle('gs-drop-dock-active', isActive)
+}
+
+function _setDropDockHover(isHover) {
+  const dock = _shadowRoot ? _shadowRoot.getElementById('gs-drop-dock') : null
+  if (!dock || dock.classList.contains('success')) {
+    return
+  }
+
+  dock.classList.toggle('hover', isHover)
+  const title = dock.querySelector('.gs-drop-title')
+  if (title) {
+    title.textContent = isHover ? t('dropHintInside') : t('dropHintOutside')
+  }
+}
+
+function _isPointInDropDock(x, y) {
+  const dock = _shadowRoot ? _shadowRoot.getElementById('gs-drop-dock') : null
+  if (!dock) {
+    return false
+  }
+
+  const board = dock.querySelector('.gs-drop-dock-board')
+  if (!board) {
+    return false
+  }
+
+  const rect = board.getBoundingClientRect()
+  const pad = 8
+  return x >= rect.left - pad && x <= rect.right + pad && y >= rect.top - pad && y <= rect.bottom + pad
+}
+
+function _bindGatekeeperDragEvents() {
+  const onDragStart = (event) => {
+    if (_isPreviewBlockedOnThisPage()) {
+      return
+    }
+    const url = detectDraggedLink(event)
+    if (!url) {
+      return
+    }
+    _startLinkDrag(url, event)
+    setTimeout(() => {
+      if (state.draggedLink) {
+        _ensureDropDock()
+        _setDropDockActive(true)
+      }
+    }, DROP_AREA_SHOW_DELAY_MS)
+  }
+
+  const onDragOver = (event) => {
+    if (_isPreviewBlockedOnThisPage()) {
+      return
+    }
+    if (!state.draggedLink) {
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+
+    _updateLinkDragPoint(event)
+    const ready = _isLinkReleaseIntentReady()
+    _setDropDockHover(ready && _isPointInDropDock(event.clientX, event.clientY))
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = ready ? 'copy' : 'none'
+    }
+  }
+
+  const onDrop = (event) => {
+    if (_isPreviewBlockedOnThisPage()) {
+      _clearLinkDragState()
+      _setDropDockActive(false)
+      return
+    }
+    if (!state.draggedLink) {
+      return
+    }
+    if (!_isLinkReleaseIntentReady()) {
+      _clearLinkDragState()
+      _setDropDockActive(false)
+      _dlog('dock drop ignored before drag intent threshold')
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+
+    const url = state.draggedLink
+    if (!validateURL(url)) {
+      console.warn(t('warnInvalidUrl'))
+      _clearLinkDragState()
+      _setDropDockActive(false)
+      return
+    }
+
+    if (!_isPointInDropDock(event.clientX, event.clientY)) {
+      // Gatekeeper: releasing outside the berth cancels the gesture.
+      _clearLinkDragState()
+      _setDropDockActive(false)
+      _dlog('dock drop cancelled outside the berth')
+      return
+    }
+
+    const dock = _ensureDropDock()
+    dock.classList.add('success')
+    dock.classList.remove('hover')
+    const title = dock.querySelector('.gs-drop-title')
+    if (title) {
+      title.textContent = t('dropHintInside')
+    }
+
+    setTimeout(() => {
+      _setDropDockActive(false)
+    }, DROP_DOCK_SUCCESS_DELAY_MS)
+
+    _clearLinkDragState()
+    openPreview(url)
+  }
+
+  const onDragEnd = () => {
+    setTimeout(() => {
+      _setDropDockActive(false)
+    }, DROP_AREA_SHOW_DELAY_MS)
+  }
+
+  document.addEventListener('dragstart', onDragStart)
+  document.addEventListener('dragover', onDragOver)
+  document.addEventListener('drop', onDrop)
+  document.addEventListener('dragend', onDragEnd)
+  _dragHandlers.push(
+    { target: document, type: 'dragstart', fn: onDragStart },
+    { target: document, type: 'dragover', fn: onDragOver },
+    { target: document, type: 'drop', fn: onDrop },
+    { target: document, type: 'dragend', fn: onDragEnd }
+  )
+}
 function reinitDropZone() {
   _removeDragHandlers()
   _setFullscreenOverlayActive(false)
@@ -1745,6 +1912,13 @@ function reinitDropZone() {
     oldDirectReleaseLayer.remove()
   }
 
+  const oldDropDock = _shadowRoot.getElementById('gs-drop-dock')
+  if (oldDropDock) {
+    oldDropDock.remove()
+    // Keep the page blur from outliving the dock across a re-init.
+    document.body.classList.remove('gs-drop-dock-active')
+  }
+
   _clearLinkDragState()
 
   if (_isPreviewBlockedOnThisPage()) {
@@ -1753,10 +1927,11 @@ function reinitDropZone() {
 
   if (_resolvePreviewTriggerMode() === 'release') {
     _bindDirectReleaseDragEvents()
+    _bindOverlayInteraction()
     return
   }
 
-  _bindFullscreenDragEvents()
+  _bindGatekeeperDragEvents()
 }
 
 async function initGlimpser() {
@@ -1772,7 +1947,8 @@ async function initGlimpser() {
   const pageStyle = document.createElement('style')
   pageStyle.id = 'gs-page-style'
   pageStyle.textContent = `
-    body.gs-dropzone-fullscreen-active > *:not(#gs-host) {
+    body.gs-dropzone-fullscreen-active > *:not(#gs-host),
+    body.gs-drop-dock-active > *:not(#gs-host) {
       filter: blur(3px);
       transition: filter 0.2s ease;
     }
@@ -1837,21 +2013,23 @@ if (typeof exports === 'undefined') {
 
       _startLinkDrag(event.data.url, null, 'frame')
       setTimeout(() => {
-        _ensureFullscreenOverlay()
-        _setFullscreenOverlayActive(true)
+        _ensureDropDock()
+        _setDropDockActive(true)
       }, DROP_AREA_SHOW_DELAY_MS)
     }
 
     if (event.data?.type === FRAME_DRAG_END_MESSAGE) {
       if (_resolvePreviewTriggerMode() === 'release') {
+        // Hide the fullscreen overlay too: a frame-sourced drag never reaches
+        // the top document's dragend handler, so the overlay would stick.
         setTimeout(() => {
-          _clearLinkDragState()
+          _hideFullscreenOverlay()
         }, DROP_AREA_SHOW_DELAY_MS)
         return
       }
 
       setTimeout(() => {
-        _hideFullscreenOverlay()
+        _setDropDockActive(false)
         _clearLinkDragState()
       }, DROP_AREA_SHOW_DELAY_MS)
     }
