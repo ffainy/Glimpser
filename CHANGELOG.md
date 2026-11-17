@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - retint the dark theme to deep forest green (#6)
 
+### Changed
+- settings: default the preview trigger mode to the drop area
+
 ## [0.3.0] - 2026-11-14
 
 ### Added

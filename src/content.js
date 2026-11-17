@@ -3,7 +3,7 @@
 
 const DEFAULT_SETTINGS = {
   previewEnabled: true,
-  previewTriggerMode: 'release',
+  previewTriggerMode: 'drop-area',
   defaultWindowScale: { width: 75, height: 82 },
   maxPreviewWindows: 1,
   newWindowOffset: 24,
@@ -172,7 +172,7 @@ function _isPreviewBlockedOnThisPage(settings = _settings || DEFAULT_SETTINGS) {
 }
 
 function _resolvePreviewTriggerMode(settings = _settings || DEFAULT_SETTINGS) {
-  return settings?.previewTriggerMode === 'drop-area' ? 'drop-area' : 'release'
+  return settings?.previewTriggerMode === 'release' ? 'release' : 'drop-area'
 }
 
 function detectDraggedLink(event) {

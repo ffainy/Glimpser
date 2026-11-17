@@ -4,7 +4,7 @@ const DEFAULT_SETTINGS = {
   language: null,
   theme: null,
   previewEnabled: true,
-  previewTriggerMode: 'release',
+  previewTriggerMode: 'drop-area',
   defaultWindowScale: { width: 75, height: 82 },
   maxPreviewWindows: 1,
   newWindowOffset: 24,
@@ -418,14 +418,14 @@ function _renderPreviewTab() {
     let triggerHint = null
     const syncHint = () => {
       if (!triggerHint) return
-      const key = (_settings.previewTriggerMode || 'release') === 'release'
+      const key = (_settings.previewTriggerMode || 'drop-area') === 'release'
         ? 'hintPreviewTriggerRelease'
         : 'hintPreviewTriggerDropArea'
       triggerHint.textContent = _t(key)
     }
 
-    const triggerRow = _settingRow('labelPreviewTrigger', 'hintPreviewTriggerRelease', () =>
-      _makeToggle((_settings.previewTriggerMode || 'release') === 'drop-area', v => {
+    const triggerRow = _settingRow('labelPreviewTrigger', 'hintPreviewTriggerDropArea', () =>
+      _makeToggle((_settings.previewTriggerMode || 'drop-area') === 'drop-area', v => {
         _settings.previewTriggerMode = v ? 'drop-area' : 'release'
         syncHint()
       })
